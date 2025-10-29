@@ -10,6 +10,8 @@
 #include <array>
 #include <string>
 
+#include "ParticleContainer.h"
+
 class Particle {
  private:
   /**
@@ -57,11 +59,19 @@ class Particle {
 
   const std::array<double, 3> &getX() const;
 
+  void setX(std::array<double, 3>);
+
   const std::array<double, 3> &getV() const;
+
+  void setV(std::array<double, 3>);
 
   const std::array<double, 3> &getF() const;
 
+  void setF(std::array<double, 3>);
+
   const std::array<double, 3> &getOldF() const;
+
+  void setOldF(std::array<double, 3>);
 
   double getM() const;
 

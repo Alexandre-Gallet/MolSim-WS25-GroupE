@@ -29,13 +29,8 @@ Particle::Particle(const Particle &other) {
 }
 
 // Todo: maybe use initializater list instead of copy?
-Particle::Particle(std::array<double, 3> x_arg, std::array<double, 3> v_arg, double m_arg, int type_arg) {
-  x = x_arg;
-  v = v_arg;
-  m = m_arg;
-  type = type_arg;
-  f = {0., 0., 0.};
-  old_f = {0., 0., 0.};
+Particle::Particle(std::array<double, 3> x_arg, std::array<double, 3> v_arg, double m_arg, int type_arg)
+  : x(x_arg), v(v_arg), f({0., 0., 0.}), old_f({0., 0., 0.}), m(m_arg), type(type_arg) {
   std::cout << "Particle generated!" << std::endl;
 }
 
@@ -43,11 +38,19 @@ Particle::~Particle() { std::cout << "Particle destructed!" << std::endl; }
 
 const std::array<double, 3> &Particle::getX() const { return x; }
 
+void Particle::setX(const std::array<double, 3> newX) { x = newX; }
+
 const std::array<double, 3> &Particle::getV() const { return v; }
+
+void Particle::setV(const std::array<double, 3> newV) { v = newV; }
 
 const std::array<double, 3> &Particle::getF() const { return f; }
 
+void Particle::setF(const std::array<double, 3> newF) { f = newF; }
+
 const std::array<double, 3> &Particle::getOldF() const { return old_f; }
+
+void Particle::setOldF(const std::array<double, 3> oldF) { old_f = oldF; }
 
 double Particle::getM() const { return m; }
 
