@@ -1,5 +1,5 @@
 # Molecular Dynamcis Simulator GroupE 
-Implementation of a MD simulator following the labcourse Scientific Computing (PSE) Molekulardynamik (IN0012, IN4229) at Technisce Universtität München during the Wintersemester 2025/2026
+Implementation of a MD simulator following the labcourse Scientific Computing (PSE) Molekulardynamik (IN0012, IN4229) at Technische Universtität München during the Wintersemester 2025/2026
 
 ## Table of Contents
 - [Building the Project](#building the project)
@@ -9,8 +9,8 @@ Implementation of a MD simulator following the labcourse Scientific Computing (P
 
 1: Clone the repository:
 ```bash
-git clone https://github.com/yourusername/yourproject.git
-cd yourproject
+git clone https://github.com/Alexandre-Gallet/MolSim-WS25-GroupE.git
+cd MolSim-WS25-GroupE
 ```
 
 2: Install dependencies:
@@ -34,7 +34,7 @@ sudo dnf install vtk-devel cmake gcc-c++ make
 ```bash
 mkdir -p build
 cd build
-cmake ..
+ccmake ..
 make -j$(nproc)
 ```
 ## Usage
