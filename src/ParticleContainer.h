@@ -66,6 +66,7 @@ class ParticleContainer {
 
   /**
    * @brief Preallocates memory for a given number of particles.
+   * This can improve performance by avoiding reallocations during insertion.
    * @param capacity The number of particles to reserve space for.
    */
   void reserve(std::size_t capacity);

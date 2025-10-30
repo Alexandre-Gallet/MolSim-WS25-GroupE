@@ -81,7 +81,6 @@ class Particle {
 
   /**
    * @brief Set the position of the particle
-   * @param x New position vector
    */
   void setX(const std::array<double, 3> &);
 
@@ -93,7 +92,6 @@ class Particle {
 
   /**
    * @brief Set the velocity of the particle
-   * @param v New velocity vector
    */
   void setV(const std::array<double, 3> &);
 
@@ -105,7 +103,6 @@ class Particle {
 
   /**
    * @brief Set the current force acting on the particle
-   * @param f New force vector
    */
   void setF(const std::array<double, 3> &);
 
@@ -117,7 +114,6 @@ class Particle {
 
   /**
    * @brief Set the old force that was acting on the particle
-   * @param old_f Old force vector
    */
   void setOldF(const std::array<double, 3> &);
 

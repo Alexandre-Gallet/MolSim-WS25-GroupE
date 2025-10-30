@@ -35,18 +35,31 @@ Particle::~Particle() { std::cout << "Particle destructed!" << std::endl; }
 
 const std::array<double, 3> &Particle::getX() const { return x; }
 
+/**
+ * @param newX New position vector
+ */
 void Particle::setX(const std::array<double, 3> &newX) { x = newX; }
 
 const std::array<double, 3> &Particle::getV() const { return v; }
 
+/**
+ * @brief Set the velocity of the particle
+ * @param newV New velocity vector
+ */
 void Particle::setV(const std::array<double, 3> &newV) { v = newV; }
 
 const std::array<double, 3> &Particle::getF() const { return f; }
 
+/**
+ * @param newF New force vector
+ */
 void Particle::setF(const std::array<double, 3> &newF) { f = newF; }
 
 const std::array<double, 3> &Particle::getOldF() const { return old_f; }
 
+/**
+   * @param oldF Old force vector
+   */
 void Particle::setOldF(const std::array<double, 3> &oldF) { old_f = oldF; }
 
 double Particle::getM() const { return m; }
