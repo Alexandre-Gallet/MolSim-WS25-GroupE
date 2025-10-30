@@ -1,39 +1,72 @@
-//
-// Created by darig on 10/28/2025.
-//
+/**
+ * @file ParticleContainer.h
+ * @brief Light-weight container wrapper around a particle storage.
+ */
 
-#ifndef MOLSIM_GROUPE_PARTICLECONTAINER_H
-#define MOLSIM_GROUPE_PARTICLECONTAINER_H
 #pragma once
-#include <array>
-#include <string>
+
+#include <cstddef>
+#include <utility>
 #include <vector>
-#include <iterator>
 
 #include "Particle.h"
-/*
+
+/**
+ * Encapsulates particle storage and provides convenient iteration utilities.
+ *
+ * A simple wrapper over `std::vector<Particle>` that keeps particle management
+ * responsibilities in a single location. It offers both range-based iteration
+ * and helper methods for iterating unique particle pairs.
+ */
 class ParticleContainer {
-  using Container = std::vector<Particle>;
-public:
+ public:
+  using storage_type = std::vector<Particle>;
+  using iterator = storage_type::iterator;
+  using const_iterator = storage_type::const_iterator;
+
   ParticleContainer() = default;
+  explicit ParticleContainer(std::size_t reserve);
 
-  void addParticle(const Particle &p);
+  [[nodiscard]] std::size_t size() const noexcept;
+  [[nodiscard]] bool empty() const noexcept;
 
-  const std::size_t size() const;
+  void reserve(std::size_t capacity);
+  void clear() noexcept;
 
-  const std::vector<Particle> &getParticles() const;
+  Particle &addParticle(const Particle &particle);
+  Particle &addParticle(Particle &&particle);
 
-  Container::iterator begin();
-
-  Container::iterator begin() const;
-
-  Container::iterator end();
-
-  Container::iterator end() const;
-  class PairIterator {
-
+  template <typename... Args>
+  Particle &emplaceParticle(Args &&...args) {
+    particles_.emplace_back(std::forward<Args>(args)...);
+    return particles_.back();
   }
-};
-*/
 
-#endif  // MOLSIM_GROUPE_PARTICLECONTAINER_H
+  iterator begin() noexcept;
+  iterator end() noexcept;
+  const_iterator begin() const noexcept;
+  const_iterator end() const noexcept;
+  const_iterator cbegin() const noexcept;
+  const_iterator cend() const noexcept;
+
+  template <typename Func>
+  void forEachPair(Func &&visitor) {
+    for (std::size_t i = 0; i < particles_.size(); ++i) {
+      for (std::size_t j = i + 1; j < particles_.size(); ++j) {
+        visitor(particles_[i], particles_[j]);
+      }
+    }
+  }
+
+  template <typename Func>
+  void forEachPair(Func &&visitor) const {
+    for (std::size_t i = 0; i < particles_.size(); ++i) {
+      for (std::size_t j = i + 1; j < particles_.size(); ++j) {
+        visitor(particles_[i], particles_[j]);
+      }
+    }
+  }
+
+ private:
+  storage_type particles_;
+};
