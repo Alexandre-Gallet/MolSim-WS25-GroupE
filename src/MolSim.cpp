@@ -41,7 +41,7 @@ std::list<Particle> particles;
 int main(int argc, char *argsv[]) {
   std::cout << "Hello from MolSim for PSE!" << std::endl;
   // parse input arguments
-  if (argc != 4) {
+  if (argc != 4) { // to avoid incomplete programm calls
     std::cout << "Erroneous programme call! " << std::endl;
     std::cout << "./molsym filename" << std::endl;
   }
@@ -79,9 +79,9 @@ int main(int argc, char *argsv[]) {
 }
 
 void calculateF() {
-  // calculate the forces using the methods in the ArrayUtils class
 
   for (auto &p : particles) {
+    // initialize to 0 so the simulation runs as expected
     p.setOldF(p.getF());
     p.setF({0., 0., 0.});
   }
@@ -89,7 +89,7 @@ void calculateF() {
 
     for (auto &p2 : particles) {
       // @TODO: insert calculation of forces here!
-      if (!(p1 == p2)) {
+      if (!(p1 == p2)) { // calculate the forces according to the given formula in the lecture
         double norm = std::pow(ArrayUtils::L2Norm(ArrayUtils::elementWisePairOp(p1.getX(), p2.getX(), std::minus<>())), 3);
         double scalar = p1.getM() * p2.getM() / norm;
         std::array<double, 3> newF = ArrayUtils::elementWiseScalarOp(

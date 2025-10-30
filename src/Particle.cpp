@@ -36,6 +36,7 @@ Particle::Particle(std::array<double, 3> x_arg, std::array<double, 3> v_arg, dou
 
 Particle::~Particle() { std::cout << "Particle destructed!" << std::endl; }
 
+// implemented standard setters
 const std::array<double, 3> &Particle::getX() const { return x; }
 
 void Particle::setX(const std::array<double, 3> newX) { x = newX; }
