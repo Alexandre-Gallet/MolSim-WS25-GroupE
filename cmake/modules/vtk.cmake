@@ -1,4 +1,5 @@
 option(ENABLE_VTK_OUTPUT "Enable VTK output" ON)
+#option(ENABLE_VTK_BINARY_OUTPUT "Enable binary VTK output" ON)
 
 if(ENABLE_VTK_OUTPUT)
     message(STATUS "VTK output enabled")
