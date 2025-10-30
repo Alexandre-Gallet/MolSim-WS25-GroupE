@@ -1,9 +1,12 @@
 
+// #include <bits/valarray_after.h>
+#include <valarray>
 #include <iostream>
 #include <list>
-
+#include <filesystem>
 #include "FileReader.h"
 #include "outputWriter/XYZWriter.h"
+#include "outputWriter/VTKWriter.h"
 #include "utils/ArrayUtils.h"
 
 /**** forward declaration of the calculation functions ****/
@@ -29,18 +32,22 @@ void calculateV();
 void plotParticles(int iteration);
 
 constexpr double start_time = 0;
-constexpr double end_time = 1000;
-constexpr double delta_t = 0.014;
+double end_time = 1000;
+double delta_t = 0.014;
 
 // TODO: what data structure to pick?
 std::list<Particle> particles;
 
 int main(int argc, char *argsv[]) {
   std::cout << "Hello from MolSim for PSE!" << std::endl;
-  if (argc != 2) {
+  // parse input arguments
+  if (argc != 4) { // to avoid incomplete programm calls
     std::cout << "Erroneous programme call! " << std::endl;
     std::cout << "./molsym filename" << std::endl;
   }
+
+  end_time = std::stod(argsv[2]);
+  delta_t = std::stod(argsv[3]);
 
   FileReader fileReader;
   fileReader.readFile(particles, argsv[1]);
@@ -72,31 +79,55 @@ int main(int argc, char *argsv[]) {
 }
 
 void calculateF() {
-  std::list<Particle>::iterator iterator;
-  iterator = particles.begin();
 
+  for (auto &p : particles) {
+    // initialize to 0 so the simulation runs as expected
+    p.setOldF(p.getF());
+    p.setF({0., 0., 0.});
+  }
   for (auto &p1 : particles) {
+
     for (auto &p2 : particles) {
       // @TODO: insert calculation of forces here!
+      if (!(p1 == p2)) { // calculate the forces according to the given formula in the lecture
+        double norm = std::pow(ArrayUtils::L2Norm(ArrayUtils::elementWisePairOp(p1.getX(), p2.getX(), std::minus<>())), 3);
+        double scalar = p1.getM() * p2.getM() / norm;
+        std::array<double, 3> newF = ArrayUtils::elementWiseScalarOp(
+          scalar,
+          ArrayUtils::elementWisePairOp(p2.getX(), p1.getX(), std::minus<>()),
+          std::multiplies<>());
+        p1.setF(ArrayUtils::elementWisePairOp(p1.getF(),newF,  std::plus<>()));
+        //p2.setF(ArrayUtils::elementWisePairOp(p2.getF(),newF,  std::minus<>()));
+      }
     }
   }
 }
 
 void calculateX() {
+  // calculate the position updates using the methods in the ArrayUtils class
+
   for (auto &p : particles) {
-    // @TODO: insert calculation of position updates here!
+    p.setX(ArrayUtils::elementWisePairOp(p.getX(), ArrayUtils::elementWisePairOp(ArrayUtils::elementWiseScalarOp(delta_t, p.getV(), std::multiplies<>()),
+      ArrayUtils::elementWiseScalarOp(pow(delta_t, 2) / (2 * p.getM()), p.getF(), std::multiplies<>()), std::plus<>()), std::plus<>() ));
   }
 }
 
 void calculateV() {
+  // calculate the forces using the methods in the ArrayUtils class
+
   for (auto &p : particles) {
-    // @TODO: insert calculation of veclocity updates here!
+    p.setV(ArrayUtils::elementWisePairOp(p.getV(), ArrayUtils::elementWiseScalarOp(delta_t / (2 * p.getM()), ArrayUtils::elementWisePairOp(p.getOldF(), p.getF(), std::plus<>()), std::multiplies<>()), std::plus<>()));
   }
 }
-
+// write the output into a separate directory
 void plotParticles(int iteration) {
-  std::string out_name("MD_vtk");
+  std::filesystem::create_directories("output");
+  std::string out_name("output/MD_vtk");
+  //outputWriter::XYZWriter xyz_writer;
 
-  outputWriter::XYZWriter writer;
-  writer.plotParticles(particles, out_name, iteration);
+// use macros to make vtk output optional and avoid build errors
+#ifdef ENABLE_VTK_OUTPUT
+  outputWriter::VTKWriter vtk_writer;
+  vtk_writer.plotParticles(particles, out_name, iteration);
+#endif
 }

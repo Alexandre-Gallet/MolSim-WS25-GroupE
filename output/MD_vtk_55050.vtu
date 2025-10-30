@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
+  <UnstructuredGrid>
+    <Piece NumberOfPoints="4" NumberOfCells="0">
+      <PointData>
+        <DataArray type="Float32" Name="mass" format="ascii" RangeMin="9.9999998245167e-15" RangeMax="1">
+          1 0.000003000000106112566 0.0009549999958835542 9.9999998245167e-15
+        </DataArray>
+        <DataArray type="Float32" Name="velocity" NumberOfComponents="3" format="ascii" RangeMin="0.0007750697339130776" RangeMax="1.005293505167124">
+          -0.0007149191224016249 0.00029937224462628365 0 0.6251883506774902 0.7872449159622192 0
+          0.3185011148452759 -0.31595179438591003 0 0.18167555332183838 0.011924432590603828 0
+          <InformationKey name="L2_NORM_RANGE" location="vtkDataArray" length="2">
+            <Value index="0">
+              0.00077506973391
+            </Value>
+            <Value index="1">
+              1.0052935052
+            </Value>
+          </InformationKey>
+        </DataArray>
+        <DataArray type="Float32" Name="force" NumberOfComponents="3" format="ascii" RangeMin="2.116680112226524e-17" RangeMax="0.000037139053301498074">
+          -0.000024384746211580932 -0.00002766052057268098 0 -0.000002365962927797227 0.0000018979735614266247 0
+          0.000026750709366751835 0.000025762547011254355 0 -2.0766526442460145e-17 4.096931688975621e-18 0
+          <InformationKey name="L2_NORM_RANGE" location="vtkDataArray" length="2">
+            <Value index="0">
+              2.1166801122e-17
+            </Value>
+            <Value index="1">
+              3.7139053301e-05
+            </Value>
+          </InformationKey>
+        </DataArray>
+        <DataArray type="Int32" Name="type" format="ascii" RangeMin="0" RangeMax="0">
+          0 0 0 0
+        </DataArray>
+      </PointData>
+      <CellData>
+      </CellData>
+      <Points>
+        <DataArray type="Float32" Name="Points" NumberOfComponents="3" format="ascii" RangeMin="0.3114512166168425" RangeMax="21.436396733995387">
+          -0.31133589148521423 0.008474845439195633 0 0.4644034504890442 -0.6138635277748108 0
+          -3.963843584060669 -3.5091137886047363 0 21.020395278930664 -4.2026286125183105 0
+          <InformationKey name="L2_NORM_RANGE" location="vtkDataArray" length="2">
+            <Value index="0">
+              0.31145121662
+            </Value>
+            <Value index="1">
+              21.436396734
+            </Value>
+          </InformationKey>
+        </DataArray>
+      </Points>
+      <Cells>
+        <DataArray type="Int64" Name="connectivity" format="ascii" RangeMin="1e+299" RangeMax="-1e+299">
+        </DataArray>
+        <DataArray type="Int64" Name="offsets" format="ascii" RangeMin="1e+299" RangeMax="-1e+299">
+        </DataArray>
+        <DataArray type="UInt8" Name="types" format="ascii" RangeMin="1e+299" RangeMax="-1e+299">
+        </DataArray>
+      </Cells>
+    </Piece>
+  </UnstructuredGrid>
+</VTKFile>
