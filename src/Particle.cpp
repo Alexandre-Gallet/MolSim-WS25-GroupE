@@ -11,7 +11,7 @@
 
 #include "utils/ArrayUtils.h"
 
-Particle::Particle(int type_arg) {
+Particle::Particle(int type_arg) : x(), v(), m(0) {
   type = type_arg;
   std::cout << "Particle generated!" << std::endl;
   f = {0., 0., 0.};
@@ -29,8 +29,8 @@ Particle::Particle(const Particle &other) {
 }
 
 // Initialize particle using initializer list
-Particle::Particle(std::array<double, 3> x_arg, std::array<double, 3> v_arg, double m_arg, int type_arg)
-  : x(x_arg), v(v_arg), f({0., 0., 0.}), old_f({0., 0., 0.}), m(m_arg), type(type_arg) {
+Particle::Particle(const std::array<double, 3> &x_arg, const std::array<double, 3> &v_arg, const double m_arg, int type)
+  : x(x_arg), v(v_arg), f({0., 0., 0.}), old_f({0., 0., 0.}), m(m_arg), type(type) {
   std::cout << "Particle generated!" << std::endl;
 }
 
@@ -39,19 +39,19 @@ Particle::~Particle() { std::cout << "Particle destructed!" << std::endl; }
 // implemented standard setters
 const std::array<double, 3> &Particle::getX() const { return x; }
 
-void Particle::setX(const std::array<double, 3> newX) { x = newX; }
+void Particle::setX(const std::array<double, 3> &newX) { x = newX; }
 
 const std::array<double, 3> &Particle::getV() const { return v; }
 
-void Particle::setV(const std::array<double, 3> newV) { v = newV; }
+void Particle::setV(const std::array<double, 3> &newV) { v = newV; }
 
 const std::array<double, 3> &Particle::getF() const { return f; }
 
-void Particle::setF(const std::array<double, 3> newF) { f = newF; }
+void Particle::setF(const std::array<double, 3> &newF) { f = newF; }
 
 const std::array<double, 3> &Particle::getOldF() const { return old_f; }
 
-void Particle::setOldF(const std::array<double, 3> oldF) { old_f = oldF; }
+void Particle::setOldF(const std::array<double, 3> &oldF) { old_f = oldF; }
 
 double Particle::getM() const { return m; }
 
@@ -63,12 +63,12 @@ std::string Particle::toString() const {
   return stream.str();
 }
 
-bool Particle::operator==(Particle &other) {
+bool Particle::operator==(const Particle &other) const {
   return (x == other.x) and (v == other.v) and (f == other.f) and (type == other.type) and (m == other.m) and
          (old_f == other.old_f);
 }
 
-std::ostream &operator<<(std::ostream &stream, Particle &p) {
+std::ostream &operator<<(std::ostream &stream, const Particle &p) {
   stream << p.toString();
   return stream;
 }

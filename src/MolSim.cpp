@@ -6,7 +6,9 @@
 #include <filesystem>
 #include "FileReader.h"
 #include "outputWriter/XYZWriter.h"
+#ifdef ENABLE_VTK_OUTPUT
 #include "outputWriter/VTKWriter.h"
+#endif
 #include "utils/ArrayUtils.h"
 
 /**** forward declaration of the calculation functions ****/
@@ -129,5 +131,8 @@ void plotParticles(int iteration) {
 #ifdef ENABLE_VTK_OUTPUT
   outputWriter::VTKWriter vtk_writer;
   vtk_writer.plotParticles(particles, out_name, iteration);
+#else
+  outputWriter::XYZWriter xyz_writer;
+  xyz_writer.plotParticles(particles, out_name, iteration);
 #endif
 }

@@ -17,27 +17,27 @@ class Particle {
   /**
    * Position of the particle
    */
-  std::array<double, 3> x;
+  std::array<double, 3> x{};
 
   /**
    * Velocity of the particle
    */
-  std::array<double, 3> v;
+  std::array<double, 3> v{};
 
   /**
    * Force effective on this particle
    */
-  std::array<double, 3> f;
+  std::array<double, 3> f{};
 
   /**
    * Force which was effective on this particle
    */
-  std::array<double, 3> old_f;
+  std::array<double, 3> old_f{};
 
   /**
    * Mass of this particle
    */
-  double m;
+  double m{};
 
   /**
    * Type of the particle. Use it for whatever you want (e.g. to separate
@@ -53,33 +53,33 @@ class Particle {
   Particle(
       // for visualization, we need always 3 coordinates
       // -> in case of 2d, we use only the first and the second
-      std::array<double, 3> x_arg, std::array<double, 3> v_arg, double m_arg, int type = 0);
+      const std::array<double, 3> &x_arg, const std::array<double, 3> &v_arg, double m_arg, int type = 0);
 
   virtual ~Particle();
 
   const std::array<double, 3> &getX() const;
 
-  void setX(std::array<double, 3>);
+  void setX(const std::array<double, 3> &);
 
   const std::array<double, 3> &getV() const;
 
-  void setV(std::array<double, 3>);
+  void setV(const std::array<double, 3> &);
 
   const std::array<double, 3> &getF() const;
 
-  void setF(std::array<double, 3>);
+  void setF(const std::array<double, 3> &);
 
   const std::array<double, 3> &getOldF() const;
 
-  void setOldF(std::array<double, 3>);
+  void setOldF(const std::array<double, 3> &);
 
   double getM() const;
 
   int getType() const;
 
-  bool operator==(Particle &other);
+  bool operator==(const Particle &other) const;
 
   std::string toString() const;
 };
 
-std::ostream &operator<<(std::ostream &stream, Particle &p);
+std::ostream &operator<<(std::ostream &stream, const Particle &p);
