@@ -44,6 +44,12 @@ class Particle {
   int type;
 
  public:
+  // --- Setters ---
+  void setX(const std::array<double,3> &x_new);
+  void setV(const std::array<double,3> &v_new);
+  void setF(const std::array<double,3> &f_new);
+  void setOldF(const std::array<double,3> &fold_new);
+
   explicit Particle(int type = 0);
 
   Particle(const Particle &other);

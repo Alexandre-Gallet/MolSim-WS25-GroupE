@@ -1,4 +1,4 @@
-option(ENABLE_VTK_OUTPUT "Enable VTK output" OFF)
+option(ENABLE_VTK_OUTPUT "Enable VTK output" ON)
 
 if(ENABLE_VTK_OUTPUT)
     message(STATUS "VTK output enabled")
@@ -25,4 +25,5 @@ if(ENABLE_VTK_OUTPUT)
             PRIVATE
             ${VTK_LIBRARIES}
     )
+    target_compile_definitions(MolSim PRIVATE ENABLE_VTK_OUTPUT)
 endif()
