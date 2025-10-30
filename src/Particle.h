@@ -10,7 +10,6 @@
 #include <array>
 #include <string>
 
-#include "ParticleContainer.h"
 
 class Particle {
  private:
