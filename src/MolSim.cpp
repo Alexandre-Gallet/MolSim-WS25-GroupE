@@ -1,3 +1,7 @@
+/**
+ * @file MolSim.cpp
+ * @brief Main entry point for the Molecular Dynamics simulation
+ */
 
 // #include <bits/valarray_after.h>
 #include <filesystem>
@@ -15,32 +19,42 @@
 /**** forward declaration of the calculation functions ****/
 
 /**
- * calculate the force for all particles
+ * @brief Calculate the force for all particles
  */
 void calculateF();
 
 /**
- * calculate the position for all particles
+ * @brief Calculate the position for all particles
  */
 void calculateX();
 
 /**
- * calculate the position for all particles
+ * @brief Calculate the velocity for all particles
  */
 void calculateV();
 
 /**
- * plot the particles to a xyz-file
+ * @brief Plot the particles to an output file
+ * @param iteration Current iteration number used for output filename
  */
 void plotParticles(int iteration);
 
+/// Start time of the simulation
 constexpr double start_time = 0;
+
+/// End time of the simulation
 double end_time = 1000;
+
+/// Time step size for integration
 double delta_t = 0.014;
 
 // TODO: what data structure to pick?
+/// Container holding all particles in the simulation
 std::list<Particle> particles;
 
+/**
+ * @brief Print usage information to stderr
+ */
 void printUsage() {
   std::cerr << "Usage: ./MolSim <input-file> <t_end> <delta_t>\n"
             << "Example: ./MolSim <input-file> eingabe-sonne.txt 1000 0.014 VTK\n"
@@ -49,6 +63,12 @@ void printUsage() {
             << "  <delta_t>      : time step (e.g. 0.014)\n";
 }
 
+/**
+ * @brief Main entry point of the molecular dynamics simulation
+ * @param argc Number of command line arguments
+ * @param argsv Array of command line argument strings
+ * @return EXIT_SUCCESS (0) on successful completion, -1 on error
+ */
 int main(int argc, char *argsv[]) {
   std::cout << "Hello from MolSim for PSE!" << std::endl;
   // parse input arguments
@@ -150,7 +170,11 @@ void calculateV() {
         std::plus<>()));
   }
 }
-// write the output into a separate directory
+
+/**
+ * @brief Write the particles output to a file
+ * @param iteration Current iteration number used for output filename
+ */
 void plotParticles(int iteration) {
   std::filesystem::create_directories("output");
   std::string out_name("output/MD_vtk");

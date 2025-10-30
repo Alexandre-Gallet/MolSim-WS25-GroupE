@@ -2,11 +2,6 @@
 
 #include <utility>
 
-/**
- * @brief Construct a ParticleContainer with reserved capacity.
- *
- * @param reserve Number of particles to reserve space for (optional performance optimization).
- */
 ParticleContainer::ParticleContainer(std::size_t reserve) {
   particles_.reserve(reserve);
 }
@@ -29,12 +24,6 @@ bool ParticleContainer::empty() const noexcept {
   return particles_.empty();
 }
 
-/**
- * @brief Reserve memory for a given number of particles.
- *
- * This can improve performance by avoiding reallocations during insertion.
- * @param capacity Desired capacity to reserve.
- */
 void ParticleContainer::reserve(std::size_t capacity) {
   particles_.reserve(capacity);
 }
@@ -46,24 +35,11 @@ void ParticleContainer::clear() noexcept {
   particles_.clear();
 }
 
-/**
- * @brief Add a new particle by copying.
- *
- * @param particle Particle to copy into the container.
- * @return Reference to the newly added particle.
- */
 Particle &ParticleContainer::addParticle(const Particle &particle) {
   particles_.push_back(particle);
   return particles_.back();
 }
 
-/**
- * @brief Add a new particle by moving.
- *
- * This uses the move constructor to avoid unnecessary copying.
- * @param particle Particle to move into the container.
- * @return Reference to the newly added particle.
- */
 Particle &ParticleContainer::addParticle(Particle &&particle) {
   particles_.push_back(std::move(particle));
   return particles_.back();

@@ -1,8 +1,6 @@
-/*
- * Particle.h
- *
- *  Created on: 23.02.2010
- *      Author: eckhardw
+/**
+ * @file Particle.h
+ * @brief Particle class representing a single particle in the molecular dynamics simulation
  */
 
 #pragma once
@@ -10,75 +8,145 @@
 #include <array>
 #include <string>
 
-
+/**
+ * @brief Class representing a particle in the molecular dynamics simulation
+ */
 class Particle {
  private:
   /**
-   * Position of the particle
+   * @brief Position of the particle
    */
   std::array<double, 3> x{};
 
   /**
-   * Velocity of the particle
+   * @brief Velocity of the particle
    */
   std::array<double, 3> v{};
 
   /**
-   * Force effective on this particle
+   * @brief Force effective on this particle
    */
   std::array<double, 3> f{};
 
   /**
-   * Force which was effective on this particle
+   * @brief Force which was effective on this particle
    */
   std::array<double, 3> old_f{};
 
   /**
-   * Mass of this particle
+   * @brief Mass of this particle
    */
   double m{};
 
   /**
-   * Type of the particle. Use it for whatever you want (e.g. to separate
-   * molecules belonging to different bodies, matters, and so on)
+   * @brief Type of the particle
    */
   int type;
 
  public:
+  /**
+   * @brief Construct a new Particle object with default type
+   * @param type Type identifier for the particle
+   */
   explicit Particle(int type = 0);
 
+  /**
+   * @brief Copy constructor
+   * @param other Particle to copy from
+   */
   Particle(const Particle &other);
 
+  /**
+   * @brief Construct a new Particle object with position, velocity, mass and type
+   * @param x_arg Initial position vector (3D coordinates)
+   * @param v_arg Initial velocity vector (3D coordinates)
+   * @param m_arg Mass of the particle
+   * @param type Type identifier for the particle
+   */
   Particle(
       // for visualization, we need always 3 coordinates
       // -> in case of 2d, we use only the first and the second
       const std::array<double, 3> &x_arg, const std::array<double, 3> &v_arg, double m_arg, int type = 0);
 
+  /**
+   * @brief Destroy the Particle object
+   */
   virtual ~Particle();
 
+  /**
+   * @brief Get the position of the particle
+   * @return Reference to the position array
+   */
   const std::array<double, 3> &getX() const;
 
+  /**
+   * @brief Set the position of the particle
+   */
   void setX(const std::array<double, 3> &);
 
+  /**
+   * @brief Get the velocity of the particle
+   * @return Reference to the velocity array
+   */
   const std::array<double, 3> &getV() const;
 
+  /**
+   * @brief Set the velocity of the particle
+   */
   void setV(const std::array<double, 3> &);
 
+  /**
+   * @brief Get the current force acting on the particle
+   * @return Reference to the force array
+   */
   const std::array<double, 3> &getF() const;
 
+  /**
+   * @brief Set the current force acting on the particle
+   */
   void setF(const std::array<double, 3> &);
 
+  /**
+   * @brief Get the old force that was acting on the particle
+   * @return Reference to the old force array
+   */
   const std::array<double, 3> &getOldF() const;
 
+  /**
+   * @brief Set the old force that was acting on the particle
+   */
   void setOldF(const std::array<double, 3> &);
 
+  /**
+   * @brief Get the mass of the particle
+   * @return Mass value
+   */
   double getM() const;
 
+  /**
+   * @brief Get the type of the particle
+   * @return Type identifier
+   */
   int getType() const;
 
+  /**
+   * @brief Equality comparison operator
+   * @param other Particle to compare with
+   * @return true if particles are equal, false otherwise
+   */
   bool operator==(const Particle &other) const;
 
+  /**
+   * @brief Convert particle data to string representation
+   * @return String containing particle information
+   */
   std::string toString() const;
 };
 
+/**
+ * @brief Output stream operator for Particle
+ * @param stream Output stream
+ * @param p Particle to output
+ * @return Reference to the output stream
+ */
 std::ostream &operator<<(std::ostream &stream, const Particle &p);
