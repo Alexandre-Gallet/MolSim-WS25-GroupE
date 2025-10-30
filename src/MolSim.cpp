@@ -40,6 +40,7 @@ std::list<Particle> particles;
 
 int main(int argc, char *argsv[]) {
   std::cout << "Hello from MolSim for PSE!" << std::endl;
+  // parse input arguments
   if (argc != 4) {
     std::cout << "Erroneous programme call! " << std::endl;
     std::cout << "./molsym filename" << std::endl;
@@ -78,8 +79,7 @@ int main(int argc, char *argsv[]) {
 }
 
 void calculateF() {
-  // std::list<Particle>::iterator iterator;
-  // iterator = particles.begin();
+  // calculate the forces using the methods in the ArrayUtils class
 
   for (auto &p : particles) {
     p.setOldF(p.getF());
@@ -104,27 +104,28 @@ void calculateF() {
 }
 
 void calculateX() {
-  for (auto &p : particles) {
-    // @TODO: insert calculation of position updates here!
+  // calculate the position updates using the methods in the ArrayUtils class
 
+  for (auto &p : particles) {
     p.setX(ArrayUtils::elementWisePairOp(p.getX(), ArrayUtils::elementWisePairOp(ArrayUtils::elementWiseScalarOp(delta_t, p.getV(), std::multiplies<>()),
       ArrayUtils::elementWiseScalarOp(pow(delta_t, 2) / (2 * p.getM()), p.getF(), std::multiplies<>()), std::plus<>()), std::plus<>() ));
   }
 }
 
 void calculateV() {
+  // calculate the forces using the methods in the ArrayUtils class
+
   for (auto &p : particles) {
-    // @TODO: insert calculation of veclocity updates here!
     p.setV(ArrayUtils::elementWisePairOp(p.getV(), ArrayUtils::elementWiseScalarOp(delta_t / (2 * p.getM()), ArrayUtils::elementWisePairOp(p.getOldF(), p.getF(), std::plus<>()), std::multiplies<>()), std::plus<>()));
   }
 }
-
+// write the output into a separate directory
 void plotParticles(int iteration) {
   std::filesystem::create_directories("output");
   std::string out_name("output/MD_vtk");
   //outputWriter::XYZWriter xyz_writer;
 
-
+// use macros to make vtk output optional and avoid build errors
 #ifdef ENABLE_VTK_OUTPUT
   outputWriter::VTKWriter vtk_writer;
   vtk_writer.plotParticles(particles, out_name, iteration);

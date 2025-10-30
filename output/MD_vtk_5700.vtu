@@ -6,27 +6,27 @@
         <DataArray type="Float32" Name="mass" format="ascii" RangeMin="9.9999998245167e-15" RangeMax="1">
           1 0.000003000000106112566 0.0009549999958835542 9.9999998245167e-15
         </DataArray>
-        <DataArray type="Float32" Name="velocity" NumberOfComponents="3" format="ascii" RangeMin="0.0005848203144176327" RangeMax="1.053216727672707">
-          -0.00040886769420467317 -0.0004181411350145936 0 -0.019748447462916374 -1.05303156375885 0
-          0.00005437954678200185 0.44115206599235535 0 0.15456834435462952 0.00808368343859911 0
+        <DataArray type="Float32" Name="velocity" NumberOfComponents="3" format="ascii" RangeMin="0.00018124963869942267" RangeMax="1.0067151025191374">
+          -0.000044080727093387395 0.0001758076250553131 0 0.3323347270488739 0.9502783417701721 0
+          -0.3830275237560272 -0.18707692623138428 0 -0.06954790651798248 0.027121461927890778 0
           <InformationKey name="L2_NORM_RANGE" location="vtkDataArray" length="2">
             <Value index="0">
-              0.00058482031442
+              0.0001812496387
             </Value>
             <Value index="1">
-              1.0532167277
+              1.0067151025
             </Value>
           </InformationKey>
         </DataArray>
-        <DataArray type="Float32" Name="force" NumberOfComponents="3" format="ascii" RangeMin="1.519230141528566e-17" RangeMax="0.00003584624171983029">
-          0.000032508418371435255 0.0000010718279099819483 0 0.0000033197866287082434 6.517338135836326e-8 0
-          -0.0000358282050001435 -0.0000011370012771294569 0 -1.4847599173390003e-17 3.2178907811234284e-18 0
+        <DataArray type="Float32" Name="force" NumberOfComponents="3" format="ascii" RangeMin="9.677767041823681e-18" RangeMax="0.00003344063757587599">
+          -0.000011402750715205912 0.000029232944143586792 0 -0.0000028667604965448845 0.0000010103581189468969 0
+          0.000014269510757003445 -0.000030243301807786338 0 -9.653099314000939e-18 -6.905422143817847e-19 0
           <InformationKey name="L2_NORM_RANGE" location="vtkDataArray" length="2">
             <Value index="0">
-              1.5192301415e-17
+              9.6777670418e-18
             </Value>
             <Value index="1">
-              3.584624172e-05
+              3.3440637576e-05
             </Value>
           </InformationKey>
         </DataArray>
@@ -37,15 +37,15 @@
       <CellData>
       </CellData>
       <Points>
-        <DataArray type="Float32" Name="Points" NumberOfComponents="3" format="ascii" RangeMin="0.33092637937847647" RangeMax="25.35043407064767">
-          -0.33088919520378113 0.004960752557963133 0 -1.2812423706054688 -0.013696165755391121 0
-          4.828065872192383 0.16867923736572266 0 24.761838912963867 -5.431007385253906 0
+        <DataArray type="Float32" Name="Points" NumberOfComponents="3" format="ascii" RangeMin="0.030428386604361955" RangeMax="32.12789842104208">
+          -0.030424166470766068 0.0005067602032795548 0 0.9065662622451782 -0.329708456993103 0
+          -2.3107619285583496 4.833538055419922 0 32.04553985595703 2.2989633083343506 0
           <InformationKey name="L2_NORM_RANGE" location="vtkDataArray" length="2">
             <Value index="0">
-              0.33092637938
+              0.030428386604
             </Value>
             <Value index="1">
-              25.350434071
+              32.127898421
             </Value>
           </InformationKey>
         </DataArray>
