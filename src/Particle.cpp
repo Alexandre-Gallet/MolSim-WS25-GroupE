@@ -27,7 +27,7 @@ Particle::Particle(const Particle &other) {
 }
 
 Particle::Particle(const std::array<double, 3> &x_arg, const std::array<double, 3> &v_arg, const double m_arg, int type)
-  : x(x_arg), v(v_arg), f({0., 0., 0.}), old_f({0., 0., 0.}), m(m_arg), type(type) {
+    : x(x_arg), v(v_arg), f({0., 0., 0.}), old_f({0., 0., 0.}), m(m_arg), type(type) {
   std::cout << "Particle generated!" << std::endl;
 }
 
@@ -58,8 +58,8 @@ void Particle::setF(const std::array<double, 3> &newF) { f = newF; }
 const std::array<double, 3> &Particle::getOldF() const { return old_f; }
 
 /**
-   * @param oldF Old force vector
-   */
+ * @param oldF Old force vector
+ */
 void Particle::setOldF(const std::array<double, 3> &oldF) { old_f = oldF; }
 
 double Particle::getM() const { return m; }
