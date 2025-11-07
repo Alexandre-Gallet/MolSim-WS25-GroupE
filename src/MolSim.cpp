@@ -10,6 +10,7 @@
 #include <valarray>
 
 #include "FileReader.h"
+#include "outputWriter/OutputWriter.h"
 #include "outputWriter/XYZWriter.h"
 #ifdef ENABLE_VTK_OUTPUT
 #include "outputWriter/VTKWriter.h"
@@ -179,13 +180,13 @@ void plotParticles(int iteration) {
   std::filesystem::create_directories("output");
   std::string out_name("output/MD_vtk");
   // outputWriter::XYZWriter xyz_writer;
+  std::unique_ptr<outputWriter::OutputWriter> writer;
 
 // use macros to make vtk output optional and avoid build errors
 #ifdef ENABLE_VTK_OUTPUT
-  outputWriter::VTKWriter vtk_writer;
-  vtk_writer.plotParticles(particles, out_name, iteration);
+  writer = std::make_unique<outputWriter::VTKWriter>();
 #else
-  outputWriter::XYZWriter xyz_writer;
-  xyz_writer.plotParticles(particles, out_name, iteration);
+  writer = std::make_unique<outputWriter::XYZWriter>();
 #endif
+  writer->plotParticles(particles, out_name, iteration);
 }
