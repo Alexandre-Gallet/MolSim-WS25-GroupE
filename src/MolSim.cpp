@@ -15,6 +15,7 @@
 #ifdef ENABLE_VTK_OUTPUT
 #include "outputWriter/VTKWriter.h"
 #endif
+#include "InputReader.h"
 #include "utils/ArrayUtils.h"
 
 /**** forward declaration of the calculation functions ****/
@@ -41,7 +42,7 @@ void calculateV();
 void plotParticles(int iteration);
 
 /// Start time of the simulation
-constexpr double start_time = 0;
+double start_time = 0;
 
 /// End time of the simulation
 double end_time = 1000;
@@ -54,48 +55,19 @@ double delta_t = 0.014;
 std::list<Particle> particles;
 
 /**
- * @brief Print usage information to stderr
- */
-void printUsage() {
-  std::cerr << "Usage: ./MolSim <input-file> <t_end> <delta_t>\n"
-            << "Example: ./MolSim <input-file> eingabe-sonne.txt 1000 0.014 VTK\n"
-            << "  <input_file>   : path to initial particle data (text file)\n"
-            << "  <t_end>        : simulation end time (e.g. 1000)\n"
-            << "  <delta_t>      : time step (e.g. 0.014)\n";
-}
-
-/**
  * @brief Main entry point of the molecular dynamics simulation
  * @param argc Number of command line arguments
  * @param argsv Array of command line argument strings
  * @return EXIT_SUCCESS (0) on successful completion, -1 on error
  */
 int main(int argc, char *argsv[]) {
-  std::cout << "Hello from MolSim for PSE!" << std::endl;
-  // parse input arguments
-  if (argc == 2) {
-    if (std::string(argsv[1]) == "-h" || std::string(argsv[1]) == "--help") {
-      printUsage();
-      return EXIT_SUCCESS;
-    }
-  }
-  if (argc != 4) {  // to avoid incomplete programm calls
-    std::cout << "Erroneous programme call! " << std::endl;
-    printUsage();
-    return -1;
-  }
-
-  try {
-    end_time = std::stod(argsv[2]);
-    delta_t = std::stod(argsv[3]);
-  } catch (const std::exception &e) {
-    std::cerr << "Error: please enter valid values" << std::endl;
-    printUsage();
-    return -1;
-  }
-
+  Arguments args;
+  inputReader::parseArguments(argc, argsv, args);
+  end_time = args.t_end;
+  delta_t = args.delta_t;
+  start_time = args.t_start;
   FileReader fileReader;
-  fileReader.readFile(particles, argsv[1]);
+  fileReader.readFile(particles, args.inputFile);
 
   double current_time = start_time;
 
