@@ -180,7 +180,7 @@ void plotParticles(int iteration) {
   std::string out_name("output/MD_vtk");
   // outputWriter::XYZWriter xyz_writer;
 
-// use macros to make vtk output optional and avoid build errors
+  // use macros to make vtk output optional and avoid build errors
 #ifdef ENABLE_VTK_OUTPUT
   outputWriter::VTKWriter vtk_writer;
   vtk_writer.plotParticles(particles, out_name, iteration);
