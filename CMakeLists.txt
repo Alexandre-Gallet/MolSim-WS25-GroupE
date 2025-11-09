@@ -28,8 +28,16 @@ add_executable(MolSim ${MY_SRC}
         src/ParticleContainer.cpp
         src/ParticleContainer.h
         src/outputWriter/OutputWriter.h
-        src/InputReader.h
-        src/InputReader.cpp
+        src/inputReader/InputReader.h
+        src/inputReader/InputReader.cpp
+        src/outputWriter/WriterFactory.h
+        src/outputWriter/OutputFormat.h
+        src/outputWriter/WriterFactory.cpp
+        src/ForceCalculation.h
+        src/StormerVerlet.cpp
+        src/StormerVerlet.h
+        src/LennardJones.cpp
+        src/LennardJones.h
 )
 
 target_include_directories(MolSim

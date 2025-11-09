@@ -7,7 +7,15 @@
 #include <iostream>
 #include <ostream>
 #include <string>
+#include "Arguments.h"
+#include "outputWriter/OutputFormat.h"
 
+/**
+ * @brief function to check if two strings are equal
+ * @param a first string
+ * @param b second string
+ * @return true if they're the same, false if not
+ */
 bool isequal(const std::string &a, const std::string &b) {
   if (a.size() != b.size()) return false;
   return std::equal(a.begin(), a.end(), b.begin(), [](char a, char b) { return std::tolower(a) == std::tolower(b); });
@@ -29,8 +37,13 @@ static void printUsage() {
             << "\t[-f | --format <value>]\t:\tOutput format (default if enabled: 'VTK').\n"
             << "\t[-h | --help]\t:\tDisplay this help message\n";
 }
-
-void parseArguments(int argc, char *argv[], Arguments &args) {
+/**
+ * @brief function to extract the values of the parameters used in the simulation
+ * @param argc Number of command line arguments
+ * @param argv Array of command line argument strings
+ * @param args parsed values for each argument
+ */
+void parseArguments(const int argc, char *argv[], Arguments &args) {
   if (argc < 2) {
     std::cerr << "Invalid number of arguments\n"
               << "Use -h or --help to display usage.\n";
@@ -74,7 +87,7 @@ void parseArguments(int argc, char *argv[], Arguments &args) {
           std::cerr << "Incorrect value for \"-f\" argument\n";
           std::exit(EXIT_FAILURE);
         }
-        args.outputFormat = argv[++i];
+        args.output_format = parse_output(argv[++i]);
       } else {
         std::cerr << "Missing value for \"-f\" argument\n";
         std::exit(EXIT_FAILURE);

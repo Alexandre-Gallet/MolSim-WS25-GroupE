@@ -9,14 +9,16 @@
 #include <list>
 #include <valarray>
 
-#include "FileReader.h"
+#include "ParticleContainer.h"
+#include "inputReader/Arguments.h"
+#include "inputReader/FileReader.h"
+#include "inputReader/InputReader.h"
+#include "outputWriter/OutputFormat.h"
 #include "outputWriter/OutputWriter.h"
-#include "outputWriter/XYZWriter.h"
-#ifdef ENABLE_VTK_OUTPUT
-#include "outputWriter/VTKWriter.h"
-#endif
-#include "InputReader.h"
+#include "outputWriter/WriterFactory.h"
 #include "utils/ArrayUtils.h"
+#include "ForceCalculation.h"
+#include "StormerVerlet.h"
 
 /**** forward declaration of the calculation functions ****/
 
@@ -38,8 +40,9 @@ void calculateV();
 /**
  * @brief Plot the particles to an output file
  * @param iteration Current iteration number used for output filename
+ * @param format The chosen output format
  */
-void plotParticles(int iteration);
+void plotParticles(int iteration, OutputFormat format);
 
 /// Start time of the simulation
 double start_time = 0;
@@ -50,9 +53,8 @@ double end_time = 1000;
 /// Time step size for integration
 double delta_t = 0.014;
 
-// TODO: what data structure to pick?
 /// Container holding all particles in the simulation
-std::list<Particle> particles;
+ParticleContainer particles;
 
 /**
  * @brief Main entry point of the molecular dynamics simulation
@@ -78,13 +80,15 @@ int main(int argc, char *argsv[]) {
     // calculate new x
     calculateX();
     // calculate new f
-    calculateF();
+    //calculateF();
+    StormerVerlet verlet;
+    verlet.calculateF(particles);
     // calculate new v
     calculateV();
 
     iteration++;
     if (iteration % 10 == 0) {
-      plotParticles(iteration);
+      plotParticles(iteration, args.output_format);
     }
     std::cout << "Iteration " << iteration << " finished." << std::endl;
 
@@ -147,18 +151,13 @@ void calculateV() {
 /**
  * @brief Write the particles output to a file
  * @param iteration Current iteration number used for output filename
+ * @param format The chosen output format
  */
-void plotParticles(int iteration) {
+void plotParticles(int iteration, OutputFormat format) {
   std::filesystem::create_directories("output");
   std::string out_name("output/MD_vtk");
-  // outputWriter::XYZWriter xyz_writer;
-  std::unique_ptr<outputWriter::OutputWriter> writer;
 
-// use macros to make vtk output optional and avoid build errors
-#ifdef ENABLE_VTK_OUTPUT
-  writer = std::make_unique<outputWriter::VTKWriter>();
-#else
-  writer = std::make_unique<outputWriter::XYZWriter>();
-#endif
+  const auto writer = WriterFactory::createWriter(format);
+
   writer->plotParticles(particles, out_name, iteration);
 }

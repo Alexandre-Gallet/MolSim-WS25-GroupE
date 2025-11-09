@@ -1,7 +1,11 @@
-
+/**
+ * @file OutputWriter.h
+ */
 #pragma once
 
-#include "Particle.h"
+#include <list>
+#include <string>
+#include "ParticleContainer.h"
 
 namespace outputWriter {
 /**
@@ -18,6 +22,6 @@ class OutputWriter {
    * @param filename Output filename
    * @param iteration Current iteration number
    */
-  virtual void plotParticles(const std::list<Particle> &particles, const std::string &filename, int iteration) = 0;
+  virtual void plotParticles(ParticleContainer &particles, const std::string &filename, int iteration) = 0;
 };
 }  // namespace outputWriter
