@@ -48,7 +48,7 @@ double end_time = 1000;
 /// Time step size for integration
 double delta_t = 0.014;
 
-// TODO: what data structure to pick?
+
 /// Container holding all particles in the simulation
 std::list<Particle> particles;
 
@@ -130,7 +130,6 @@ void calculateF() {
   }
   for (auto &p1 : particles) {
     for (auto &p2 : particles) {
-      // @TODO: insert calculation of forces here!
       if (!(p1 == p2)) {  // calculate the forces according to the given formula in the lecture
         double norm =
             std::pow(ArrayUtils::L2Norm(ArrayUtils::elementWisePairOp(p1.getX(), p2.getX(), std::minus<>())), 3);
