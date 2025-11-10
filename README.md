@@ -31,13 +31,12 @@ sudo pacman -S base-devel cmake vtk
 sudo dnf install vtk-devel cmake gcc-c++ make
 ```
 
-3: Build the project, configure makefiles with ccmake GUI (if not debugging or parallelizing make sure to set CMAKE_BUILD_TYPE -> Release), generate doxygen Documentation 
+3: Build the project with cmake, generate doxygen Documentation. By default CMAKE_BUILD_TYPE is set to "Release" which passes the -O3 and -DNDEBUG flags tp the compiler. 
 ```bash
 mkdir -p build
 cd build
-ccmake ..
-make -j$(nproc)
-make doc_doxygen
+cmake --build . -- -j$(nproc)
+cmake --build . --target doc_doxygen
 ```
 ## Usage
 
