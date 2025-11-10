@@ -48,7 +48,6 @@ double end_time = 1000;
 /// Time step size for integration
 double delta_t = 0.014;
 
-
 /// Container holding all particles in the simulation
 std::list<Particle> particles;
 

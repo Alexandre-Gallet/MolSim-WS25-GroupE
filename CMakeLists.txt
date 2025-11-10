@@ -1,11 +1,15 @@
 cmake_minimum_required(VERSION 3.10)
 
-# Enable C++17. You may raise the standard if you want
+#----------------------
+# Project Configuration
+#----------------------
+
+# define project name, version (In the future we will automate versioning with github tags)
+project(MolSim_GroupE VERSION 0.1.1 LANGUAGES CXX)
+
+# Enable C++17.
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# define project name, version
-project(MolSim_GroupE VERSION 0.0.1 LANGUAGES CXX)
 
 # let ccmake and cmake-gui offer the default build type options
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug;Release;RelWithDebInfo;MinSizeRel")
@@ -16,26 +20,27 @@ if(NOT CMAKE_BUILD_TYPE)
             "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif(NOT CMAKE_BUILD_TYPE)
 
-# collect all cpp files
+#----------------------
+# Collect source files
+#----------------------
 file(GLOB_RECURSE MY_SRC
         "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
-        # header don't need to be included but this might be necessary for some IDEs
         "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
 )
 
-# create make target
-add_executable(MolSim ${MY_SRC}
-        src/ParticleContainer.cpp
-        src/ParticleContainer.h
-)
+#--------------------------
+# Define executable target
+#--------------------------
+add_executable(MolSim ${MY_SRC})
 
 target_include_directories(MolSim
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-# activate all compiler warnings. Clean up your code :P
-# depending on the compiler different flags are used
+#-------------------
+# Compiler Warnings
+#-------------------
 target_compile_options(MolSim
         PRIVATE
         $<$<CXX_COMPILER_ID:GNU>:-Wall>
@@ -43,9 +48,52 @@ target_compile_options(MolSim
         $<$<CXX_COMPILER_ID:Intel>:-w3 -wd383,981,1418,1572,2259>
 )
 
-# add additional modules
+# ------------------------------
+# Custom clang-format targets
+# ------------------------------
+find_program(CLANG_FORMAT_EXE NAMES clang-format)
+if(CLANG_FORMAT_EXE)
+    file(GLOB_RECURSE ALL_CODE_FILES
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
+    )
+
+    # Check formatting
+    add_custom_target(clang_format_check
+            COMMAND ${CLANG_FORMAT_EXE} --dry-run --Werror ${ALL_CODE_FILES}
+            COMMENT "Checking code formatting with clang-format"
+            VERBATIM
+    )
+
+    # Fix formatting
+    add_custom_target(clang_format_fix
+            COMMAND ${CLANG_FORMAT_EXE} -i ${ALL_CODE_FILES}
+            COMMENT "Fixing code formatting with clang-format"
+            VERBATIM
+    )
+endif()
+
+# ------------------------------
+# Custom clang-tidy target
+# ------------------------------
+find_program(CLANG_TIDY_EXE NAMES clang-tidy)
+if(CLANG_TIDY_EXE)
+    # Export compile_commands.json for clang-tidy
+    set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+    add_custom_target(run_clang_tidy
+            COMMAND ${CLANG_TIDY_EXE} -p ${CMAKE_BINARY_DIR} ${MY_SRC}
+            COMMENT "Running clang-tidy static analysis"
+            VERBATIM
+    )
+endif()
+
+# ------------------------------
+# Include custom CMake modules
+# ------------------------------
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 
+# Optional modules
 include(vtk)
 include(clang-format)
-include(doxygen)  # This now loads your complete doxygen module
+include(doxygen)
