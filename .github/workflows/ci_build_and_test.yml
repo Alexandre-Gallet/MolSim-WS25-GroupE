@@ -19,7 +19,7 @@ jobs:
 
       # Step 2: Install necessary tools (here we have to use the package manager of ubuntu not Arch!)
       - name: Install build dependencies
-        run: sudo apt update && sudo apt install -y cmake build-essential doxygen
+        run: sudo apt update && sudo apt install -y cmake build-essential doxygen libvtk9-dev
 
       # Step 3: Configure CMake (needed to generate build system)
       - name: Configure project
@@ -49,7 +49,7 @@ jobs:
 
       # Step 2: Install necessary tools (here we have to use the package manager of ubuntu not Arch!)
       - name: Install build dependencies
-        run: sudo apt update && sudo apt install -y cmake build-essential
+        run: sudo apt update && sudo apt install -y cmake build-essential libvtk9-dev
 
       # Step 3: Configure CMake (needed to generate build system). Here we pass extra flags for sanitizing, hence also a separate build.
       - name: Configure ASan build
