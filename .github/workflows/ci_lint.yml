@@ -1,0 +1,35 @@
+name: Lint and Static Analysis
+
+# Trigger on pushes or pull requests to branches matching 'alexandre_assignment2'
+on:
+  push:
+    branches: ['alexandre_assignment2']
+  pull_request:
+    branches: ['alexandre_assignment2']
+
+jobs:
+  clang-tools:
+    name: Run clang-tidy and clang-format
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository (This copies the repo into the virtual machine)
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Install necessary tools (here we have to use the package manager by ubuntu not Arch!)
+      - name: Install dependencies
+        run: sudo apt update && sudo apt install -y clang-tidy clang-format cmake build-essential
+
+      # Step 3: Configure CMake (needed to generate build system)
+      - name: Configure project
+        run: cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON # the extra flag is needed here so that clang tidy can find include paths and compiler flags
+
+      # Step 4: Run clang-tidy using your custom target
+      - name: Run clang-tidy
+        run: cmake --build build --target run_clang_tidy
+
+      # Step 5: Check code formatting using your custom target
+      - name: Run clang-format check
+        run: cmake --build build --target clang_format_check
+
