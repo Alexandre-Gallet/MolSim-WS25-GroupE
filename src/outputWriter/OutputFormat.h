@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 /**
- * Class to diferentiate between the different output types
+ * Class to differentiate between the different output types
  */
 enum class OutputFormat { XYZ, VTK };
 

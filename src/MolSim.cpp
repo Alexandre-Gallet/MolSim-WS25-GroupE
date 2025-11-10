@@ -12,6 +12,8 @@
 #include "ForceCalculation/ForceCalculation.h"
 #include "ForceCalculation/StormerVerlet.h"
 #include "ParticleContainer.h"
+#include "PlanetSimulation.h"
+#include "SimulationFactory.h"
 #include "inputReader/Arguments.h"
 #include "inputReader/FileReader.h"
 #include "inputReader/InputReader.h"
@@ -65,35 +67,8 @@ ParticleContainer particles;
 int main(int argc, char *argsv[]) {
   Arguments args;
   inputReader::parseArguments(argc, argsv, args);
-  end_time = args.t_end;
-  delta_t = args.delta_t;
-  start_time = args.t_start;
-  FileReader fileReader;
-  fileReader.readFile(particles, args.inputFile);
-
-  double current_time = start_time;
-
-  int iteration = 0;
-
-  // for this loop, we assume: current x, current f and current v are known
-  while (current_time < end_time) {
-    // calculate new x
-    calculateX();
-    // calculate new f
-    // calculateF();
-    StormerVerlet verlet;
-    verlet.calculateF(particles);
-    // calculate new v
-    calculateV();
-
-    iteration++;
-    if (iteration % 10 == 0) {
-      plotParticles(iteration, args.output_format);
-    }
-    std::cout << "Iteration " << iteration << " finished." << std::endl;
-
-    current_time += delta_t;
-  }
+  auto simulation = SimulationFactory::createSimulation(SimulationType::Planet, args, particles);
+  simulation->runSimulation();
 
   std::cout << "output written. Terminating..." << std::endl;
   return 0;

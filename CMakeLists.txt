@@ -38,6 +38,12 @@ add_executable(MolSim ${MY_SRC}
         src/ForceCalculation/StormerVerlet.h
         src/ForceCalculation/LennardJones.cpp
         src/ForceCalculation/LennardJones.h
+        src/Simulation.h
+        src/PlanetSimulation.cpp
+        src/PlanetSimulation.h
+        src/SimulationFactory.cpp
+        src/SimulationFactory.h
+        src/SimulationType.h
 )
 
 target_include_directories(MolSim

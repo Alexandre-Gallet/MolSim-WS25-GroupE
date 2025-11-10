@@ -17,6 +17,8 @@ class StormerVerlet : public ForceCalculation {
    * @param p1 First particle
    * @param p2 Second particle
    */
-  void calc(Particle &p1, Particle &p2);
+  static void calc(Particle &p1, Particle &p2);
   void calculateF(ParticleContainer &particles) override;
+  static void calculateX(ParticleContainer &particles, double delta_t);
+  static void calculateV(ParticleContainer &particles, double delta_t);
 };
