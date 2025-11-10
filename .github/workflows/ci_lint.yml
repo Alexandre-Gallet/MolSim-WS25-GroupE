@@ -19,11 +19,11 @@ jobs:
 
       # Step 2: Install necessary tools (here we have to use the package manager by ubuntu not Arch!)
       - name: Install dependencies
-        run: sudo apt update && sudo apt install -y clang-tidy clang-format cmake build-essential
+        run: sudo apt update && sudo apt install -y clang-tidy clang-format cmake build-essential libvtk9-dev
 
       # Step 3: Configure CMake (needed to generate build system)
       - name: Configure project
-        run: cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON # the extra flag is needed here so that clang tidy can find include paths and compiler flags
+        run: cmake -S . -B build # the extra flag is needed here so that clang tidy can find include paths and compiler flags
 
       # Step 4: Run clang-tidy using your custom target
       - name: Run clang-tidy
