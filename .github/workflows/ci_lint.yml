@@ -23,7 +23,7 @@ jobs:
 
       # Step 3: Configure CMake (needed to generate build system)
       - name: Configure project
-        run: cmake -S . -B build # the extra flag is needed here so that clang tidy can find include paths and compiler flags
+        run: cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON # the extra flag is needed here so that clang tidy can find include paths and compiler flags
 
       # Step 4: Run clang-tidy using your custom target
       - name: Run clang-tidy
