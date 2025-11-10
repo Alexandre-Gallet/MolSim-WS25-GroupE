@@ -10,6 +10,6 @@
 #include "inputReader/Arguments.h"
 
 class SimulationFactory {
-  public:
-  static Simulation* createSimulation(SimulationType type, const Arguments &args, ParticleContainer &particles);
+ public:
+  static Simulation *createSimulation(SimulationType type, const Arguments &args, ParticleContainer &particles);
 };

@@ -24,17 +24,17 @@ void StormerVerlet::calculateF(ParticleContainer &particles) {
   particles.forEachPair([](Particle &p1, Particle &p2) { calc(p1, p2); });
 }
 void StormerVerlet::calculateX(ParticleContainer &particles, double delta_t) {
-    // calculate the position updates using the methods in the ArrayUtils class
+  // calculate the position updates using the methods in the ArrayUtils class
 
-    for (auto &p : particles) {
-      p.setX(ArrayUtils::elementWisePairOp(
-          p.getX(),
-          ArrayUtils::elementWisePairOp(
-              ArrayUtils::elementWiseScalarOp(delta_t, p.getV(), std::multiplies<>()),
-              ArrayUtils::elementWiseScalarOp(pow(delta_t, 2) / (2 * p.getM()), p.getF(), std::multiplies<>()),
-              std::plus<>()),
-          std::plus<>()));
-    }
+  for (auto &p : particles) {
+    p.setX(ArrayUtils::elementWisePairOp(
+        p.getX(),
+        ArrayUtils::elementWisePairOp(
+            ArrayUtils::elementWiseScalarOp(delta_t, p.getV(), std::multiplies<>()),
+            ArrayUtils::elementWiseScalarOp(pow(delta_t, 2) / (2 * p.getM()), p.getF(), std::multiplies<>()),
+            std::plus<>()),
+        std::plus<>()));
+  }
 }
 void StormerVerlet::calculateV(ParticleContainer &particles, double delta_t) {
   // calculate the forces using the methods in the ArrayUtils class
