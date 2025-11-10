@@ -3,14 +3,20 @@
  */
 #pragma once
 
+#include "../ParticleContainer.h"
 #include "ForceCalculation.h"
-#include "ParticleContainer.h"
 /**
  * Class used to compute forces using the Störmer-Verlet formulas
  */
 class StormerVerlet : public ForceCalculation {
-public:
+ public:
   StormerVerlet();
   ~StormerVerlet() override;
+  /**
+   * @brief Computes the forces between two particles
+   * @param p1 First particle
+   * @param p2 Second particle
+   */
+  void calc(Particle &p1, Particle &p2);
   void calculateF(ParticleContainer &particles) override;
 };

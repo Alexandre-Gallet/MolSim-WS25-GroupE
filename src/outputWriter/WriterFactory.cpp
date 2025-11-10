@@ -1,6 +1,8 @@
 
 #include "WriterFactory.h"
+
 #include <memory>
+
 #include "outputWriter/OutputFormat.h"
 #include "outputWriter/OutputWriter.h"
 #ifdef ENABLE_VTK_OUTPUT
@@ -13,10 +15,10 @@ std::unique_ptr<outputWriter::OutputWriter> WriterFactory::createWriter(OutputFo
     case OutputFormat::XYZ:
       return std::make_unique<outputWriter::XYZWriter>();
     case OutputFormat::VTK:
-      // use macros to make vtk output optional and avoid build errors
-      #ifdef ENABLE_VTK_OUTPUT
+// use macros to make vtk output optional and avoid build errors
+#ifdef ENABLE_VTK_OUTPUT
       return std::make_unique<outputWriter::VTKWriter>();
-      #endif
+#endif
     default:
       return std::make_unique<outputWriter::XYZWriter>();
   }

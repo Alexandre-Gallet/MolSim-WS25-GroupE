@@ -33,11 +33,11 @@ add_executable(MolSim ${MY_SRC}
         src/outputWriter/WriterFactory.h
         src/outputWriter/OutputFormat.h
         src/outputWriter/WriterFactory.cpp
-        src/ForceCalculation.h
-        src/StormerVerlet.cpp
-        src/StormerVerlet.h
-        src/LennardJones.cpp
-        src/LennardJones.h
+        src/ForceCalculation/ForceCalculation.h
+        src/ForceCalculation/StormerVerlet.cpp
+        src/ForceCalculation/StormerVerlet.h
+        src/ForceCalculation/LennardJones.cpp
+        src/ForceCalculation/LennardJones.h
 )
 
 target_include_directories(MolSim

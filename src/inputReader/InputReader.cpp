@@ -7,6 +7,7 @@
 #include <iostream>
 #include <ostream>
 #include <string>
+
 #include "Arguments.h"
 #include "outputWriter/OutputFormat.h"
 

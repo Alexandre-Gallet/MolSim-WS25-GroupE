@@ -9,6 +9,8 @@
 #include <list>
 #include <valarray>
 
+#include "ForceCalculation/ForceCalculation.h"
+#include "ForceCalculation/StormerVerlet.h"
 #include "ParticleContainer.h"
 #include "inputReader/Arguments.h"
 #include "inputReader/FileReader.h"
@@ -17,8 +19,6 @@
 #include "outputWriter/OutputWriter.h"
 #include "outputWriter/WriterFactory.h"
 #include "utils/ArrayUtils.h"
-#include "ForceCalculation.h"
-#include "StormerVerlet.h"
 
 /**** forward declaration of the calculation functions ****/
 
@@ -80,7 +80,7 @@ int main(int argc, char *argsv[]) {
     // calculate new x
     calculateX();
     // calculate new f
-    //calculateF();
+    // calculateF();
     StormerVerlet verlet;
     verlet.calculateF(particles);
     // calculate new v
