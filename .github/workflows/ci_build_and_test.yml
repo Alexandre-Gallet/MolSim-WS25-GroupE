@@ -1,0 +1,68 @@
+name: Build and Test
+
+on:
+  push:
+    branches: ['alexandre_assignment2']
+  pull_request:
+    branches: ['alexandre_assignment2']
+
+jobs:
+  # Normal build + test
+  build_and_test:
+    name: Normal build and test
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository (This copies the repo into the virtual machine)
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Install necessary tools (here we have to use the package manager of ubuntu not Arch!)
+      - name: Install build dependencies
+        run: sudo apt update && sudo apt install -y cmake build-essential doxygen
+
+      # Step 3: Configure CMake (needed to generate build system)
+      - name: Configure project
+        run: cmake -S . -B build
+
+      # Step 4: build with generated makefiles and use all available cores
+      - name: Build project
+        run: cmake --build build -- -j$(nproc)
+
+      # Step 5: build the documentation
+      - name: Build documentation
+        run: cmake --build build --target doc_doxygen
+
+      # waiting for Altays work on Google tests
+      #- name: Run unit tests
+      #  run: ctest --test-dir build --output-on-failure -j$(nproc)
+
+  # ASan build + test which is done as its own job to start with a fresh VM
+  build_and_test_asan:
+    name: AddressSanitizer build and test
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository (This copies the repo into the virtual machine)
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Install necessary tools (here we have to use the package manager of ubuntu not Arch!)
+      - name: Install build dependencies
+        run: sudo apt update && sudo apt install -y cmake build-essential
+
+      # Step 3: Configure CMake (needed to generate build system). Here we pass extra flags for sanitizing, hence also a separate build.
+      - name: Configure ASan build
+        run: |
+          cmake -S . -B build_asan \
+                -DCMAKE_BUILD_TYPE=Debug \
+                -DCMAKE_C_FLAGS="-fsanitize=address -O1 -fno-omit-frame-pointer -g" \
+                -DCMAKE_CXX_FLAGS="-fsanitize=address -O1 -fno-omit-frame-pointer -g"
+
+      # Step 4: build with generated makefiles and use all available cores
+      - name: Build ASan project
+        run: cmake --build build_asan -- -j$(nproc)
+
+      # Step 5: probably unnecessary as test were already run on normal build job
+      #- name: Run ASan tests
+      #  run: ctest --test-dir build_asan --output-on-failure -j$(nproc)
