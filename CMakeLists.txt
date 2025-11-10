@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14)
 
 # Enable C++17. You may raise the standard if you want
 set(CMAKE_CXX_STANDARD 17)
@@ -27,6 +27,9 @@ file(GLOB_RECURSE MY_SRC
 add_executable(MolSim ${MY_SRC}
         src/ParticleContainer.cpp
         src/ParticleContainer.h
+        src/ParticleGenerator.cpp
+        src/ParticleGenerator.h
+        src/ParticleGenerator.h
 )
 
 target_include_directories(MolSim
@@ -49,3 +52,21 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 include(vtk)
 include(clang-format)
 include(doxygen)  # This now loads your complete doxygen module
+include(CTest)
+
+if (BUILD_TESTING)
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/refs/tags/v1.15.2.zip
+)
+FetchContent_MakeAvailable(googletest)
+
+add_executable(ParticleContainerTest
+        Testing/Temporary/ParticleContainerTest.cpp
+)
+target_link_libraries(ParticleContainerTest PRIVATE GTest::gtest_main)
+target_include_directories(ParticleContainerTest PRIVATE ${PROJECT_SOURCE_DIR}/src)
+include(GoogleTest)
+gtest_discover_tests(ParticleContainerTest)
+endif ()
