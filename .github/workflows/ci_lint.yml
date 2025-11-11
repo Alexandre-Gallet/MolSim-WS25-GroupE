@@ -17,18 +17,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Install necessary tools (here we have to use the package manager of ubuntu not Arch!)
-      - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y clang-tidy clang-format cmake build-essential libvtk9-dev
-
-      # Step 3: Copy APT packages to workspace for caching (Option 2)
-      - name: Copy APT packages for caching
-        run: mkdir -p ${{ github.workspace }}/apt-cache && sudo cp -r /var/cache/apt/archives/*.deb ${{ github.workspace }}/apt-cache/
-
-      # Step 4: Cache APT packages to speed up installs. This Caches the downloaded packages on a GitHub cache.
-      # This cache can be accessed acoss branches
-      # This avoids the long downloads from mirrors every time the workflows run.
-      # The "|" isn't an OS pipe but indicates a multiline string literal
+      # Step 2: Cache APT packages to speed up installs. This Caches the downloaded packages locally to avoid permission issues
+      # This cache can be accessed across branches
       - name: Cache APT packages
         uses: actions/cache@v4
         with:
@@ -37,7 +27,21 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-apt-
 
-      # Step 5: Cache CMake configuration to speed up future runs. This uses the same cache key as the build and test workflow i.e. this cache is shared across workflows.
+      # Step 3: Copy cached APT packages into the system cache so apt-get can use them
+      - name: Populate APT cache
+        run: |
+          sudo mkdir -p /var/cache/apt/archives/
+          sudo cp -r ${{ github.workspace }}/apt-cache/*.deb /var/cache/apt/archives/ || true
+
+      # Step 4: Install necessary tools (here we have to use the package manager of ubuntu not Arch!)
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y clang-tidy clang-format cmake build-essential libvtk9-dev
+
+      # Step 5: Copy any newly downloaded APT packages to workspace for caching (Option 2)
+      - name: Copy APT packages for caching
+        run: mkdir -p ${{ github.workspace }}/apt-cache && sudo cp -r /var/cache/apt/archives/*.deb ${{ github.workspace }}/apt-cache/
+
+      # Step 6: Cache CMake configuration to speed up future runs. This uses the same cache key as the build and test workflow i.e. this cache is shared across workflows.
       # Because the cache key is determined by "${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}" changes to the source files do not invalidate the cache.
       # Only changing any of the CMakeLists.txt or *.cmake files invalidate the cache.
       - name: Cache CMake configuration
@@ -51,15 +55,14 @@ jobs:
             ${{ runner.os }}-cmake-
       # the last line makes the runner use an older cache if there isn't an exact match. This avoids full cache misses.
 
-      # Step 6: Configure CMake (needed to generate build system)
+      # Step 7: Configure CMake (needed to generate build system)
       - name: Configure project
         run: cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON # the extra flag is needed here so that clang tidy can find include paths and compiler flags
 
-      # Step 7: Run clang-tidy using your custom target
+      # Step 8: Run clang-tidy using your custom target
       - name: Run clang-tidy
         run: cmake --build build --target run_clang_tidy
 
-      # Step 8: Check code formatting using your custom target
+      # Step 9: Check code formatting using your custom target
       - name: Run clang-format check
         run: cmake --build build --target clang_format_check
-
