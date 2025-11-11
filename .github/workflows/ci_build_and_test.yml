@@ -21,15 +21,35 @@ jobs:
       - name: Install build dependencies
         run: sudo apt update && sudo apt install -y cmake build-essential doxygen libvtk9-dev
 
-      # Step 3: Configure CMake (needed to generate build system)
+      # Step 3: Cache CMake configuration (This caches the result of the terminal command: $ cmake -S - -B build)
+      - name: Cache CMake configuration
+        uses: actions/cache@v4
+        with:
+          path: |
+           build/CMakeCache.txt
+           build/CMakeFiles
+          key: ${{ runner.os }}-cmake-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+          restore-keys: |
+            ${{ runner.os }}-cmake-
+
+      # Step 4: Cache external dependencies (FetchContent libraries such as google test get cached inbetween runs speeding up the entire job)
+      - name: Cache external dependencies
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: ${{ runner.os }}-deps-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+          restore-keys: |
+                 ${{ runner.os }}-deps-
+
+      # Step 5: Configure CMake (needed to generate build system)
       - name: Configure project
         run: cmake -S . -B build
 
-      # Step 4: build with generated makefiles and use all available cores
+      # Step 6: build with generated makefiles and use all available cores
       - name: Build project
         run: cmake --build build -- -j$(nproc)
 
-      # Step 5: build the documentation
+      # Step 7: build the documentation
       - name: Build documentation
         run: cmake --build build --target doc_doxygen
 
