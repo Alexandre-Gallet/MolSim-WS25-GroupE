@@ -31,6 +31,13 @@ jobs:
       - name: Prepare APT cache directory
         run: mkdir -p apt-cache/partial
 
+      # additional step to avoid lengthy unnecessary task
+      - name: Disable man-db to speed up installs
+        run: |
+          sudo apt-get -y remove man-db || true
+          sudo apt-get -y purge man-db || true
+          sudo apt-get -y autoremove || true
+
       # Step 4: Install clang-tidy, clang-format and build deps using cached APT packages
       - name: Install dependencies
         run: |

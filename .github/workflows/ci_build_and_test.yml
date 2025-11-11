@@ -33,6 +33,13 @@ jobs:
       - name: Prepare APT cache directory
         run: mkdir -p apt-cache/partial
 
+      # additional step to avoid lengthy unnecessary task
+      - name: Disable man-db to speed up installs
+        run: |
+          sudo apt-get -y remove man-db || true
+          sudo apt-get -y purge man-db || true
+          sudo apt-get -y autoremove || true
+
       # Step 4: Install necessary tools using cached APT packages
       # This uses ./apt-cache as the apt archive directory (where .deb files are stored).
       - name: Install build dependencies
@@ -109,6 +116,13 @@ jobs:
       # Step 3: Ensure APT cache directory exists
       - name: Prepare APT cache directory
         run: mkdir -p apt-cache/partial
+
+      # additional step to avoid lengthy unnecessary task
+      - name: Disable man-db to speed up installs
+        run: |
+          sudo apt-get -y remove man-db || true
+          sudo apt-get -y purge man-db || true
+          sudo apt-get -y autoremove || true
 
       # Step 4: Install ASan build dependencies using the cached APT archive
       - name: Install build dependencies
