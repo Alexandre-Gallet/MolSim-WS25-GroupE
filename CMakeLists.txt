@@ -35,6 +35,7 @@ add_executable(MolSim ${MY_SRC}
 target_include_directories(MolSim
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+# Just have to add #include "utils/MaxwellBoltzmannDistribution.h" to make use of the file
 )
 
 # activate all compiler warnings. Clean up your code :P
