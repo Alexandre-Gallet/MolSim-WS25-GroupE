@@ -1,6 +1,5 @@
 name: Lint and Static Analysis
 
-# Trigger on pushes or pull requests to branches matching 'alexandre_assignment2'
 on:
   push:
     branches: ['alexandre_assignment2']
@@ -13,56 +12,49 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository (This copies the repo into the virtual machine)
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Cache APT packages (shared with build workflow)
+      - name: Prepare APT cache
+        run: mkdir -p ${{ github.workspace }}/apt-cache
+
       - name: Cache APT packages
-        id: cache-apt
         uses: actions/cache@v4
         with:
-          path: apt-cache
+          path: ${{ github.workspace }}/apt-cache
           key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/*.yml') }}
           restore-keys: |
             ${{ runner.os }}-apt-
 
-      # Step 3: Ensure APT cache directory exists
-      - name: Prepare APT cache directory
-        run: mkdir -p apt-cache/partial
-
-      # Step 4: Install clang-tidy, clang-format and build deps using cached APT packages
-      - name: Install dependencies
+      - name: Install dependencies (using restored APT cache)
         run: |
+          if [ -d "${{ github.workspace }}/apt-cache" ]; then
+            sudo mkdir -p /var/cache/apt/archives
+            sudo cp -r ${{ github.workspace }}/apt-cache/*.deb /var/cache/apt/archives/ 2>/dev/null || true
+          fi
+
           sudo apt-get update
-          sudo apt-get -o Dir::Cache::Archives=$PWD/apt-cache install -y \
-            clang-tidy clang-format cmake build-essential libvtk9-dev
+          sudo apt-get install -y clang-tidy clang-format cmake build-essential libvtk9-dev
 
-      # Step 5: Normalize APT cache permissions for saving
-      - name: Normalize APT cache permissions
-        run: |
-          sudo rm -f apt-cache/lock || true
-          sudo chmod -R a+rX apt-cache || true
+          mkdir -p ${{ github.workspace }}/apt-cache
+          sudo cp -r /var/cache/apt/archives/*.deb ${{ github.workspace }}/apt-cache/ || true
 
-      # Step 6: Cache CMake configuration (shared with main build)
+      # Cache CMake configuration to speed up future runs. This uses the same cache key as the build and test workflow i.e. shared across workflows.
       - name: Cache CMake configuration
         uses: actions/cache@v4
         with:
           path: |
             build/CMakeCache.txt
             build/CMakeFiles
-          key: ${{ runner.os }}-cmake-${{ hashFiles('CMakeLists.txt', 'cmake/**/*.cmake') }}
+          key: ${{ runner.os }}-cmake-${{ hashFiles('**/CMakeLists.txt') }}-${{ hashFiles('**/*.cmake') }}
           restore-keys: |
             ${{ runner.os }}-cmake-
 
-      # Step 7: Configure CMake (needed for compile_commands.json for clang-tidy)
       - name: Configure project
-        run: cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        run: cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON # needed for clang-tidy include path detection
 
-      # Step 8: Run clang-tidy using your custom CMake target
       - name: Run clang-tidy
         run: cmake --build build --target run_clang_tidy
 
-      # Step 9: Check code formatting using your custom CMake target
       - name: Run clang-format check
         run: cmake --build build --target clang_format_check
