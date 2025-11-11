@@ -64,7 +64,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 add_executable(ParticleContainerTest
-        Testing/Temporary/ParticleContainerTest.cpp
+        tests/Temporary/Unit/ParticleContainerTest.cpp
 )
 target_link_libraries(ParticleContainerTest PRIVATE GTest::gtest_main)
 target_include_directories(ParticleContainerTest PRIVATE ${PROJECT_SOURCE_DIR}/src)
