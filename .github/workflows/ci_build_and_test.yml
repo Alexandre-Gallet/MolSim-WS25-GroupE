@@ -17,17 +17,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Cache APT packages to speed up installs. This Caches the downloaded packages on a GitHub cache.
-      # This cache can be accessed acoss branches
+      # Step 2: Cache APT packages to speed up installs. This Caches the downloaded packages locally to avoid permission issues
+      # This cache can be accessed acoss branches.
       # This avoids the long downloads from mirrors every time the workflows run.
       # The "|" isn't an OS pipe but indicates a multiline string literal
       - name: Cache APT packages
         uses: actions/cache@v4
         with:
-          path: /var/cache/apt/archives
-          key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/*.yml') }}
-          restore-keys: |
-            ${{ runner.os }}-apt-
+            path: ${{ github.workspace }}/apt-cache
+            key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/*.yml') }}
+            restore-keys: |
+              ${{ runner.os }}-apt-
 
       # Step 3: Install necessary tools (here we have to use the package manager of ubuntu not Arch!)
       # Use sudo apt-get which will check the cache for .deb files
@@ -90,7 +90,7 @@ jobs:
       - name: Cache APT packages
         uses: actions/cache@v4
         with:
-          path: /var/cache/apt/archives
+          path: ${{ github.workspace }}/apt-cache
           key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/*.yml') }}
           restore-keys: |
             ${{ runner.os }}-apt-
