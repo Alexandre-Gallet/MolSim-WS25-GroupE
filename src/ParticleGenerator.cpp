@@ -27,8 +27,9 @@ void ParticleGenerator::generateCuboid(
 
         std::array<double, 3> vel = baseVelocity;
 
+        // 3 for the Dimension
+        auto brownian = maxwellBoltzmannDistributedVelocity(brownianMean, 3);
 
-        auto brownian = MaxwellBoltzmannDistribution::drawVelocity(brownianMean);
         vel[0] += brownian[0];
         vel[1] += brownian[1];
         vel[2] += brownian[2];
