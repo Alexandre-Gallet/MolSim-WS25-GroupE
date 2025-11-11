@@ -34,7 +34,7 @@ jobs:
           fi
 
           sudo apt-get update
-          sudo apt-get install -y clang-tidy clang-format cmake build-essential libvtk9-dev
+          sudo apt-get install -y clang-tidy clang-format cmake build-essential libvtk9-core-dev
 
           mkdir -p ${{ github.workspace }}/apt-cache
           sudo cp -r /var/cache/apt/archives/*.deb ${{ github.workspace }}/apt-cache/ || true
