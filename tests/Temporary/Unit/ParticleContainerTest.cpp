@@ -1,3 +1,13 @@
+/**
+* @file ParticleContainerTest.cpp
+ * @brief Tests for ParticleContainer and its basic functionality.
+ *
+ * This file contains unit tests that verify creation, insertion, iteration,
+ * pair iteration and clearing of the ParticleContainer used in the MolSim project.
+ * Each test states its intention briefly, as required in the worksheet.
+ */
+
+
 #include <array>
 #include <cassert>
 #include <cmath>
@@ -20,48 +30,7 @@ protected:
   }
   ParticleContainer pc;
 };
-int main() {
-  ParticleContainer container;
-  assert(container.empty());
-  assert(container.size() == 0);
 
-  container.reserve(5);
-
-  container.emplaceParticle(std::array<double, 3>{0.0, 0.0, 0.0}, std::array<double, 3>{1.0, 0.0, 0.0}, 2.0, 1);
-  container.emplaceParticle(std::array<double, 3>{1.0, 0.0, 0.0}, std::array<double, 3>{0.0, 1.0, 0.0}, 4.0, 2);
-  container.emplaceParticle(std::array<double, 3>{0.0, 1.0, 0.0}, std::array<double, 3>{0.0, 0.0, 1.0}, 6.0, 3);
-
-  assert(!container.empty());
-  assert(container.size() == 3);
-
-  double mass_sum = 0.0;
-  for (auto &particle : container) {
-    mass_sum += particle.getM();
-  }
-  assert(std::abs(mass_sum - 12.0) < tolerance);
-
-  std::size_t pair_count = 0;
-  container.forEachPair([&pair_count](Particle &first, Particle &second) {
-    assert(&first != &second);
-    ++pair_count;
-  });
-  assert(pair_count == container.size() * (container.size() - 1) / 2);
-
-  const ParticleContainer &const_ref = container;
-  std::size_t const_pair_count = 0;
-  const_ref.forEachPair([&const_pair_count](const Particle &first, const Particle &second) {
-    assert(&first != &second);
-    ++const_pair_count;
-  });
-  assert(const_pair_count == pair_count);
-
-  container.clear();
-  assert(container.empty());
-  assert(container.size() == 0);
-
-  std::cout << "ParticleContainer tests passed." << std::endl;
-  return 0;
-}
 
 // 1
 TEST(ParticleContainerTest, NewlyConstructedIsEmpty) {
