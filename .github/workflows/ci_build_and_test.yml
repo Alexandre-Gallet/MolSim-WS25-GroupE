@@ -17,111 +17,115 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Prepare directory for caching APT packages
-      - name: Prepare APT cache
-        run: mkdir -p ${{ github.workspace }}/apt-cache
-
-      # Step 3: Cache APT packages to speed up installs.
-      # This caches the downloaded packages across runs and branches.
-      # The "|" isn't an OS pipe but indicates a multiline string literal.
+      # Step 2: Cache APT packages to speed up installs.
+      # This caches downloaded .deb packages in ./apt-cache inside the workspace.
+      # On a cache hit, apt-get can reuse them instead of downloading again.
       - name: Cache APT packages
+        id: cache-apt
         uses: actions/cache@v4
         with:
-          path: ${{ github.workspace }}/apt-cache
+          path: apt-cache
           key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/*.yml') }}
           restore-keys: |
             ${{ runner.os }}-apt-
 
-      # Step 4: Install necessary tools (here we have to use the package manager of ubuntu not Arch!)
-      # Copy restored cache to system APT directory before installing,
-      # then copy any newly downloaded packages back for next time.
-      - name: Install build dependencies (using restored APT cache)
+      # Step 3: Ensure APT cache directory exists for use with Dir::Cache::Archives
+      - name: Prepare APT cache directory
+        run: mkdir -p apt-cache/partial
+
+      # Step 4: Install necessary tools using cached APT packages
+      # This uses ./apt-cache as the apt archive directory (where .deb files are stored).
+      - name: Install build dependencies
         run: |
-          # Restore cached packages into system cache
-          if [ -d "${{ github.workspace }}/apt-cache" ]; then
-            sudo mkdir -p /var/cache/apt/archives
-            sudo cp -r ${{ github.workspace }}/apt-cache/*.deb /var/cache/apt/archives/ 2>/dev/null || true
-          fi
-
-          # Install dependencies (APT will reuse local .deb files)
           sudo apt-get update
-          sudo apt-get install -y cmake build-essential doxygen libvtk9-core-dev
+          sudo apt-get -o Dir::Cache::Archives=$PWD/apt-cache install -y \
+            --no-install-recommends cmake build-essential doxygen libvtk9-dev
 
-          # Save any newly downloaded packages back to workspace cache
-          mkdir -p ${{ github.workspace }}/apt-cache
-          sudo cp -r /var/cache/apt/archives/*.deb ${{ github.workspace }}/apt-cache/ || true
+      # Step 5: Fix APT cache permissions and remove lock file so cache can be saved
+      # Without this, root-owned lock files can break `actions/cache` on save.
+      - name: Normalize APT cache permissions
+        run: |
+          sudo rm -f apt-cache/lock || true
+          sudo chmod -R a+rX apt-cache || true
 
-      # Step 5: Cache CMake configuration (This caches the result of $ cmake -S . -B build)
-      # Because the cache key is determined by "${{ hashFiles('**/CMakeLists.txt') }}" and "${{ hashFiles('**/*.cmake') }}",
-      # changes to source files do not invalidate the cache — only modifications to CMake files do.
+      # Step 6: Cache CMake configuration (result of `cmake -S . -B build`)
+      # This avoids redoing configure work if CMake files haven't changed.
       - name: Cache CMake configuration
         uses: actions/cache@v4
         with:
           path: |
             build/CMakeCache.txt
             build/CMakeFiles
-          key: ${{ runner.os }}-cmake-${{ hashFiles('**/CMakeLists.txt') }}-${{ hashFiles('**/*.cmake') }}
+          key: ${{ runner.os }}-cmake-${{ hashFiles('CMakeLists.txt', 'cmake/**/*.cmake') }}
           restore-keys: |
             ${{ runner.os }}-cmake-
 
-      # Step 6: Cache external dependencies (FetchContent libraries such as google test get cached)
+      # Step 7: Cache external dependencies (e.g. FetchContent, GTest) if present
+      # Safe even if build/_deps doesn't exist yet; then nothing is cached.
       - name: Cache external dependencies
         uses: actions/cache@v4
         with:
           path: build/_deps
-          key: ${{ runner.os }}-deps-${{ hashFiles('**/CMakeLists.txt') }}-${{ hashFiles('**/*.cmake') }}
+          key: ${{ runner.os }}-deps-${{ hashFiles('CMakeLists.txt', 'cmake/**/*.cmake') }}
           restore-keys: |
             ${{ runner.os }}-deps-
 
-      # Step 7: Configure CMake (needed to generate build system)
+      # Step 8: Configure CMake (needed to generate build system)
       - name: Configure project
         run: cmake -S . -B build
 
-      # Step 8: Build with generated makefiles using all available cores
+      # Step 9: Build with generated buildsystem using all available cores
       - name: Build project
-        run: cmake --build build -- -j$(nproc)
+        run: cmake --build build -- -j"$(nproc)"
 
-      # Step 9: Build the documentation
+      # Step 10: Build the documentation (doc_doxygen target comes from your CMake module)
       - name: Build documentation
         run: cmake --build build --target doc_doxygen
 
-      # Step 10: Run unit tests (currently waiting for Altay’s work)
-      #- name: Run unit tests
-      #  run: ctest --test-dir build --output-on-failure -j$(nproc)
+      # Step 11: Run unit tests (enable once tests exist)
+      # - name: Run unit tests
+      #   run: ctest --test-dir build --output-on-failure -j"$(nproc)"
 
-  # ASan build + test which is done as its own job to start with a fresh VM
+  # ASan build + test (separate job, fresh build tree)
   build_and_test_asan:
     name: AddressSanitizer build and test
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Prepare APT cache
-        run: mkdir -p ${{ github.workspace }}/apt-cache
-
+      # Step 2: Reuse the same APT cache as the normal build job
       - name: Cache APT packages
+        id: cache-apt-asan
         uses: actions/cache@v4
         with:
-          path: ${{ github.workspace }}/apt-cache
+          path: apt-cache
           key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/*.yml') }}
           restore-keys: |
             ${{ runner.os }}-apt-
 
-      - name: Install build dependencies (using restored APT cache)
+      # Step 3: Ensure APT cache directory exists
+      - name: Prepare APT cache directory
+        run: mkdir -p apt-cache/partial
+
+      # Step 4: Install ASan build dependencies using the cached APT archive
+      - name: Install build dependencies
         run: |
-          if [ -d "${{ github.workspace }}/apt-cache" ]; then
-            sudo mkdir -p /var/cache/apt/archives
-            sudo cp -r ${{ github.workspace }}/apt-cache/*.deb /var/cache/apt/archives/ 2>/dev/null || true
-          fi
-
           sudo apt-get update
-          sudo apt-get install -y cmake build-essential libvtk9-core-dev
+          sudo apt-get -o Dir::Cache::Archives=$PWD/apt-cache install -y \
+            --no-install-recommends cmake build-essential libvtk9-dev
 
-          mkdir -p ${{ github.workspace }}/apt-cache
-          sudo cp -r /var/cache/apt/archives/*.deb ${{ github.workspace }}/apt-cache/ || true
+      # Step 5: Normalize APT cache permissions
+      - name: Normalize APT cache permissions
+        run: |
+          sudo rm -f apt-cache/lock || true
+          sudo chmod -R a+rX apt-cache || true
 
+      # Note: No CMake/dep cache here on purpose to keep ASan build clean & independent.
+
+      # Step 6: Configure CMake for ASan build (separate build directory)
       - name: Configure ASan build
         run: |
           cmake -S . -B build_asan \
@@ -129,5 +133,10 @@ jobs:
                 -DCMAKE_C_FLAGS="-fsanitize=address -O1 -fno-omit-frame-pointer -g" \
                 -DCMAKE_CXX_FLAGS="-fsanitize=address -O1 -fno-omit-frame-pointer -g"
 
+      # Step 7: Build with generated buildsystem using all available cores
       - name: Build ASan project
-        run: cmake --build build_asan -- -j$(nproc)
+        run: cmake --build build_asan -- -j"$(nproc)"
+
+      # Step 8: Optionally run ASan tests once they exist
+      # - name: Run ASan tests
+      #   run: ctest --test-dir build_asan --output-on-failure -j"$(nproc)"
