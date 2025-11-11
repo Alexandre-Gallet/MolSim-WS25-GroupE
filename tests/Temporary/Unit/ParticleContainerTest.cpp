@@ -1,5 +1,5 @@
 /**
-* @file ParticleContainerTest.cpp
+ * @file ParticleContainerTest.cpp
  * @brief Tests for ParticleContainer and its basic functionality.
  *
  * This file contains unit tests that verify creation, insertion, iteration,
@@ -7,20 +7,33 @@
  * Each test states its intention briefly, as required in the worksheet.
  */
 
-
 #include <array>
 #include <cassert>
 #include <cmath>
 #include <iostream>
+
 #include "gtest/gtest.h"
 #include "Particle.h"
 #include "ParticleContainer.h"
 
 namespace {
+/**
+ * @brief Numerical tolerance used for floating point comparisons.
+ */
 constexpr double tolerance = 1e-12;
-const std::array<double,3> ZERO{0.0,0.0,0.0}; // Zero Vector
+
+/**
+ * @brief Convenience zero vector for particle creation.
+ */
+const std::array<double, 3> ZERO{0.0, 0.0, 0.0};
 }
 
+/**
+ * @brief Test fixture providing a ParticleContainer with two particles.
+ *
+ * This fixture is used for tests that need a pre-filled container.
+ * It creates two particles at positions (0,0,0) and (1,0,0).
+ */
 class ParticleContainerFixture : public ::testing::Test {
 protected:
   void SetUp() override {
@@ -28,24 +41,38 @@ protected:
     pc.addParticle(Particle{x1, v, 1.0, 0});
     pc.addParticle(Particle{x2, v, 1.0, 0});
   }
+
+  /**
+   * @brief The container under test.
+   */
   ParticleContainer pc;
 };
 
-
-// 1
+/**
+ * @test
+ * @brief Newly created container must be empty.
+ */
 TEST(ParticleContainerTest, NewlyConstructedIsEmpty) {
   ParticleContainer c;
   EXPECT_TRUE(c.empty());
   EXPECT_EQ(c.size(), 0u);
 }
-//2
+
+/**
+ * @test
+ * @brief Adding one particle should increase the size to 1 and make it non-empty.
+ */
 TEST(ParticleContainerTest, AddParticleIncreasesSize) {
   ParticleContainer c;
   c.addParticle(Particle{ZERO, ZERO, 1.0, 0});
   EXPECT_EQ(c.size(), 1u);
   EXPECT_FALSE(c.empty());
 }
-//3
+
+/**
+ * @test
+ * @brief Range-based iteration should visit all inserted particles (const and non-const).
+ */
 TEST(ParticleContainerTest, IterationVisitsAllParticles) {
   ParticleContainer c;
   c.addParticle(Particle{ZERO, ZERO, 1.0, 0});
@@ -69,7 +96,11 @@ TEST(ParticleContainerTest, IterationVisitsAllParticles) {
   }
   EXPECT_EQ(count, 3u);
 }
-//4
+
+/**
+ * @test
+ * @brief Reserving capacity must not change the logical size of the container.
+ */
 TEST(ParticleContainerTest, ReserveDoesNotChangeSize) {
   ParticleContainer c;
   EXPECT_EQ(c.size(), 0u);
@@ -78,7 +109,11 @@ TEST(ParticleContainerTest, ReserveDoesNotChangeSize) {
   c.addParticle(Particle{ZERO, ZERO, 1.0, 0});
   EXPECT_EQ(c.size(), 1u);
 }
-//5
+
+/**
+ * @test
+ * @brief Adding a particle by const reference should still increase the size.
+ */
 TEST(ParticleContainerTest, AddParticleByConstRefIncreasesSize) {
   ParticleContainer c;
   Particle p{ZERO, ZERO, 1.0, 0};
@@ -87,7 +122,11 @@ TEST(ParticleContainerTest, AddParticleByConstRefIncreasesSize) {
   EXPECT_FALSE(c.empty());
   (void)ref;
 }
-//6
+
+/**
+ * @test
+ * @brief Adding a particle by rvalue should also increase the size.
+ */
 TEST(ParticleContainerTest, AddParticleByRvalueIncreasesSize) {
   ParticleContainer c;
   auto &ref = c.addParticle(Particle{ZERO, ZERO, 1.0, 0});
@@ -95,15 +134,26 @@ TEST(ParticleContainerTest, AddParticleByRvalueIncreasesSize) {
   EXPECT_FALSE(c.empty());
   (void)ref;
 }
-//7
+
+/**
+ * @test
+ * @brief Empty containers should provide begin()==end() and no iteration.
+ */
 TEST(ParticleContainerTest, EmptyContainerHasNoIteration) {
   ParticleContainer c;
   EXPECT_EQ(c.begin(), c.end());
   int count = 0;
-  for (auto &p : c) { (void)p; ++count; }
+  for (auto &p : c) {
+    (void)p;
+    ++count;
+  }
   EXPECT_EQ(count, 0);
 }
-//8
+
+/**
+ * @test
+ * @brief After reserving, adding multiple particles should correctly update size.
+ */
 TEST(ParticleContainerTest, ReserveThenAddMultiple) {
   ParticleContainer c;
   c.reserve(10);
@@ -112,7 +162,11 @@ TEST(ParticleContainerTest, ReserveThenAddMultiple) {
   }
   EXPECT_EQ(c.size(), 10u);
 }
-//9
+
+/**
+ * @test
+ * @brief clear() must remove all particles and make the container empty.
+ */
 TEST(ParticleContainerTest, ClearEmptiesContainer) {
   ParticleContainer c;
   c.addParticle(Particle{ZERO, ZERO, 1.0, 0});
@@ -122,24 +176,39 @@ TEST(ParticleContainerTest, ClearEmptiesContainer) {
   EXPECT_TRUE(c.empty());
   EXPECT_EQ(c.size(), 0u);
 }
-//10
+
+/**
+ * @test
+ * @brief Fixture setup should create exactly two particles.
+ */
 TEST_F(ParticleContainerFixture, SizeIsTwoAfterSetup) {
   EXPECT_EQ(pc.size(), 2u);
 }
-//11
+
+/**
+ * @test
+ * @brief Adding one more particle on top of fixture data should yield three.
+ */
 TEST_F(ParticleContainerFixture, SizeAfterAddIsThree) {
   pc.addParticle(Particle{ZERO, ZERO, 1.0, 0});
   EXPECT_EQ(pc.size(), 3u);
 }
 
-//12
+/**
+ * @test
+ * @brief After clearing a pre-filled container, adding one should result in size 1.
+ */
 TEST_F(ParticleContainerFixture, ClearThenAddOne) {
   pc.clear();
   EXPECT_EQ(pc.size(), 0u);
   pc.addParticle(Particle{ZERO, ZERO, 1.0, 0});
   EXPECT_EQ(pc.size(), 1u);
 }
-//13
+
+/**
+ * @test
+ * @brief Manual iterator usage should visit exactly the inserted elements (order preserved).
+ */
 TEST(ParticleContainerTest, IteratorVisitsAllInInsertionOrder) {
   ParticleContainer c;
   c.addParticle(Particle{ZERO, ZERO, 1.0, 0});
@@ -153,7 +222,11 @@ TEST(ParticleContainerTest, IteratorVisitsAllInInsertionOrder) {
   EXPECT_EQ(count, c.size());
   EXPECT_EQ(count, 3u);
 }
-//14
+
+/**
+ * @test
+ * @brief Const iterators (cbegin/cend) should work and visit all elements.
+ */
 TEST(ParticleContainerTest, ConstIterationWorks) {
   ParticleContainer c;
   c.addParticle(Particle{ZERO, ZERO, 1.0, 0});
@@ -167,8 +240,12 @@ TEST(ParticleContainerTest, ConstIterationWorks) {
   EXPECT_EQ(count, 1u);
 }
 
-
-//15
+/**
+ * @test
+ * @brief forEachPair should visit each unique unordered pair exactly once.
+ *
+ * For n=4 particles, the number of unique pairs is n*(n-1)/2 = 6.
+ */
 TEST(ParticleContainerTest, ForEachPairVisitsAllUniquePairs) {
   ParticleContainer c;
   c.addParticle(Particle{ZERO, ZERO, 1.0, 0});
@@ -183,7 +260,13 @@ TEST(ParticleContainerTest, ForEachPairVisitsAllUniquePairs) {
   });
   EXPECT_EQ(calls, 6); // 4 * 3 / 2
 }
-// 16
+
+/**
+ * @test
+ * @brief Const version of forEachPair should also visit all unique unordered pairs.
+ *
+ * For n=3 particles, the number of unique pairs is n*(n-1)/2 = 3.
+ */
 TEST(ParticleContainerTest, ConstForEachPairAlsoWorks) {
   ParticleContainer c;
   c.addParticle(Particle{ZERO, ZERO, 1.0, 0});
@@ -198,4 +281,3 @@ TEST(ParticleContainerTest, ConstForEachPairAlsoWorks) {
   });
   EXPECT_EQ(calls, 3); // 3 * 2 / 2
 }
-
