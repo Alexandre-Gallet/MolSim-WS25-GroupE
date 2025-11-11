@@ -187,3 +187,5 @@ void plotParticles(int iteration) {
   xyz_writer.plotParticles(particles, out_name, iteration);
 #endif
 }
+
+// Alexandre was here, Memento Mori!
