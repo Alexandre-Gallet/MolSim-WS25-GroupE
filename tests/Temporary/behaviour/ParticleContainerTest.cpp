@@ -68,7 +68,17 @@ TEST(ParticleGeneratorBehaviourTest, GeneratesCorrectNumberAndNonZeroVelocity) {
 
 
 
+TEST(ParticleGeneratorBehaviour, GeneratesCorrectGridPositions) {
+  ParticleContainer c;
+  ParticleGenerator g;
+  g.generateCuboid(c, {0,0,0}, {3,3,1}, 1.0, 1.0, {0,0,0}, 0.1);
 
+  for (auto &p : c) {
+    auto x = p.getX();
+    EXPECT_TRUE(fmod(x[0], 1.0) == 0.0);
+    EXPECT_TRUE(fmod(x[1], 1.0) == 0.0);
+  }
+}
 
 
 
