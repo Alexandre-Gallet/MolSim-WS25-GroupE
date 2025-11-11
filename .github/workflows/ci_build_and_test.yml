@@ -17,109 +17,115 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Cache APT packages to speed up installs. This Caches the downloaded packages locally to avoid permission issues
-      # This cache can be accessed across branches.
-      # The "|" isn't an OS pipe but indicates a multiline string literal
+      # Step 2: Cache APT packages to speed up installs.
+      # This caches downloaded .deb packages in ./apt-cache inside the workspace.
+      # On a cache hit, apt-get can reuse them instead of downloading again.
       - name: Cache APT packages
+        id: cache-apt
         uses: actions/cache@v4
         with:
-          path: ${{ github.workspace }}/apt-cache
+          path: apt-cache
           key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/*.yml') }}
           restore-keys: |
             ${{ runner.os }}-apt-
 
-      # Step 3: Copy cached APT packages into the system cache so apt-get can use them
-      - name: Populate APT cache
-        run: |
-          sudo mkdir -p /var/cache/apt/archives/
-          sudo cp -r ${{ github.workspace }}/apt-cache/*.deb /var/cache/apt/archives/ || true
+      # Step 3: Ensure APT cache directory exists for use with Dir::Cache::Archives
+      - name: Prepare APT cache directory
+        run: mkdir -p apt-cache/partial
 
-      # Step 4: Install necessary tools (here we have to use the package manager of ubuntu not Arch!)
-      # Use sudo apt-get which will check the cache for .deb files
+      # Step 4: Install necessary tools using cached APT packages
+      # This uses ./apt-cache as the apt archive directory (where .deb files are stored).
       - name: Install build dependencies
-        run: sudo apt-get update && sudo apt-get install -y cmake build-essential doxygen libvtk9-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get -o Dir::Cache::Archives=$PWD/apt-cache install -y \
+            cmake build-essential doxygen libvtk9-dev
 
-      # Step 5: Copy any newly downloaded APT packages to workspace for caching (Option 2)
-      - name: Copy APT packages for caching
-        run: mkdir -p ${{ github.workspace }}/apt-cache && sudo cp -r /var/cache/apt/archives/*.deb ${{ github.workspace }}/apt-cache/
+      # Step 5: Fix APT cache permissions and remove lock file so cache can be saved
+      # Without this, root-owned lock files can break `actions/cache` on save.
+      - name: Normalize APT cache permissions
+        run: |
+          sudo rm -f apt-cache/lock || true
+          sudo chmod -R a+rX apt-cache || true
 
-      # Step 6: Cache CMake configuration (This caches the result of the terminal command: $ cmake -S - -B build)
-      # Because the cache key is determined by "${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}" changes to the source files do not invalidate the cache.
-      # Only changing any of the CMakeLists.txt or *.cmake files invalidate the cache.
+      # Step 6: Cache CMake configuration (result of `cmake -S . -B build`)
+      # This avoids redoing configure work if CMake files haven't changed.
       - name: Cache CMake configuration
         uses: actions/cache@v4
         with:
           path: |
             build/CMakeCache.txt
             build/CMakeFiles
-          key: ${{ runner.os }}-cmake-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+          key: ${{ runner.os }}-cmake-${{ hashFiles('CMakeLists.txt', 'cmake/**/*.cmake') }}
           restore-keys: |
             ${{ runner.os }}-cmake-
-      # the last line makes the runner use an older cache if there isn't an exact match. This avoids full cache misses.
 
-      # Step 7: Cache external dependencies (FetchContent libraries such as google test get cached inbetween runs speeding up the entire job)
-      # Because the cache key is determined by "${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}" changes to the source files do not invalidate the cache.
-      # Only changing any of the CMakeLists.txt or *.cmake files invalidate the cache.
+      # Step 7: Cache external dependencies (e.g. FetchContent, GTest) if present
+      # Safe even if build/_deps doesn't exist yet; then nothing is cached.
       - name: Cache external dependencies
         uses: actions/cache@v4
         with:
           path: build/_deps
-          key: ${{ runner.os }}-deps-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+          key: ${{ runner.os }}-deps-${{ hashFiles('CMakeLists.txt', 'cmake/**/*.cmake') }}
           restore-keys: |
             ${{ runner.os }}-deps-
-      # the last line makes the runner use an older cache if there isn't an exact match. This avoids full cache misses.
 
       # Step 8: Configure CMake (needed to generate build system)
       - name: Configure project
         run: cmake -S . -B build
 
-      # Step 9: build with generated makefiles and use all available cores
+      # Step 9: Build with generated buildsystem using all available cores
       - name: Build project
-        run: cmake --build build -- -j$(nproc)
+        run: cmake --build build -- -j"$(nproc)"
 
-      # Step 10: build the documentation
+      # Step 10: Build the documentation (doc_doxygen target comes from your CMake module)
       - name: Build documentation
         run: cmake --build build --target doc_doxygen
 
-      # waiting for Altays work on Google tests
-      #- name: Run unit tests
-      #  run: ctest --test-dir build --output-on-failure -j$(nproc)
+      # Step 11: Run unit tests (enable once tests exist)
+      # - name: Run unit tests
+      #   run: ctest --test-dir build --output-on-failure -j"$(nproc)"
 
-  # ASan build + test which is done as its own job to start with a fresh VM
+  # ASan build + test (separate job, fresh build tree)
   build_and_test_asan:
     name: AddressSanitizer build and test
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository (This copies the repo into the virtual machine)
+      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Cache APT packages to speed up installs. This Caches the downloaded packages locally to avoid permission issues
-      # This cache can be accessed across branches.
+      # Step 2: Reuse the same APT cache as the normal build job
       - name: Cache APT packages
+        id: cache-apt-asan
         uses: actions/cache@v4
         with:
-          path: ${{ github.workspace }}/apt-cache
+          path: apt-cache
           key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/*.yml') }}
           restore-keys: |
             ${{ runner.os }}-apt-
 
-      # Step 3: Copy cached APT packages into the system cache so apt-get can use them
-      - name: Populate APT cache
-        run: |
-          sudo mkdir -p /var/cache/apt/archives/
-          sudo cp -r ${{ github.workspace }}/apt-cache/*.deb /var/cache/apt/archives/ || true
+      # Step 3: Ensure APT cache directory exists
+      - name: Prepare APT cache directory
+        run: mkdir -p apt-cache/partial
 
-      # Step 4: Install necessary tools (here we have to use the package manager of ubuntu not Arch!)
+      # Step 4: Install ASan build dependencies using the cached APT archive
       - name: Install build dependencies
-        run: sudo apt-get update && sudo apt-get install -y cmake build-essential libvtk9-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get -o Dir::Cache::Archives=$PWD/apt-cache install -y \
+            cmake build-essential libvtk9-dev
 
-      # Step 5: Copy any newly downloaded APT packages to workspace for caching (Option 2)
-      - name: Copy APT packages for caching
-        run: mkdir -p ${{ github.workspace }}/apt-cache && sudo cp -r /var/cache/apt/archives/*.deb ${{ github.workspace }}/apt-cache/
+      # Step 5: Normalize APT cache permissions
+      - name: Normalize APT cache permissions
+        run: |
+          sudo rm -f apt-cache/lock || true
+          sudo chmod -R a+rX apt-cache || true
 
-      # Step 6: Configure CMake (needed to generate build system). Here we pass extra flags for sanitizing, hence also a separate build.
+      # Note: No CMake/dep cache here on purpose to keep ASan build clean & independent.
+
+      # Step 6: Configure CMake for ASan build (separate build directory)
       - name: Configure ASan build
         run: |
           cmake -S . -B build_asan \
@@ -127,10 +133,10 @@ jobs:
                 -DCMAKE_C_FLAGS="-fsanitize=address -O1 -fno-omit-frame-pointer -g" \
                 -DCMAKE_CXX_FLAGS="-fsanitize=address -O1 -fno-omit-frame-pointer -g"
 
-      # Step 7: build with generated makefiles and use all available cores
+      # Step 7: Build with generated buildsystem using all available cores
       - name: Build ASan project
-        run: cmake --build build_asan -- -j$(nproc)
+        run: cmake --build build_asan -- -j"$(nproc)"
 
-      # Step 8: probably unnecessary as test were already run on normal build job
-      #- name: Run ASan tests
-      #  run: ctest --test-dir build_asan --output-on-failure -j$(nproc)
+      # Step 8: Optionally run ASan tests once they exist
+      # - name: Run ASan tests
+      #   run: ctest --test-dir build_asan --output-on-failure -j"$(nproc)"
