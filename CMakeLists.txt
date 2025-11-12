@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.10)
 
 # Enable C++17. You may raise the standard if you want
 set(CMAKE_CXX_STANDARD 17)
@@ -27,6 +27,28 @@ file(GLOB_RECURSE MY_SRC
 add_executable(MolSim ${MY_SRC}
         src/ParticleContainer.cpp
         src/ParticleContainer.h
+        src/outputWriter/OutputWriter.h
+        src/inputReader/InputReader.h
+        src/inputReader/InputReader.cpp
+        src/outputWriter/WriterFactory.h
+        src/outputWriter/OutputFormat.h
+        src/outputWriter/WriterFactory.cpp
+        src/ForceCalculation/ForceCalculation.h
+        src/ForceCalculation/StormerVerlet.cpp
+        src/ForceCalculation/StormerVerlet.h
+        src/ForceCalculation/LennardJones.cpp
+        src/ForceCalculation/LennardJones.h
+        src/Simulation/Simulation.h
+        src/Simulation/PlanetSimulation.cpp
+        src/Simulation/PlanetSimulation.h
+        src/Simulation/SimulationFactory.cpp
+        src/Simulation/SimulationFactory.h
+        src/Simulation/SimulationType.h
+        src/ParticleGenerator.cpp
+        src/ParticleGenerator.h
+        src/inputReader/Cuboid.h
+        src/Simulation/MoleculeSimulation.cpp
+        src/Simulation/MoleculeSimulation.h
         src/ParticleGenerator.cpp
         src/ParticleGenerator.h
         src/ParticleGenerator.h
@@ -39,7 +61,6 @@ add_executable(MolSim ${MY_SRC}
 target_include_directories(MolSim
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
-# Just have to add #include "utils/MaxwellBoltzmannDistribution.h" to make use of the file
 )
 
 # activate all compiler warnings. Clean up your code :P

@@ -50,7 +50,7 @@ After building the project, run the simulation with from within the `build` dire
 
 From the `build` directory using the preexisitng input file eingabe_sonne.txt:
 ```bash
-./MolSim ./../input/eingabe_sonne.txt 1000 0.014
+./MolSim ./../input/eingabe-sonne.txt 1000 0.014
 ```
 ## Doxygen 
 From the `build` directory open the documentation in browser with:

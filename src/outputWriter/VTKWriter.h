@@ -14,7 +14,9 @@
 #include <list>
 #include <string>
 
+#include "OutputWriter.h"
 #include "Particle.h"
+#include "ParticleContainer.h"
 
 namespace outputWriter {
 
@@ -22,10 +24,10 @@ namespace outputWriter {
  * This class implements the functionality to generate vtk output from
  * particles using the official VTK library.
  */
-class VTKWriter {
+class VTKWriter : public OutputWriter {
  public:
   VTKWriter() = default;
-  ~VTKWriter() = default;
+  ~VTKWriter() override = default;
 
   // Delete copy constructor and assignment operator
   VTKWriter(const VTKWriter &) = delete;
@@ -37,7 +39,7 @@ class VTKWriter {
    * @param filename Output filename
    * @param iteration Current iteration number
    */
-  void plotParticles(const std::list<Particle> &particles, const std::string &filename, int iteration);
+  void plotParticles(ParticleContainer &particles, const std::string &filename, int iteration) override;
 };
 
 }  // namespace outputWriter
