@@ -4,9 +4,9 @@
 #include <filesystem>
 #include <iostream>
 
-#include "ForceCalculation/StormerVerlet.h"
-#include "inputReader/FileReader.h"
-#include "outputWriter/WriterFactory.h"
+#include "../ForceCalculation/StormerVerlet.h"
+#include "../inputReader/FileReader.h"
+#include "../outputWriter/WriterFactory.h"
 
 PlanetSimulation::PlanetSimulation(const Arguments &args, ParticleContainer &particles)
     : inputFile(args.inputFile),

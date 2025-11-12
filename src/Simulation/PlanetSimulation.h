@@ -1,9 +1,9 @@
 
 #pragma once
 
-#include "ParticleContainer.h"
+#include "../ParticleContainer.h"
+#include "../inputReader/Arguments.h"
 #include "Simulation.h"
-#include "inputReader/Arguments.h"
 
 class PlanetSimulation : public Simulation {
   char *inputFile;

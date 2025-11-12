@@ -38,12 +38,17 @@ add_executable(MolSim ${MY_SRC}
         src/ForceCalculation/StormerVerlet.h
         src/ForceCalculation/LennardJones.cpp
         src/ForceCalculation/LennardJones.h
-        src/Simulation.h
-        src/PlanetSimulation.cpp
-        src/PlanetSimulation.h
-        src/SimulationFactory.cpp
-        src/SimulationFactory.h
-        src/SimulationType.h
+        src/Simulation/Simulation.h
+        src/Simulation/PlanetSimulation.cpp
+        src/Simulation/PlanetSimulation.h
+        src/Simulation/SimulationFactory.cpp
+        src/Simulation/SimulationFactory.h
+        src/Simulation/SimulationType.h
+        src/ParticleGenerator.cpp
+        src/ParticleGenerator.h
+        src/Cuboid.h
+        src/Simulation/MoleculeSimulation.cpp
+        src/Simulation/MoleculeSimulation.h
 )
 
 target_include_directories(MolSim

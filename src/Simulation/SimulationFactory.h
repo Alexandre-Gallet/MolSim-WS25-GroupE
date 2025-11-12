@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "ParticleContainer.h"
-#include "Simulation.h"
+#include "../ParticleContainer.h"
 #include "SimulationType.h"
-#include "inputReader/Arguments.h"
+#include "../inputReader/Arguments.h"
+#include "Simulation.h"
 
 class SimulationFactory {
  public:
