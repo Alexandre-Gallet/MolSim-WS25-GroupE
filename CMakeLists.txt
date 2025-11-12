@@ -30,6 +30,10 @@ add_executable(MolSim ${MY_SRC}
         src/ParticleGenerator.cpp
         src/ParticleGenerator.h
         src/ParticleGenerator.h
+        tests/Temporary/behaviour/ParticleContainerTest.cpp
+        tests/Temporary/behaviour/ParticleContainerTest.h
+        tests/Temporary/integration/ParticleContainerTest.cpp
+        tests/Temporary/integration/ParticleContainerTest.h
 )
 
 target_include_directories(MolSim
