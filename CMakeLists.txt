@@ -49,6 +49,13 @@ add_executable(MolSim ${MY_SRC}
         src/inputReader/Cuboid.h
         src/Simulation/MoleculeSimulation.cpp
         src/Simulation/MoleculeSimulation.h
+        src/ParticleGenerator.cpp
+        src/ParticleGenerator.h
+        src/ParticleGenerator.h
+        tests/Temporary/behaviour/ParticleContainerTest.cpp
+        tests/Temporary/behaviour/ParticleContainerTest.h
+        tests/Temporary/integration/ParticleContainerTest.cpp
+        tests/Temporary/integration/ParticleContainerTest.h
 )
 
 target_include_directories(MolSim
@@ -71,3 +78,21 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 include(vtk)
 include(clang-format)
 include(doxygen)  # This now loads your complete doxygen module
+include(CTest)
+
+if (BUILD_TESTING)
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/refs/tags/v1.15.2.zip
+)
+FetchContent_MakeAvailable(googletest)
+
+add_executable(ParticleContainerTest
+        tests/Temporary/Unit/ParticleContainerTest.cpp
+)
+target_link_libraries(ParticleContainerTest PRIVATE GTest::gtest_main)
+target_include_directories(ParticleContainerTest PRIVATE ${PROJECT_SOURCE_DIR}/src)
+include(GoogleTest)
+gtest_discover_tests(ParticleContainerTest)
+endif ()
