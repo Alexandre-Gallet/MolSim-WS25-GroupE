@@ -16,9 +16,21 @@ class LennardJones : public ForceCalculation {
  public:
   LennardJones();
   ~LennardJones() override;
+  //getters for parameters and potential
   [[nodiscard]] double getEpsilon() const { return epsilon; }
   [[nodiscard]] double getSigma() const { return sigma; }
   [[nodiscard]] double calculateU(const Particle &p1, const Particle &p2) const;
+  /**
+   * @brief Calculates the forces using the Lennard-Jones formulas
+   * @param particles Particle container on which the calculations are performed
+   */
   void calculateF(ParticleContainer &particles) override;
+  /**
+   * @brief Calculate the force between two particles using Lennard-Jones formula
+   * @param p1 First particle
+   * @param p2 Second particle
+   * @param epsilon
+   * @param sigma
+   */
   static void calc(Particle &p1, Particle &p2, double epsilon, double sigma);
 };

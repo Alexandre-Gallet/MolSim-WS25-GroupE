@@ -3,6 +3,7 @@
 #include "Cuboid.h"
 #include "outputWriter/OutputFormat.h"
 
+//Struct with all possible command line parameters and their default values
 struct Arguments {
   char *inputFile;
   double t_start = 0.0;

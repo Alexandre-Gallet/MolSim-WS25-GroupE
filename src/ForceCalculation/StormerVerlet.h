@@ -18,7 +18,9 @@ class StormerVerlet : public ForceCalculation {
    * @param p2 Second particle
    */
   static void calc(Particle &p1, Particle &p2);
+  /**
+   * @brief Calculates the forces using the Störmer-Verlet formulas
+   * @param particles Particle container on which the calculations are performed
+   */
   void calculateF(ParticleContainer &particles) override;
-  static void calculateX(ParticleContainer &particles, double delta_t);
-  static void calculateV(ParticleContainer &particles, double delta_t);
 };

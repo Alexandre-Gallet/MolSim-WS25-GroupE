@@ -50,11 +50,13 @@ void parseArguments(const int argc, char *argv[], Arguments &args) {
               << "Use -h or --help to display usage.\n";
     std::exit(EXIT_FAILURE);
   }
+  //print the help message if necessary
   if (std::string arg = argv[1]; arg == "-h" || arg == "--help") {
     printUsage();
     std::exit(EXIT_SUCCESS);
   }
   args.inputFile = argv[1];
+  //parse the arguments, checking the flags and saving the values for the simulation parameters
   for (int i = 2; i < argc; i++) {
     std::string arg = argv[i];
     if (arg == "-h" || arg == "--help") {
@@ -98,6 +100,7 @@ void parseArguments(const int argc, char *argv[], Arguments &args) {
       std::exit(EXIT_FAILURE);
     }
   }
+  //check the validity of the given parameters
   if (args.t_start > args.t_end) {
     std::cerr << "Start time must be greater than end time\n";
     std::exit(EXIT_FAILURE);

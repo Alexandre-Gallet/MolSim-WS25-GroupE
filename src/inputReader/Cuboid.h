@@ -2,6 +2,7 @@
 
 #include "../ParticleContainer.h"
 
+//Struct with the given parameters of the cuboid
 struct Cuboid {
   ParticleContainer &container;
   const std::array<double, 3> &origin;
