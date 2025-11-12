@@ -46,7 +46,7 @@ add_executable(MolSim ${MY_SRC}
         src/Simulation/SimulationType.h
         src/ParticleGenerator.cpp
         src/ParticleGenerator.h
-        src/Cuboid.h
+        src/inputReader/Cuboid.h
         src/Simulation/MoleculeSimulation.cpp
         src/Simulation/MoleculeSimulation.h
 )

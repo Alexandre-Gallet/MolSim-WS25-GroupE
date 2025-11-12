@@ -1,11 +1,12 @@
 #pragma once
-#include "ParticleContainer.h"
-#include "Particle.h"
 #include <array>
+
+#include "Particle.h"
+#include "ParticleContainer.h"
 #include "utils/MaxwellBoltzmannDistribution.h"
 
 class ParticleGenerator {
-public:
+ public:
   /**
    * @brief Creates a cuboid of particles and inserts them into the given container.
    *
@@ -17,14 +18,7 @@ public:
    * @param baseVelocity   Initial velocity of each particle.
    * @param type       Type/id of the particle.
    */
-  static void generateCuboid(
-        ParticleContainer& container,
-        const std::array<double, 3>& origin,
-        const std::array<size_t, 3>& numPerDim,
-        double h,
-        double mass,
-        const std::array<double, 3>& baseVelocity,
-        double brownianMean = 0.1,
-        int type = 0
-    );
+  static void generateCuboid(ParticleContainer &container, const std::array<double, 3> &origin,
+                             const std::array<size_t, 3> &numPerDim, double h, double mass,
+                             const std::array<double, 3> &baseVelocity, double brownianMean = 0.1, int type = 0);
 };

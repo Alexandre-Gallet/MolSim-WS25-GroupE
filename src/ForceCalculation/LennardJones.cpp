@@ -1,5 +1,6 @@
 
 #include "LennardJones.h"
+
 #include "../utils/ArrayUtils.h"
 
 LennardJones::LennardJones() = default;

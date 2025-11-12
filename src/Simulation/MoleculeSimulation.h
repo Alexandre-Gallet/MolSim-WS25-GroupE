@@ -1,19 +1,16 @@
 
 #pragma once
 
+#include "../inputReader/Cuboid.h"
 #include "Simulation.h"
-#include "../Cuboid.h"
+#include "inputReader/Arguments.h"
 
 class MoleculeSimulation : public Simulation {
-  Cuboid cuboid;
-  double t_start;
-  double t_end;
-  double delta_t;
-  public:
-  [[nodiscard]] double getTStart() const { return t_start; }
-  [[nodiscard]] double getTEnd() const { return t_end; }
-  [[nodiscard]] double getDeltaT() const { return delta_t; }
-  explicit MoleculeSimulation() = default;
+  Arguments &args;
+  ParticleContainer &particles;
+ public:
+  explicit MoleculeSimulation(Arguments &args, ParticleContainer &particles);
   ~MoleculeSimulation() override;
   void runSimulation() override;
+  static void plotParticles(ParticleContainer &particles, int iteration, OutputFormat format);
 };

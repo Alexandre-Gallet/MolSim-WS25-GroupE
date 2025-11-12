@@ -5,9 +5,9 @@
 #pragma once
 
 #include "../ParticleContainer.h"
-#include "SimulationType.h"
 #include "../inputReader/Arguments.h"
 #include "Simulation.h"
+#include "SimulationType.h"
 
 class SimulationFactory {
  public:

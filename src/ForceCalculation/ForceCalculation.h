@@ -30,6 +30,17 @@ class ForceCalculation {
               std::plus<>()),
           std::plus<>()));
     }
+  }
+  static void calculateV(ParticleContainer &particles, double delta_t) {
+    // calculate the forces using the methods in the ArrayUtils class
 
+    for (auto &p : particles) {
+      p.setV(ArrayUtils::elementWisePairOp(
+          p.getV(),
+          ArrayUtils::elementWiseScalarOp(delta_t / (2 * p.getM()),
+                                          ArrayUtils::elementWisePairOp(p.getOldF(), p.getF(), std::plus<>()),
+                                          std::multiplies<>()),
+          std::plus<>()));
+    }
   }
 };
