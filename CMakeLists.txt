@@ -27,6 +27,28 @@ file(GLOB_RECURSE MY_SRC
 add_executable(MolSim ${MY_SRC}
         src/ParticleContainer.cpp
         src/ParticleContainer.h
+        src/outputWriter/OutputWriter.h
+        src/inputReader/InputReader.h
+        src/inputReader/InputReader.cpp
+        src/outputWriter/WriterFactory.h
+        src/outputWriter/OutputFormat.h
+        src/outputWriter/WriterFactory.cpp
+        src/ForceCalculation/ForceCalculation.h
+        src/ForceCalculation/StormerVerlet.cpp
+        src/ForceCalculation/StormerVerlet.h
+        src/ForceCalculation/LennardJones.cpp
+        src/ForceCalculation/LennardJones.h
+        src/Simulation/Simulation.h
+        src/Simulation/PlanetSimulation.cpp
+        src/Simulation/PlanetSimulation.h
+        src/Simulation/SimulationFactory.cpp
+        src/Simulation/SimulationFactory.h
+        src/Simulation/SimulationType.h
+        src/ParticleGenerator.cpp
+        src/ParticleGenerator.h
+        src/inputReader/Cuboid.h
+        src/Simulation/MoleculeSimulation.cpp
+        src/Simulation/MoleculeSimulation.h
 )
 
 target_include_directories(MolSim
