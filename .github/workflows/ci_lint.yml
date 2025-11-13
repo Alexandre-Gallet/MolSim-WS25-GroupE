@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repository
+      # Step 1: Checkout the repository (This copies the repo into the virtual machine)
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -34,14 +34,14 @@ jobs:
       - name: Prepare APT cache directory
         run: mkdir -p apt-cache/partial
 
-      # Step 4: Disable man-db for faster installs
-      - name: Disable man-db
+      # additional step to avoid lengthy unnecessary task
+      - name: Disable man-db to speed up installs
         run: |
           sudo apt-get -y remove man-db || true
           sudo apt-get -y purge man-db || true
           sudo apt-get -y autoremove || true
 
-      # Step 5: Install dependencies (clang-tidy, clang-format, cmake)
+      # Step 4: Install clang-tidy, clang-format and build deps using cached APT packages
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -54,7 +54,7 @@ jobs:
           sudo rm -f apt-cache/lock || true
           sudo chmod -R a+rX apt-cache || true
 
-      # Step 7: Cache CMake configuration
+      # Step 6: Cache CMake configuration (shared with main build)
       - name: Cache CMake configuration
         uses: actions/cache@v4
         with:
@@ -65,7 +65,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cmake-
 
-      # Step 8: Configure build (generates compile_commands.json)
+      # Step 7: Configure CMake (needed for compile_commands.json for clang-tidy)
       - name: Configure project
         run: cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
