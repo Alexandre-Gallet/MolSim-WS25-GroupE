@@ -35,12 +35,26 @@
 .idea/
 .vscode/
 
-# Build folders.
-# This rule ignores any folder in the project root that contains "build"
-/*build*/
+# ignore the build folder
+build/
 
-# Output folder
-/*output*/
+# ignore the output folder
+output/
 
-# Doxygen generated documentation
+# ignore the folder containing the generated doxygen documentation
 docs/
+
+# ignore the Cmake generated folders/foles
+.cmake/
+
+# remove the WSL specifc files
+*:Zone.Identifier
+
+# ignore Darinas auto generated testing folder the testing folder
+Testing/
+
+# ignore auto generated test log file
+tests/LastTest.log
+
+# ignore auto generated folder
+cmake-build-debug/
