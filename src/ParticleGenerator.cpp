@@ -20,7 +20,9 @@ void ParticleGenerator::generateCuboid(ParticleContainer &container, const std::
 
         vel[0] += brownian[0];
         vel[1] += brownian[1];
-        vel[2] += brownian[2];
+        if (vel[2] != 0) {
+          vel[2] += brownian[2];
+        }
 
         container.emplaceParticle(pos, vel, mass, type);
       }
