@@ -1,35 +1,35 @@
-/**
- * @file test_particle_generator.cpp
- * @brief Behaviour test for the ParticleGenerator component in the MolSim project.
- *
- * This test verifies that the ParticleGenerator correctly generates a cuboid of particles
- * with the expected number of particles and assigns non-zero velocities using the
- * Maxwell-Boltzmann distribution.
- *
- * Unlike a unit test, this behaviour test checks the *observable behaviour* of the
- * ParticleGenerator as a whole, rather than the correctness of a single internal function.
- */
+
 
 #include <gtest/gtest.h>
-#include "ParticleGenerator.h"
-#include "ParticleContainer.h"
 
-/**
- * @test ParticleGeneratorBehaviourTest.GeneratesCorrectNumberAndNonZeroVelocity
- * @brief Ensures that ParticleGenerator creates the correct number of particles and applies
- *        a non-zero velocity distribution.
- *
- * **Test Idea:**
- * Given a cuboid configuration (origin, dimensions, spacing, etc.), when the generator
- * creates the particles, then:
- * - The number of generated particles should equal the product of the given dimensions.
- * - The velocities of at least some particles should not be all zero (indicating the
- *   application of Maxwell-Boltzmann thermal motion).
- *
- * **Type:** Behaviour Test
- * **Rationale:** Tests the overall behaviour of `ParticleGenerator` rather than the
- * correctness of internal formulas. It observes the *expected effects* (number of particles
- * and presence of random velocity) from a user's perspective.
+#include <cmath>
+#include <sstream>
+
+#include "ParticleContainer.h"
+#include "ParticleGenerator.h"
+#include "Simulation/Simulation.h"
+#include "inputReader/FileReader.h"
+
+/*
+
+   Behaviour test for the ParticleGenerator component in the MolSim project.
+
+  This test verifies that the ParticleGenerator correctly generates a cuboid of particles
+  with the expected number of particles and assigns non-zero velocities using the
+  Maxwell-Boltzmann distribution.
+
+ */
+
+/*
+  Ensures that ParticleGenerator creates the correct number of particles and applies
+         a non-zero velocity distribution.
+
+    **Test Idea:**
+  Given a cuboid configuration (origin, dimensions, spacing, etc.), when the generator
+  creates the particles, then:
+   - The number of generated particles should equal the product of the given dimensions.
+   - The velocities of at least some particles should not be all zero (indicating the
+    application of Maxwell-Boltzmann thermal motion).
  */
 TEST(ParticleGeneratorBehaviourTest, GeneratesCorrectNumberAndNonZeroVelocity) {
     /// Container to hold the generated particles.
@@ -68,7 +68,7 @@ TEST(ParticleGeneratorBehaviourTest, GeneratesCorrectNumberAndNonZeroVelocity) {
 
 
 
-TEST(ParticleGeneratorBehaviour, GeneratesCorrectGridPositions) {
+TEST(ParticleGeneratorBehaviourTest, GeneratesCorrectGridPositions) {
   ParticleContainer c;
   ParticleGenerator g;
   g.generateCuboid(c, {0,0,0}, {3,3,1}, 1.0, 1.0, {0,0,0}, 0.1);
@@ -79,3 +79,41 @@ TEST(ParticleGeneratorBehaviour, GeneratesCorrectGridPositions) {
     EXPECT_TRUE(fmod(x[1], 1.0) == 0.0);
   }
 }
+
+
+//Check that cuboid generator does not change initial velocities when brownian motion mean velocitiy is 0
+TEST(ParticleGeneratorBehaviourTest, NoBrownianKeepsVelocityConstant) {
+  ParticleContainer container;
+  ParticleGenerator generator;
+
+  const std::array<double, 3> origin{0.0, 0.0, 0.0};
+  const std::array<size_t, 3> N{3, 2, 1};
+  const double h = 1.0;
+  const double m = 1.0;
+  const std::array<double, 3> v0{1.0, -0.5, 0.2};
+  const double brownianMeanVelocity = 0.0;
+
+  generator.generateCuboid(container, origin, N, h, m, v0, brownianMeanVelocity);
+
+  for (const auto &p : container) {
+    EXPECT_DOUBLE_EQ(p.getV()[0], v0[0]);
+    EXPECT_DOUBLE_EQ(p.getV()[1], v0[1]);
+    EXPECT_DOUBLE_EQ(p.getV()[2], v0[2]);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

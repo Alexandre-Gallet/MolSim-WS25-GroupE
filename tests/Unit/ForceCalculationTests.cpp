@@ -90,8 +90,7 @@ TEST(LennardJonesBehaviourTest, RepulsiveForShortDistances) {
 
     auto F12 = p1.getF();
 
-    EXPECT_LT(dot3D(F12, r12), 0.0)
-        << "LJ force should be repulsive for r < r_min.";
+    EXPECT_LT(dot3D(F12, r12), 0.0);
 }
 
 
@@ -120,6 +119,5 @@ TEST(LennardJonesBehaviourTest, AttractiveForLongDistances) {
 
     auto F12 = p1.getF();
 
-    EXPECT_GT(dot3D(F12, r12), 0.0)
-        << "LJ force should be attractive for r > r_min.";
+    EXPECT_GT(dot3D(F12, r12), 0.0);
 }
