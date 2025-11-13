@@ -79,10 +79,3 @@ TEST(ParticleGeneratorBehaviour, GeneratesCorrectGridPositions) {
     EXPECT_TRUE(fmod(x[1], 1.0) == 0.0);
   }
 }
-
-
-
-
-
-
-
