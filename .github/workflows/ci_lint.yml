@@ -9,13 +9,19 @@ on:
 
 jobs:
   clang-tools:
-    name: Run clang-tidy and clang-format
+    name: Run clang-tidy and clang-format, redirecting output to reviewdog
     runs-on: ubuntu-latest
 
     steps:
       # Step 1: Checkout the repository (This copies the repo into the virtual machine)
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # Additionalstep: Install Review dog
+      - name: Install reviewdog
+        uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
 
       # Step 2: Cache APT packages (shared with build workflow)
       - name: Cache APT packages
@@ -66,10 +72,38 @@ jobs:
       - name: Configure project
         run: cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
-      # Step 8: Run clang-tidy using your custom CMake target
-      - name: Run clang-tidy
-        run: cmake --build build --target run_clang_tidy
+      # Step 8: Run clang-tidy via custom target in cmake and pass warnings/errors to reviewdog. Set to -fail-on-error=false
+      - name: Run clang-tidy with Reviewdog
+        run: |
+          cmake --build build --target run_clang_tidy 2> clang-tidy.log || true
+          reviewdog -f=clang-tidy \
+            -name="clang-tidy" \
+            -reporter=github-pr-review \
+            -fail-on-error=false \
+            < clang-tidy.log
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 9: Check code formatting using your custom CMake target
-      - name: Run clang-format check
-        run: cmake --build build --target clang_format_check
+     # Step 9: Run clang format via custom target in cmake and pass warnings to reviewdog. Set to -fail-on-error=true
+      - name: Run clang-format check with Reviewdog
+        run: |
+          cmake --build build --target clang_format_check 2> clang-format.log || true
+          reviewdog -f=clang-format \
+            -name="clang-format" \
+            -reporter=github-pr-review \
+            -fail-on-error=true \
+            < clang-format.log
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 10: Pass compiler warnings to review dog. Set to fail-on-error=false
+      - name: Compiler warnings (Reviewdog)
+        run: |
+         cmake --build build -- -j"$(nproc)" 2> warnings.log || true
+         reviewdog -f=gcc \
+           -name="compiler-warnings" \
+           -reporter=github-pr-review \
+           -fail-on-error=false \
+           < warnings.log
+        env:
+         REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
