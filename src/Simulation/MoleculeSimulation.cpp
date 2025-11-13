@@ -12,7 +12,6 @@
 MoleculeSimulation::MoleculeSimulation(Arguments &args, ParticleContainer &particles)
     : args(args), particles(particles) {}
 void MoleculeSimulation::runSimulation() {
-
   for (const auto &c : args.cuboids) {
     ParticleGenerator::generateCuboid(particles, c.origin, c.numPerDim, c.h, c.mass, c.baseVelocity, c.brownianMean,
                                       c.type);
