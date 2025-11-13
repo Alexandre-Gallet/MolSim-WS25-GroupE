@@ -95,12 +95,11 @@ jobs:
       - name: Build documentation
         run: cmake --build build --target doc_doxygen
 
-      # Step 11: Run unit tests and pass errors to review dog. Set fail-on-error=false
+      # Step 11: Run unit tests and pass errors to review dog. Set fail-on-error=false. Also, Convert CTest XML → Reviewdog format.
       - name: Run unit tests and annotate
         run: |
           ctest --test-dir build --output-on-failure --no-compress-output -T Test || true
 
-      # Convert CTest XML → Reviewdog format
           reviewdog -f=junit \
             -name="gtest" \
             -reporter=github-pr-review \
@@ -173,7 +172,7 @@ jobs:
       - name: Build ASan project
         run: cmake --build build_asan -- -j"$(nproc)"
 
-      # Step 11: Run unit tests and pass errors to review dog. Set fail-on-error=false. Tests are run in both builds for safety!
+      # Step 11: Run unit tests and pass errors to review dog. Set fail-on-error=false. Tests are run in both builds for safety! Also, Convert CTest XML → Reviewdog format.
       - name: Run ASan tests and annotate
         run: |
           ctest --test-dir build_asan --output-on-failure --no-compress-output -T Test || true
