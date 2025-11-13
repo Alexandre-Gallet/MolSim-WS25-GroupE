@@ -1,3 +1,4 @@
+
 cmake_minimum_required(VERSION 3.10)
 
 # Enable C++17. You may raise the standard if you want
@@ -81,18 +82,20 @@ include(doxygen)  # This now loads your complete doxygen module
 include(CTest)
 
 if (BUILD_TESTING)
-include(FetchContent)
-FetchContent_Declare(
-        googletest
-        URL https://github.com/google/googletest/archive/refs/tags/v1.15.2.zip
-)
-FetchContent_MakeAvailable(googletest)
+    include(FetchContent)
+    FetchContent_Declare(
+            googletest
+            URL https://github.com/google/googletest/archive/refs/tags/v1.15.2.zip
+    )
+    FetchContent_MakeAvailable(googletest)
 
-add_executable(ParticleContainerTest
-        tests/Temporary/Unit/ParticleContainerTest.cpp
-)
-target_link_libraries(ParticleContainerTest PRIVATE GTest::gtest_main)
-target_include_directories(ParticleContainerTest PRIVATE ${PROJECT_SOURCE_DIR}/src)
-include(GoogleTest)
-gtest_discover_tests(ParticleContainerTest)
+    add_executable(ParticleContainerTest
+            tests/Temporary/Unit/ParticleContainerTest.cpp
+            tests/Temporary/Unit/ForceCalculationTests.cpp
+            tests/Temporary/Unit/ForceCalculationTests.h
+    )
+    target_link_libraries(ParticleContainerTest PRIVATE GTest::gtest_main)
+    target_include_directories(ParticleContainerTest PRIVATE ${PROJECT_SOURCE_DIR}/src)
+    include(GoogleTest)
+    gtest_discover_tests(ParticleContainerTest)
 endif ()
