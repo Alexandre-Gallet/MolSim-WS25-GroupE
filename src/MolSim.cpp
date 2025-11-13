@@ -23,7 +23,7 @@ ParticleContainer particles;
 int main(int argc, char *argsv[]) {
   Arguments args;
   inputReader::parseArguments(argc, argsv, args);
-  auto simulation = SimulationFactory::createSimulation(SimulationType::Planet, args, particles);
+  auto simulation = SimulationFactory::createSimulation(args.sim_type, args, particles);
   simulation->runSimulation();
 
   std::cout << "output written. Terminating..." << std::endl;

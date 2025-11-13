@@ -2,14 +2,13 @@
 
 #include "../ParticleContainer.h"
 
-//Struct with the given parameters of the cuboid
+//Struct with the given parameters of the cuboid and a container for storing the particles
 struct Cuboid {
-  ParticleContainer &container;
-  const std::array<double, 3> &origin;
-  const std::array<size_t, 3> &numPerDim;
+  std::array<double, 3> &origin;
+  std::array<size_t, 3> &numPerDim;
   double h;
   double mass;
-  const std::array<double, 3> &baseVelocity;
+  std::array<double, 3> &baseVelocity;
   double brownianMean;
   int type;
 };

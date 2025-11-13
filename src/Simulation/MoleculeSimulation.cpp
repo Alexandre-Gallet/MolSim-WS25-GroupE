@@ -7,23 +7,32 @@
 
 #include "ForceCalculation/LennardJones.h"
 #include "ParticleGenerator.h"
+#include "inputReader/FileReaderCuboids.h"
 #include "outputWriter/WriterFactory.h"
 
 MoleculeSimulation::MoleculeSimulation(Arguments &args, ParticleContainer &particles)
     : args(args), particles(particles) {}
-void MoleculeSimulation::runSimulation() {
 
-  for (const auto &c : args.cuboids) {
+void MoleculeSimulation::runSimulation() {
+  std::vector<Cuboid> cuboids;
+  //read the parameters for each cuboid from the input file
+  FileReaderCuboid::readFile(cuboids, args.inputFile);
+  //generate each cuboid from the parameters given as input
+  for (const auto &c : cuboids) {
     ParticleGenerator::generateCuboid(particles, c.origin, c.numPerDim, c.h, c.mass, c.baseVelocity, c.brownianMean,
                                       c.type);
   }
   double current_time = args.t_start;
   int iteration = 0;
   while (current_time < args.t_end) {
+    //calculate forces, position and velocity
     LennardJones lj;
+    lj.setEpsilon(5);
+    lj.setSigma(1);
     LennardJones::calculateX(particles, args.delta_t);
     lj.calculateF(particles);
     LennardJones::calculateV(particles, args.delta_t);
+
     iteration++;
     if (iteration % 10 == 0) {
       plotParticles(particles, iteration, args.output_format);

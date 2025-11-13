@@ -52,10 +52,12 @@ add_executable(MolSim ${MY_SRC}
         src/ParticleGenerator.cpp
         src/ParticleGenerator.h
         src/ParticleGenerator.h
-        tests/Temporary/behaviour/ParticleContainerTest.cpp
-        tests/Temporary/behaviour/ParticleContainerTest.h
-        tests/Temporary/integration/ParticleContainerTest.cpp
-        tests/Temporary/integration/ParticleContainerTest.h
+#        tests/Temporary/behaviour/ParticleContainerTest.cpp
+#        tests/Temporary/behaviour/ParticleContainerTest.h
+#        tests/Temporary/integration/ParticleContainerTest.cpp
+#        tests/Temporary/integration/ParticleContainerTest.h
+        src/inputReader/FileReaderCuboids.cpp
+        src/inputReader/FileReaderCuboids.h
 )
 
 target_include_directories(MolSim
@@ -78,6 +80,7 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 include(vtk)
 include(clang-format)
 include(doxygen)  # This now loads your complete doxygen module
+
 include(CTest)
 
 if (BUILD_TESTING)

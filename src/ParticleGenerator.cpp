@@ -16,11 +16,14 @@ void ParticleGenerator::generateCuboid(ParticleContainer &container, const std::
         std::array<double, 3> vel = baseVelocity;
 
         // 3 for the Dimension
-        auto brownian = maxwellBoltzmannDistributedVelocity(brownianMean, 3);
+        //TODO change dim maybe?
+        auto brownian = maxwellBoltzmannDistributedVelocity(brownianMean, 2);
 
         vel[0] += brownian[0];
         vel[1] += brownian[1];
-        vel[2] += brownian[2];
+        if (vel[2] != 0) {
+          vel[2] += brownian[2];
+        }
 
         container.emplaceParticle(pos, vel, mass, type);
       }

@@ -10,15 +10,16 @@
  * Class used to compute forces using the Lennard-Jones formulas
  */
 class LennardJones : public ForceCalculation {
-  double epsilon{};
-  double sigma{};
-
+  double epsilon;
+  double sigma;
  public:
   LennardJones();
   ~LennardJones() override;
   //getters for parameters and potential
   [[nodiscard]] double getEpsilon() const { return epsilon; }
   [[nodiscard]] double getSigma() const { return sigma; }
+  void setEpsilon(double eps) { this->epsilon = eps; }
+  void setSigma(double sig) { this->sigma = sig; }
   [[nodiscard]] double calculateU(const Particle &p1, const Particle &p2) const;
   /**
    * @brief Calculates the forces using the Lennard-Jones formulas
