@@ -1,0 +1,70 @@
+---
+# ===============================
+#  Minimal but Effective Clang-Tidy remove those from cppcoreguidelines that would are not helpful
+# ===============================
+
+Checks: >
+  bugprone-*,
+  performance-*,
+  readability-*,
+  modernize-*,
+  portability-*,
+  cppcoreguidelines-*,
+  -cppcoreguidelines-owning-memory,       
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-pro-type-vararg,
+  -cppcoreguidelines-avoid-magic-numbers, 
+  -cppcoreguidelines-avoid-goto,         
+  -readability-magic-numbers,             
+  -readability-braces-around-statements,  
+  -readability-identifier-length,         
+  -performance-no-int-to-ptr,             
+  -modernize-use-nodiscard               
+
+WarningsAsErrors: ''
+
+HeaderFilterRegex: '.*'
+
+AnalyzeTemporaryDtors: false
+FormatStyle:     none
+
+# ==========================================
+#  OPTIONS FOR SOME CHECKS
+# ==========================================
+CheckOptions:
+  - key:             readability-identifier-naming.VariableCase
+    value:           lower_case
+  - key:             readability-identifier-naming.ClassCase
+    value:           CamelCase
+  - key:             readability-identifier-naming.FunctionCase
+    value:           camelBack
+  - key:             modernize-loop-convert.MaxCopySize
+    value:           '16'
+  - key:             modernize-use-nullptr.NullMacros
+    value:           'NULL,0'
+
+# ==============================================
+# ADVANCED MODE (DISABLED for now)
+# ==============================================
+# Checks: >
+#   clang-analyzer-*,
+#   concurrency-*,
+#   hicpp-*,
+#   misc-*,
+#   performance-*,
+#   portability-*,
+#   modernize-*,
+#   readability-*,
+#   cppcoreguidelines-*,
+#   bugprone-*,
+#   -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+#   -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+#   -hicpp-no-array-decay,
+#   -hicpp-use-auto,
+#   -readability-function-cognitive-complexity
+#
+# Notes:
+# • advanced mode is MUCH stricter
+# • prepare your team before enabling it
+# • works best after the codebase stabilizes
