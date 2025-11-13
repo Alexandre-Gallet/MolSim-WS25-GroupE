@@ -1,101 +1,125 @@
 #include <gtest/gtest.h>
-#include <array>
 #include <cmath>
+#include <array>
 
-#include "LennardJones.h"
+#include "ForceCalculation/LennardJones.h"
+#include "ParticleContainer.h"
+#include "Particle.h"
 
-
-// Helper: compute the magnitude of a 3D vector
-double norm(const std::array<double,3>& v) {
+// --- Helper: vector norm ---
+double norm3D(const std::array<double,3>& v) {
     return std::sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
 
-// Helper: compute dot product of two 3D vectors
-double dot(const std::array<double,3>& a, const std::array<double,3>& b) {
+// --- Helper: dot product ---
+double dot3D(const std::array<double,3>& a, const std::array<double,3>& b) {
     return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
 }
 
+/*  TEST 1: Newton's 3rd Law (force symmetry)  F12 = -F21 MUST always hold for Lennard-Jones interactions. */
+TEST(LennardJonesBehaviourTest, Newton3rdLawSymmetry) {
+    LennardJones lj;
+    ParticleContainer container;
 
-// Test 1: Force symmetry (Newton's 3rd law)
-// For Lennard-Jones, the force from particle j on i must be the exact negative
-// of the force from i on j. This ensures momentum conservation.
-TEST(LennardJonesForceTest, SymmetryFijEqualsMinusFji) {
+    // parameters are stored inside lj object; override via constructor or setters
+    // your class currently uses default epsilon/sigma = 0,
+    // so we manually access `calc()` instead of `calculateF()`.
+
     double epsilon = 5.0;
     double sigma   = 1.0;
 
-    std::array<double,3> xi{0.0, 0.0, 0.0};
-    std::array<double,3> xj{1.5, 0.0, 0.0};
+    Particle p1, p2;
+    p1.setX({0,0,0});
+    p2.setX({1.5,0,0});
+    p1.setF({0,0,0});
+    p2.setF({0,0,0});
 
-    // Compute forces in both directions
-    auto Fij = lennardJonesForce(xi, xj, epsilon, sigma);
-    auto Fji = lennardJonesForce(xj, xi, epsilon, sigma);
+    // Pairwise force application
+    LennardJones::calc(p1, p2, epsilon, sigma);
 
-    // They must cancel out perfectly component-wise
-    EXPECT_NEAR(Fij[0] + Fji[0], 0.0, 1e-10);
-    EXPECT_NEAR(Fij[1] + Fji[1], 0.0, 1e-10);
-    EXPECT_NEAR(Fij[2] + Fji[2], 0.0, 1e-10);
+    auto F12 = p1.getF();
+    auto F21 = p2.getF();
+
+    EXPECT_NEAR(F12[0] + F21[0], 0.0, 1e-10);
+    EXPECT_NEAR(F12[1] + F21[1], 0.0, 1e-10);
+    EXPECT_NEAR(F12[2] + F21[2], 0.0, 1e-10);
 }
 
 
-// Test 2: Zero force at potential minimum
-// The Lennard–Jones potential reaches its minimum at
-//      r_min = 2^(1/6) * sigma
-// At this distance the force MUST be zero (stable equilibrium).
-TEST(LennardJonesForceTest, ZeroForceAtPotentialMinimum) {
+/*  TEST 2: Zero force at equilibrium distance  r_min = 2^(1/6) * sigma */
+TEST(LennardJonesBehaviourTest, ZeroForceAtEquilibriumDistance) {
     double epsilon = 5.0;
     double sigma   = 1.0;
 
     double r_min = std::pow(2.0, 1.0/6.0) * sigma;
 
-    std::array<double,3> xi{0.0, 0.0, 0.0};
-    std::array<double,3> xj{r_min, 0.0, 0.0};
+    Particle p1, p2;
+    p1.setX({0,0,0});
+    p2.setX({r_min,0,0});
+    p1.setF({0,0,0});
+    p2.setF({0,0,0});
 
-    auto Fij = lennardJonesForce(xi, xj, epsilon, sigma);
+    LennardJones::calc(p1, p2, epsilon, sigma);
 
-    // The norm of the force should be nearly zero
-    EXPECT_NEAR(norm(Fij), 0.0, 1e-6);
+    EXPECT_NEAR(norm3D(p1.getF()), 0.0, 1e-6);
+    EXPECT_NEAR(norm3D(p2.getF()), 0.0, 1e-6);
 }
 
 
-// Test 3: Repulsive force when particles are too close
-// For r < r_min, the LJ force must push particles apart.
-// This means: dot(Fij, r_ij) < 0
-TEST(LennardJonesForceTest, RepulsiveForShortDistances) {
+/*  dot(F12, r12) < 0 means pushing apart. */
+TEST(LennardJonesBehaviourTest, RepulsiveForShortDistances) {
     double epsilon = 5.0;
     double sigma   = 1.0;
 
     double r_min = std::pow(2.0, 1.0/6.0) * sigma;
-    double r     = 0.8 * r_min;   // closer than minimum -> repulsion
+    double r     = 0.7 * r_min;  // too close → repulsive
 
-    std::array<double,3> xi{0.0, 0.0, 0.0};
-    std::array<double,3> xj{r,   0.0, 0.0};
+    Particle p1, p2;
+    p1.setX({0,0,0});
+    p2.setX({r,0,0});
+    p1.setF({0,0,0});
+    p2.setF({0,0,0});
 
-    auto Fij = lennardJonesForce(xi, xj, epsilon, sigma);
+    LennardJones::calc(p1, p2, epsilon, sigma);
 
-    std::array<double,3> rij{xj[0] - xi[0], xj[1] - xi[1], xj[2] - xi[2]};
+    std::array<double,3> r12 = {
+        p2.getX()[0] - p1.getX()[0],
+        p2.getX()[1] - p1.getX()[1],
+        p2.getX()[2] - p1.getX()[2]
+    };
 
-    // Repulsion means the force is in the opposite direction of rij
-    EXPECT_LT(dot(Fij, rij), 0.0);
+    auto F12 = p1.getF();
+
+    EXPECT_LT(dot3D(F12, r12), 0.0)
+        << "LJ force should be repulsive for r < r_min.";
 }
 
 
-// Test 4: Attractive force at long distances
-// For r > r_min, the LJ force must pull particles together.
-// That means: dot(Fij, r_ij) > 0
-TEST(LennardJonesForceTest, AttractiveForLongDistances) {
+
+ /* TEST 4: Attractive force for long distances (r > r_min) dot(F12, r12) > 0 means pulling together. */
+TEST(LennardJonesBehaviourTest, AttractiveForLongDistances) {
     double epsilon = 5.0;
     double sigma   = 1.0;
 
     double r_min = std::pow(2.0, 1.0/6.0) * sigma;
-    double r     = 2.0 * r_min;  // larger than minimum -> attraction
+    double r     = 2.0 * r_min;  // far → attraction
 
-    std::array<double,3> xi{0.0, 0.0, 0.0};
-    std::array<double,3> xj{r,   0.0, 0.0};
+    Particle p1, p2;
+    p1.setX({0,0,0});
+    p2.setX({r,0,0});
+    p1.setF({0,0,0});
+    p2.setF({0,0,0});
 
-    auto Fij = lennardJonesForce(xi, xj, epsilon, sigma);
+    LennardJones::calc(p1, p2, epsilon, sigma);
 
-    std::array<double,3> rij{xj[0] - xi[0], xj[1] - xi[1], xj[2] - xi[2]};
+    std::array<double,3> r12 = {
+        p2.getX()[0] - p1.getX()[0],
+        p2.getX()[1] - p1.getX()[1],
+        p2.getX()[2] - p1.getX()[2]
+    };
 
-    // Attraction means the force is in the same direction as rij
-    EXPECT_GT(dot(Fij, rij), 0.0);
+    auto F12 = p1.getF();
+
+    EXPECT_GT(dot3D(F12, r12), 0.0)
+        << "LJ force should be attractive for r > r_min.";
 }
