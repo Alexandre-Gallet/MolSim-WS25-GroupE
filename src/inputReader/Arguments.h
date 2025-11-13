@@ -14,6 +14,6 @@ struct Arguments {
 #ifdef ENABLE_VTK_OUTPUT
   OutputFormat output_format = OutputFormat::VTK;
 #else
-  OutputFormat outputFormat = OutputFormat::XYZ;
+  OutputFormat output_format = OutputFormat::XYZ;
 #endif
 };

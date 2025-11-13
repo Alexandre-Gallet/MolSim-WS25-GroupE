@@ -1,0 +1,10 @@
+//
+// Created by altay on 13.11.2025.
+//
+
+#ifndef PSEMOLDYN_FORCECALCULATIONTESTS_H
+#define PSEMOLDYN_FORCECALCULATIONTESTS_H
+
+class ForceCalculationTests {};
+
+#endif  // PSEMOLDYN_FORCECALCULATIONTESTS_H
