@@ -1,4 +1,4 @@
-#Molecular Dynamcis Simulator GroupE 
+#Molecular Dynamics Simulator GroupE 
 Implementation of a MD simulator following the labcourse Scientific Computing (PSE) Molekulardynamik (IN0012, IN4229) at Technische Universtität München during the Wintersemester 2025/2026
 
 ## Table of Contents
