@@ -41,7 +41,6 @@ protected:
     pc.addParticle(Particle{x2, v, 1.0, 0});
   }
 
-
      //The container under test.
 
   ParticleContainer pc;
