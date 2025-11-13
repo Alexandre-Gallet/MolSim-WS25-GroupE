@@ -22,13 +22,16 @@ void MoleculeSimulation::runSimulation() {
     ParticleGenerator::generateCuboid(particles, c.origin, c.numPerDim, c.h, c.mass, c.baseVelocity, c.brownianMean,
                                       c.type);
   }
+
+  LennardJones lj;
+  lj.setEpsilon(5);
+  lj.setSigma(1);
+  lj.calculateF(particles);  // initial force evaluation for the first integration step
+
   double current_time = args.t_start;
   int iteration = 0;
   while (current_time < args.t_end) {
     //calculate forces, position and velocity
-    LennardJones lj;
-    lj.setEpsilon(5);
-    lj.setSigma(1);
     LennardJones::calculateX(particles, args.delta_t);
     lj.calculateF(particles);
     LennardJones::calculateV(particles, args.delta_t);

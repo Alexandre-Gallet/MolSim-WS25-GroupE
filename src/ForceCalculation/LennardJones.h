@@ -10,8 +10,8 @@
  * Class used to compute forces using the Lennard-Jones formulas
  */
 class LennardJones : public ForceCalculation {
-  double epsilon;
-  double sigma;
+  double epsilon{};
+  double sigma{};
  public:
   LennardJones();
   ~LennardJones() override;
