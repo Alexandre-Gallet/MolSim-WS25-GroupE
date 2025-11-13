@@ -1,10 +1,14 @@
 name: Build and Test
 
+# Trigger on all pushes and pull_requests to master and AssignmentX
 on:
   push:
-    branches: ['alexandre_assignment2']
+    branches:
+      - '**'
   pull_request:
-    branches: ['alexandre_assignment2']
+    branches:
+      - 'master'
+      - 'Assignment*'
 
 jobs:
   # Normal build + test
