@@ -76,13 +76,14 @@ jobs:
         run: cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
       # Step 8: Run clang-tidy via custom target in cmake and pass warnings/errors to reviewdog. Set to -fail-on-error=false
-      - name: Run clang-tidy and pass to Reviewdog
+      - name: Run clang-tidy (reviewdog)
         run: |
           cmake --build build --target run_clang_tidy 2> clang-tidy.log || true
-          reviewdog -f=clang-tidy \
+          reviewdog \
+            -efm="%f:%l:%c: %m" \
             -name="clang-tidy" \
             -reporter=github-pr-review \
-            -fail-on-error=false \
+            -fail-on-error=true \
             < clang-tidy.log
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
