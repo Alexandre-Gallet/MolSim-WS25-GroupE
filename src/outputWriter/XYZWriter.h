@@ -10,17 +10,19 @@
 #include <fstream>
 #include <list>
 
+#include "OutputWriter.h"
 #include "Particle.h"
+#include "ParticleContainer.h"
 
 namespace outputWriter {
 
-class XYZWriter {
+class XYZWriter : public OutputWriter {
  public:
   XYZWriter();
 
-  virtual ~XYZWriter();
+  ~XYZWriter() override;
 
-  void plotParticles(std::list<Particle> particles, const std::string &filename, int iteration);
+  void plotParticles(ParticleContainer &particles, const std::string &filename, int iteration) override;
 };
 
 }  // namespace outputWriter

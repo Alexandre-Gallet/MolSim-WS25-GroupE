@@ -1,0 +1,28 @@
+/**
+ * @file OutputWriter.h
+ */
+#pragma once
+
+#include <list>
+#include <string>
+
+#include "ParticleContainer.h"
+
+namespace outputWriter {
+/**
+ * This abstract class defines a common interface for all output writers
+ */
+class OutputWriter {
+ public:
+  OutputWriter() = default;
+
+  virtual ~OutputWriter() = default;
+  /**
+   * @brief Write the given particles to an output file.
+   * @param particles articles to write to output
+   * @param filename Output filename
+   * @param iteration Current iteration number
+   */
+  virtual void plotParticles(ParticleContainer &particles, const std::string &filename, int iteration) = 0;
+};
+}  // namespace outputWriter

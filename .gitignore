@@ -50,5 +50,11 @@ docs/
 # remove the WSL specifc files
 *:Zone.Identifier
 
-# ignore the testing folder
+# ignore Darinas auto generated testing folder the testing folder
 Testing/
+
+# ignore auto generated test log file
+tests/LastTest.log
+
+# ignore auto cmake generated folder
+cmake-build-debug/q
