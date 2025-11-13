@@ -21,12 +21,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # additional step
-      - name: Install reviewdog
-        uses: reviewdog/action-setup@v1
-        with:
-          reviewdog_version: latest
-
       # Step 2: Cache APT packages to speed up installs.
       # This caches downloaded .deb packages in ./apt-cache inside the workspace.
       # On a cache hit, apt-get can reuse them instead of downloading again.
@@ -99,18 +93,9 @@ jobs:
       - name: Build documentation
         run: cmake --build build --target doc_doxygen
 
-      # Step 11: Run unit tests and pass errors to review dog. Set fail-on-error=false. Also, Convert CTest XML → Reviewdog format.
-      - name: Run unit tests and annotate
-        run: |
-          ctest --test-dir build --output-on-failure --no-compress-output -T Test || true
-
-          reviewdog -f=junit \
-            -name="gtest" \
-            -reporter=github-pr-review \
-            -fail-on-error=false \
-            < build/Testing/*/Test.xml
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Step 11: Run unit tests
+      - name: Run unit tests
+        run: ctest --test-dir build --output-on-failure -j"$(nproc)"
 
   # ASan build + test (separate job, fresh build tree)
   build_and_test_asan:
@@ -176,15 +161,6 @@ jobs:
       - name: Build ASan project
         run: cmake --build build_asan -- -j"$(nproc)"
 
-      # Step 11: Run unit tests and pass errors to review dog. Set fail-on-error=false. Tests are run in both builds for safety! Also, Convert CTest XML → Reviewdog format.
-      - name: Run ASan tests and annotate
-        run: |
-          ctest --test-dir build_asan --output-on-failure --no-compress-output -T Test || true
-
-          reviewdog -f=junit \
-            -name="gtest-asan" \
-            -reporter=github-pr-review \
-            -fail-on-error=false \
-            < build_asan/Testing/*/Test.xml
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Step 8: Run tests with asan build
+      - name: Run ASan tests
+        run: ctest --test-dir build_asan --output-on-failure -j"$(nproc)"

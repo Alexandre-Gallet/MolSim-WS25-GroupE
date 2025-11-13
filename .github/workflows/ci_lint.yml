@@ -12,21 +12,15 @@ on:
 
 jobs:
   clang-tools:
-    name: Run clang-tidy and clang-format, redirecting output to reviewdog
+    name: Run clang-tidy and clang-format
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository (This copies the repo into the virtual machine)
+      # Step 1: Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Additionalstep: Install Review dog
-      - name: Install reviewdog
-        uses: reviewdog/action-setup@v1
-        with:
-          reviewdog_version: latest
-
-      # Step 2: Cache APT packages (shared with build workflow)
+      # Step 2: Cache APT packages
       - name: Cache APT packages
         id: cache-apt
         uses: actions/cache@v4
@@ -40,27 +34,27 @@ jobs:
       - name: Prepare APT cache directory
         run: mkdir -p apt-cache/partial
 
-      # additional step to avoid lengthy unnecessary task
-      - name: Disable man-db to speed up installs
+      # Step 4: Disable man-db for faster installs
+      - name: Disable man-db
         run: |
           sudo apt-get -y remove man-db || true
           sudo apt-get -y purge man-db || true
           sudo apt-get -y autoremove || true
 
-      # Step 4: Install clang-tidy, clang-format and build deps using cached APT packages
+      # Step 5: Install dependencies (clang-tidy, clang-format, cmake)
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get -o Dir::Cache::Archives=$PWD/apt-cache install -y \
             --no-install-recommends clang-tidy clang-format cmake build-essential libvtk9-dev
 
-      # Step 5: Normalize APT cache permissions for saving
+      # Step 6: Fix APT cache permissions
       - name: Normalize APT cache permissions
         run: |
           sudo rm -f apt-cache/lock || true
           sudo chmod -R a+rX apt-cache || true
 
-      # Step 6: Cache CMake configuration (shared with main build)
+      # Step 7: Cache CMake configuration
       - name: Cache CMake configuration
         uses: actions/cache@v4
         with:
@@ -71,42 +65,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cmake-
 
-      # Step 7: Configure CMake (needed for compile_commands.json for clang-tidy)
+      # Step 8: Configure build (generates compile_commands.json)
       - name: Configure project
         run: cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
-      # Step 8: Run clang-tidy via custom target in cmake and pass warnings/errors to reviewdog. Set to -fail-on-error=false
-      - name: Run clang-tidy and pass to Reviewdog
-        run: |
-          cmake --build build --target run_clang_tidy 2> clang-tidy.log || true
-          reviewdog -f=clang-tidy \
-            -name="clang-tidy" \
-            -reporter=github-pr-review \
-            -fail-on-error=false \
-            < clang-tidy.log
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Step 9: Run clang-tidy using your custom CMake target
+      - name: Run clang-tidy
+        run: cmake --build build --target run_clang_tidy
 
-     # Step 9: Run clang format via custom target in cmake and pass warnings to reviewdog. Set to -fail-on-error=true
-      - name: Run clang-format check and pass to Reviewdog
-        run: |
-          cmake --build build --target clang_format_check 2> clang-format.log || true
-          reviewdog -f=clang-format \
-            -name="clang-format" \
-            -reporter=github-pr-review \
-            -fail-on-error=true \
-            < clang-format.log
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Step 10: Pass compiler warnings to review dog. Set to fail-on-error=false
-      - name: Gather compiler warnings and pass to review-dog
-        run: |
-         cmake --build build -- -j"$(nproc)" 2> warnings.log || true
-         reviewdog -f=gcc \
-           -name="compiler-warnings" \
-           -reporter=github-pr-review \
-           -fail-on-error=false \
-           < warnings.log
-        env:
-         REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Step 10: Run clang-format using your custom CMake target
+      - name: Run clang-format check
+        run: cmake --build build --target clang_format_check
