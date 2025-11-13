@@ -1,4 +1,4 @@
-#Molecular Dynamcis Simulator GroupE 
+# Molecular Dynamcis Simulator GroupE 
 Implementation of a MD simulator following the labcourse Scientific Computing (PSE) Molekulardynamik (IN0012, IN4229) at Technische Universtität München during the Wintersemester 2025/2026
 
 ## Table of Contents
@@ -31,13 +31,12 @@ sudo pacman -S base-devel cmake vtk
 sudo dnf install vtk-devel cmake gcc-c++ make
 ```
 
-3: Build the project, configure makefiles with ccmake GUI, generate doxygen Documentation
+3: Build the project with cmake, generate doxygen Documentation. By default CMAKE_BUILD_TYPE is set to "Release" which passes the -O3 and -DNDEBUG flags tp the compiler. 
 ```bash
 mkdir -p build
 cd build
-ccmake ..
-make -j$(nproc)
-make doc_doxygen
+cmake --build . -- -j$(nproc)
+cmake --build . --target doc_doxygen
 ```
 ## Usage
 
@@ -48,7 +47,7 @@ After building the project, run the simulation with from within the `build` dire
 
 ### Example:
 
-From the `build` directory using the preexisitng input file eingabe_sonne.txt:
+From the `build` directory using the preexisitng input file eingabe-sonne.txt:
 ```bash
 ./MolSim ./../input/eingabe-sonne.txt 1000 0.014
 ```
