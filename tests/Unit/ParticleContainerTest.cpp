@@ -46,7 +46,6 @@ protected:
   ParticleContainer pc;
 };
 
-
  // Newly created container must be empty.
 
 TEST(ParticleContainerTest, NewlyConstructedIsEmpty) {
