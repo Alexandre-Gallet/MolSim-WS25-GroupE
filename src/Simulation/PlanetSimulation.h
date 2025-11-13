@@ -22,6 +22,9 @@ class PlanetSimulation : public Simulation {
   [[nodiscard]] ParticleContainer &getParticles() const { return particles; }
   explicit PlanetSimulation(const Arguments &args, ParticleContainer &particles);
   ~PlanetSimulation() override = default;
+  /**
+   * @brief main function for running the simulation
+   */
   void runSimulation() override;
   static void plotParticles(ParticleContainer &particles, int iteration, OutputFormat format);
 };
