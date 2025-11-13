@@ -4,7 +4,7 @@
 #include "Simulation/SimulationType.h"
 #include "outputWriter/OutputFormat.h"
 
-//Struct with all possible command line parameters and their default values
+// Struct with all possible command line parameters and their default values
 struct Arguments {
   SimulationType sim_type;
   char *inputFile;

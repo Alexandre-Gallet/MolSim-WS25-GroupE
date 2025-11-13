@@ -12,10 +12,11 @@
 class LennardJones : public ForceCalculation {
   double epsilon{};
   double sigma{};
+
  public:
   LennardJones();
   ~LennardJones() override;
-  //getters for parameters and potential
+  // getters for parameters and potential
   [[nodiscard]] double getEpsilon() const { return epsilon; }
   [[nodiscard]] double getSigma() const { return sigma; }
   void setEpsilon(double eps) { this->epsilon = eps; }

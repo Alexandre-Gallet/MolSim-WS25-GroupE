@@ -12,7 +12,7 @@ void StormerVerlet::calc(Particle &p1, Particle &p2) {
   double scalar = p1.getM() * p2.getM() / norm;
   std::array<double, 3> newF = ArrayUtils::elementWiseScalarOp(
       scalar, ArrayUtils::elementWisePairOp(p2.getX(), p1.getX(), std::minus<>()), std::multiplies<>());
-  //Set the new values making use of Newton's third law
+  // Set the new values making use of Newton's third law
   p1.setF(ArrayUtils::elementWisePairOp(p1.getF(), newF, std::plus<>()));
   p2.setF(ArrayUtils::elementWisePairOp(p2.getF(), newF, std::minus<>()));
 }
@@ -22,6 +22,6 @@ void StormerVerlet::calculateF(ParticleContainer &particles) {
     p.setOldF(p.getF());
     p.setF({0., 0., 0.});
   }
-  //Use pair iterator to calculates forces between each pair of particles
+  // Use pair iterator to calculates forces between each pair of particles
   particles.forEachPair([](Particle &p1, Particle &p2) { calc(p1, p2); });
 }

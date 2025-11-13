@@ -15,9 +15,9 @@ MoleculeSimulation::MoleculeSimulation(Arguments &args, ParticleContainer &parti
 
 void MoleculeSimulation::runSimulation() {
   std::vector<Cuboid> cuboids;
-  //read the parameters for each cuboid from the input file
+  // read the parameters for each cuboid from the input file
   FileReaderCuboid::readFile(cuboids, args.inputFile);
-  //generate each cuboid from the parameters given as input
+  // generate each cuboid from the parameters given as input
   for (const auto &c : cuboids) {
     ParticleGenerator::generateCuboid(particles, c.origin, c.numPerDim, c.h, c.mass, c.baseVelocity, c.brownianMean,
                                       c.type);
@@ -31,7 +31,7 @@ void MoleculeSimulation::runSimulation() {
   double current_time = args.t_start;
   int iteration = 0;
   while (current_time < args.t_end) {
-    //calculate forces, position and velocity
+    // calculate forces, position and velocity
     LennardJones::calculateX(particles, args.delta_t);
     lj.calculateF(particles);
     LennardJones::calculateV(particles, args.delta_t);

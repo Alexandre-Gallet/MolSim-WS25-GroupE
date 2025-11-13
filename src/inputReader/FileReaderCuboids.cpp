@@ -13,7 +13,7 @@ FileReaderCuboid::FileReaderCuboid() = default;
 
 FileReaderCuboid::~FileReaderCuboid() = default;
 
-void FileReaderCuboid::readFile(std::vector<Cuboid>& cuboids, char *filename) {
+void FileReaderCuboid::readFile(std::vector<Cuboid> &cuboids, char *filename) {
   std::ifstream input_file(filename);
   std::string tmp_string;
 

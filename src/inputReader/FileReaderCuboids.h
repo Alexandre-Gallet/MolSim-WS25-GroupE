@@ -7,9 +7,9 @@
 #include "Cuboid.h"
 
 class FileReaderCuboid {
-public:
+ public:
   FileReaderCuboid();
   virtual ~FileReaderCuboid();
 
-  static void readFile(std::vector<Cuboid>& cuboids, char *filename);
+  static void readFile(std::vector<Cuboid> &cuboids, char *filename);
 };

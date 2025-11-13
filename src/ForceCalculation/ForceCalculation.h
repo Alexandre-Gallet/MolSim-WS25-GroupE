@@ -11,9 +11,9 @@
  */
 class ForceCalculation {
  public:
-  //default constructor
+  // default constructor
   ForceCalculation() = default;
-  //default destructor
+  // default destructor
   virtual ~ForceCalculation() = default;
   /**
    * @brief Function for calculating the force for each particle, implemented by each sub-class

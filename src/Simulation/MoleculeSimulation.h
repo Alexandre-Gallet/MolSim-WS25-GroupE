@@ -12,6 +12,7 @@
 class MoleculeSimulation : public Simulation {
   Arguments &args;
   ParticleContainer &particles;
+
  public:
   explicit MoleculeSimulation(Arguments &args, ParticleContainer &particles);
   ~MoleculeSimulation() override = default;
