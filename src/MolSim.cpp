@@ -1,15 +1,14 @@
 /**
- * @file MolSim.cpp
+* @file MolSim.cpp
  * @brief Main entry point for the Molecular Dynamics simulation
  */
-
-// #include <bits/valarray_after.h>
-#include <iostream>
 
 #include "ParticleContainer.h"
 #include "Simulation/SimulationFactory.h"
 #include "inputReader/Arguments.h"
 #include "inputReader/InputReader.h"
+#include "logging.hpp"
+#include <spdlog/spdlog.h>
 
 /// Container holding all particles in the simulation
 ParticleContainer particles;
@@ -21,11 +20,21 @@ ParticleContainer particles;
  * @return EXIT_SUCCESS (0) on successful completion, -1 on error
  */
 int main(int argc, char *argsv[]) {
-  Arguments args;
-  inputReader::parseArguments(argc, argsv, args);
-  auto simulation = SimulationFactory::createSimulation(args.sim_type, args, particles);
-  simulation->runSimulation();
+    // Initialize logging (console + simulation.log)
+    logging::init_logging();
 
-  std::cout << "output written. Terminating..." << std::endl;
-  return 0;
+    SPDLOG_INFO("MolSim starting...");
+
+    Arguments args;
+    inputReader::parseArguments(argc, argsv, args);
+
+    SPDLOG_INFO("Creating simulation (input='{}')", args.inputFile);
+
+    auto simulation = SimulationFactory::createSimulation(args.sim_type, args, particles);
+
+    SPDLOG_INFO("Starting simulation run...");
+    simulation->runSimulation();
+    SPDLOG_INFO("Simulation finished. Output written. Terminating.");
+
+    return 0;
 }
