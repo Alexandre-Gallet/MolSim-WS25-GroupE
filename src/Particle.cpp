@@ -16,7 +16,6 @@ Particle::Particle(int type_arg) : x(), v(), m(0) {
 
   // debug-level: particle creation (compiled out by default when LOG_LEVEL=INFO)
   SPDLOG_DEBUG("Particle generated (type={})", type);
-
 }
 
 Particle::Particle(const Particle &other) {
@@ -33,11 +32,10 @@ Particle::Particle(const Particle &other) {
 
 Particle::Particle(const std::array<double, 3> &x_arg, const std::array<double, 3> &v_arg, const double m_arg, int type)
     : x(x_arg), v(v_arg), f({0., 0., 0.}), old_f({0., 0., 0.}), m(m_arg), type(type) {
-  SPDLOG_DEBUG("Particle generated at position ({}, {}, {})",
-               x[0], x[1], x[2]);
+  SPDLOG_DEBUG("Particle generated at position ({}, {}, {})", x[0], x[1], x[2]);
 }
 
-Particle::~Particle() {   // debug-level: particle destruction
+Particle::~Particle() {  // debug-level: particle destruction
   SPDLOG_DEBUG("Particle destructed (type={})", type);
 }
 

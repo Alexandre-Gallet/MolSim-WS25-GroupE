@@ -1,7 +1,8 @@
 #include "StormerVerlet.h"
 
-#include "../utils/ArrayUtils.h"
 #include <spdlog/spdlog.h>
+
+#include "../utils/ArrayUtils.h"
 
 StormerVerlet::StormerVerlet() = default;
 StormerVerlet::~StormerVerlet() = default;
@@ -23,8 +24,7 @@ void StormerVerlet::calculateF(ParticleContainer &particles) {
     p.setF({0., 0., 0.});
   }
 
-  SPDLOG_DEBUG("Recomputing gravitational forces for {} particles (Stormer-Verlet).",
-               particles.size());
+  SPDLOG_DEBUG("Recomputing gravitational forces for {} particles (Stormer-Verlet).", particles.size());
 
   // Use pair iterator to calculate forces between each pair of particles.
   // TRACE-level: extremely fine-grained debug, compiled out unless LOG_LEVEL=TRACE.

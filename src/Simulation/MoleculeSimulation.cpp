@@ -1,8 +1,8 @@
 #include "MoleculeSimulation.h"
 
-#include <filesystem>
-
 #include <spdlog/spdlog.h>
+
+#include <filesystem>
 
 #include "ForceCalculation/LennardJones.h"
 #include "ParticleGenerator.h"
@@ -35,8 +35,8 @@ void MoleculeSimulation::runSimulation() {
   double current_time = args.t_start;
   int iteration = 0;
 
-  SPDLOG_INFO("Starting molecule simulation: t_start={}, t_end={}, delta_t={}.",
-              args.t_start, args.t_end, args.delta_t);
+  SPDLOG_INFO("Starting molecule simulation: t_start={}, t_end={}, delta_t={}.", args.t_start, args.t_end,
+              args.delta_t);
 
   while (current_time < args.t_end) {
     // calculate forces, position and velocity
@@ -50,14 +50,12 @@ void MoleculeSimulation::runSimulation() {
       plotParticles(particles, iteration, args.output_format);
     }
 
-
     SPDLOG_DEBUG("Iteration {} finished (t = {}).", iteration, current_time);
 
     current_time += args.delta_t;
   }
 
-  SPDLOG_INFO("Molecule simulation completed after {} iterations (final t = {}).",
-              iteration, current_time);
+  SPDLOG_INFO("Molecule simulation completed after {} iterations (final t = {}).", iteration, current_time);
 }
 
 void MoleculeSimulation::plotParticles(ParticleContainer &particles, int iteration, OutputFormat format) {
@@ -66,8 +64,7 @@ void MoleculeSimulation::plotParticles(ParticleContainer &particles, int iterati
 
   const auto writer = WriterFactory::createWriter(format);
 
-  SPDLOG_DEBUG("Plotting {} particles at iteration {} to '{}'.",
-               particles.size(), iteration, out_name);
+  SPDLOG_DEBUG("Plotting {} particles at iteration {} to '{}'.", particles.size(), iteration, out_name);
 
   writer->plotParticles(particles, out_name, iteration);
 }
