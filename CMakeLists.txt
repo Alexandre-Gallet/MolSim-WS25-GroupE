@@ -90,6 +90,31 @@ include(vtk)
 include(clang-format)
 include(doxygen)
 
+# -----------------------------
+# Logging: spdlog via FetchContent
+# -----------------------------
+include(FetchContent)
+
+FetchContent_Declare(
+        spdlog
+        URL https://github.com/gabime/spdlog/archive/refs/tags/v1.14.1.zip
+)
+
+FetchContent_MakeAvailable(spdlog)
+
+# Set log_level to default "INFO" and make it user configurable via cmake
+set(LOG_LEVEL "INFO" CACHE STRING "Minimum log level: TRACE, DEBUG, INFO, WARN, ERROR, CRITICAL, OFF")
+set_property(CACHE LOG_LEVEL PROPERTY STRINGS TRACE DEBUG INFO WARN ERROR CRITICAL OFF)
+
+# Link spdlog to main binary
+target_link_libraries(MolSim PRIVATE spdlog::spdlog)
+target_compile_definitions(MolSim PRIVATE SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_${LOG_LEVEL})
+
+# Link to test binary too
+target_link_libraries(MolSimTests PRIVATE spdlog::spdlog)
+target_compile_definitions(MolSimTests PRIVATE SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_${LOG_LEVEL})
+
+
 # -----------------------------------
 # Testing Support
 # -----------------------------------
@@ -128,3 +153,4 @@ if(BUILD_TESTING)
     gtest_discover_tests(MolSimTests)
 
 endif()
+
