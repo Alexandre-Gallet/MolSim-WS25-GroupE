@@ -110,10 +110,6 @@ set_property(CACHE LOG_LEVEL PROPERTY STRINGS TRACE DEBUG INFO WARN ERROR CRITIC
 target_link_libraries(MolSim PRIVATE spdlog::spdlog)
 target_compile_definitions(MolSim PRIVATE SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_${LOG_LEVEL})
 
-# Link to test binary too
-target_link_libraries(MolSimTests PRIVATE spdlog::spdlog)
-target_compile_definitions(MolSimTests PRIVATE SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_${LOG_LEVEL})
-
 
 # -----------------------------------
 # Testing Support
@@ -143,6 +139,10 @@ if(BUILD_TESTING)
     # -----------------------------
     # added MY_SRC so that MolSImTests can link correctly
     add_executable(MolSimTests ${TEST_SRC} ${MY_SRC})
+
+    # Link spdlog to test binary after MolSimTests was created
+    target_link_libraries(MolSimTests PRIVATE spdlog::spdlog)
+    target_compile_definitions(MolSimTests PRIVATE SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_${LOG_LEVEL})
 
     target_include_directories(MolSimTests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
