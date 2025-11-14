@@ -66,5 +66,7 @@ void MoleculeSimulation::plotParticles(ParticleContainer &particles, int iterati
 
   SPDLOG_DEBUG("Plotting {} particles at iteration {} to '{}'.", particles.size(), iteration, out_name);
 
+#ifndef ENABLE_BENCHMARK
   writer->plotParticles(particles, out_name, iteration);
+#endif
 }

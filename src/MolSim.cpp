@@ -3,6 +3,9 @@
  * @brief Main entry point for the Molecular Dynamics simulation
  */
 
+// Uncomment to enable benchmarking. Also don't forget to build with cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+// -DLOG_LEVEL=OFF #define ENABLE_BENCHMARK
+
 #include <spdlog/spdlog.h>
 
 #include "ParticleContainer.h"
@@ -34,7 +37,19 @@ int main(int argc, char *argsv[]) {
   auto simulation = SimulationFactory::createSimulation(args.sim_type, args, particles);
 
   SPDLOG_INFO("Starting simulation run...");
+
+#ifdef ENABLE_BENCHMARK
+  auto bench_start = std::chrono::high_resolution_clock::now();
+#endif
+
   simulation->runSimulation();
+
+#ifdef ENABLE_BENCHMARK
+  auto bench_end = std::chrono::high_resolution_clock::now();
+  double elapsed = std::chrono::duration<double>(bench_end - bench_start).count();
+  std::cout << "Benchmark runtime (no IO): " << elapsed << " seconds\n";
+#endif
+
   SPDLOG_INFO("Simulation finished. Output written. Terminating.");
 
   return 0;
