@@ -1,6 +1,6 @@
-
-
 #include "StormerVerlet.h"
+
+#include <spdlog/spdlog.h>
 
 #include "../utils/ArrayUtils.h"
 
@@ -16,12 +16,20 @@ void StormerVerlet::calc(Particle &p1, Particle &p2) {
   p1.setF(ArrayUtils::elementWisePairOp(p1.getF(), newF, std::plus<>()));
   p2.setF(ArrayUtils::elementWisePairOp(p2.getF(), newF, std::minus<>()));
 }
+
 void StormerVerlet::calculateF(ParticleContainer &particles) {
+  // Reset forces
   for (auto &p : particles) {
-    // initialize to 0 so the simulation runs as expected
     p.setOldF(p.getF());
     p.setF({0., 0., 0.});
   }
-  // Use pair iterator to calculates forces between each pair of particles
-  particles.forEachPair([](Particle &p1, Particle &p2) { calc(p1, p2); });
+
+  SPDLOG_DEBUG("Recomputing gravitational forces for {} particles (Stormer-Verlet).", particles.size());
+
+  // Use pair iterator to calculate forces between each pair of particles.
+  // TRACE-level: extremely fine-grained debug, compiled out unless LOG_LEVEL=TRACE.
+  particles.forEachPair([](Particle &p1, Particle &p2) {
+    calc(p1, p2);
+    SPDLOG_TRACE("Updated forces between a particle pair in Stormer-Verlet.");
+  });
 }

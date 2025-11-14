@@ -72,13 +72,19 @@ endif()
 # --------------------------------
 # Custom clang-tidy
 # --------------------------------
+
+# Collect only CPP files for clang-tidy
+file(GLOB_RECURSE ALL_CPP
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+)
+
 find_program(CLANG_TIDY_EXE NAMES clang-tidy)
 if(CLANG_TIDY_EXE)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
     add_custom_target(run_clang_tidy
-            COMMAND ${CLANG_TIDY_EXE} -p ${CMAKE_BINARY_DIR} ${MY_SRC}
-            COMMENT "Running clang-tidy static analysis"
+            COMMAND ${CLANG_TIDY_EXE} -p ${CMAKE_BINARY_DIR} ${ALL_CPP}
+            COMMENT "Running clang-tidy static analysis on CPP files only"
             VERBATIM)
 endif()
 
@@ -89,6 +95,27 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 include(vtk)
 include(clang-format)
 include(doxygen)
+
+# -----------------------------
+# Logging: spdlog via FetchContent
+# -----------------------------
+include(FetchContent)
+
+FetchContent_Declare(
+        spdlog
+        URL https://github.com/gabime/spdlog/archive/refs/tags/v1.14.1.zip
+)
+
+FetchContent_MakeAvailable(spdlog)
+
+# Set log_level to default "INFO" and make it user configurable via cmake
+set(LOG_LEVEL "INFO" CACHE STRING "Minimum log level: TRACE, DEBUG, INFO, WARN, ERROR, CRITICAL, OFF")
+set_property(CACHE LOG_LEVEL PROPERTY STRINGS TRACE DEBUG INFO WARN ERROR CRITICAL OFF)
+
+# Link spdlog to main binary
+target_link_libraries(MolSim PRIVATE spdlog::spdlog)
+target_compile_definitions(MolSim PRIVATE SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_${LOG_LEVEL})
+
 
 # -----------------------------------
 # Testing Support
@@ -119,6 +146,10 @@ if(BUILD_TESTING)
     # added MY_SRC so that MolSImTests can link correctly
     add_executable(MolSimTests ${TEST_SRC} ${MY_SRC})
 
+    # Link spdlog to test binary after MolSimTests was created
+    target_link_libraries(MolSimTests PRIVATE spdlog::spdlog)
+    target_compile_definitions(MolSimTests PRIVATE SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_${LOG_LEVEL})
+
     target_include_directories(MolSimTests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
     target_link_libraries(MolSimTests PRIVATE GTest::gtest_main)
@@ -128,3 +159,4 @@ if(BUILD_TESTING)
     gtest_discover_tests(MolSimTests)
 
 endif()
+
