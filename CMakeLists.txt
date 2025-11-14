@@ -72,13 +72,19 @@ endif()
 # --------------------------------
 # Custom clang-tidy
 # --------------------------------
+
+# Collect only CPP files for clang-tidy
+file(GLOB_RECURSE ALL_CPP
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+)
+
 find_program(CLANG_TIDY_EXE NAMES clang-tidy)
 if(CLANG_TIDY_EXE)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
     add_custom_target(run_clang_tidy
-            COMMAND ${CLANG_TIDY_EXE} -p ${CMAKE_BINARY_DIR} ${MY_SRC}
-            COMMENT "Running clang-tidy static analysis"
+            COMMAND ${CLANG_TIDY_EXE} -p ${CMAKE_BINARY_DIR} ${ALL_CPP}
+            COMMENT "Running clang-tidy static analysis on CPP files only"
             VERBATIM)
 endif()
 
