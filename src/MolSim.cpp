@@ -10,8 +10,6 @@
 #include "logging.hpp"
 #include <spdlog/spdlog.h>
 
-/// Container holding all particles in the simulation
-ParticleContainer particles;
 
 /**
  * @brief Main entry point of the molecular dynamics simulation
@@ -22,6 +20,9 @@ ParticleContainer particles;
 int main(int argc, char *argsv[]) {
     // Initialize logging (console + simulation.log)
     logging::init_logging();
+
+    // Container holding all particles in the simulation - moved this inside main to avoid segmentation fault.
+    ParticleContainer particles;
 
     SPDLOG_INFO("MolSim starting...");
 
