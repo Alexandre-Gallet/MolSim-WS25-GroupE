@@ -6,6 +6,9 @@
 #include <iostream>
 
 #include "../Generator/ParticleGenerator.h"
+#include "../Generator/CuboidGenerator.h"
+#include "../Generator/ParticleGenerator.h"
+
 #include "ForceCalculation/LennardJones.h"
 #include "outputWriter/WriterFactory.h"
 
@@ -13,7 +16,7 @@ MoleculeSimulation::MoleculeSimulation(Arguments &args, ParticleContainer &parti
     : args(args), particles(particles) {}
 void MoleculeSimulation::runSimulation() {
   for (const auto &c : args.cuboids) {
-    ParticleGenerator::generateCuboid(particles, c.origin, c.numPerDim, c.h, c.mass, c.baseVelocity, c.brownianMean,
+    CuboidGenerator::generateCuboid(particles, c.origin, c.numPerDim, c.h, c.mass, c.baseVelocity, c.brownianMean,
                                       c.type);
   }
   double current_time = args.t_start;

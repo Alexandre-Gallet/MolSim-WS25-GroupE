@@ -17,10 +17,10 @@ void DiscGenerator::generate(ParticleContainer& container) const {
 
       if (dx * dx + dy * dy <= R2) {
         std::array<double, 3> pos = {
-          center_[0] + dx,
-          center_[1] + dy,
-          center_[2]      ,
-      };
+            center_[0] + dx,
+            center_[1] + dy,
+            center_[2]
+        };
 
         std::array<double, 3> vel = baseVelocity_;
 

@@ -1,24 +1,17 @@
+// ParticleGenerator.h
 #pragma once
-#include <array>
 
-#include "../Particle.h"
-#include "../ParticleContainer.h"
-#include "../utils/MaxwellBoltzmannDistribution.h"
+#include "ParticleContainer.h"
 
+/**
+ * @brief Abstract base class for all particle generators.
+ */
 class ParticleGenerator {
- public:
+public:
+  virtual ~ParticleGenerator() = default;
+
   /**
-   * @brief Creates a cuboid of particles and inserts them into the given container.
-   *
-   * @param container  Container to fill with generated particles.
-   * @param origin     Lower-left-front corner of the cuboid.
-   * @param numPerDim  Number of particles per dimension (N1, N2, N3).
-   * @param h    Distance between adjacent particles (h).
-   * @param mass       Mass of each particle.
-   * @param baseVelocity   Initial velocity of each particle.
-   * @param type       Type/id of the particle.
+   * @brief Generate particles and insert them into the given container.
    */
-  static void generateCuboid(ParticleContainer &container, const std::array<double, 3> &origin,
-                             const std::array<size_t, 3> &numPerDim, double h, double mass,
-                             const std::array<double, 3> &baseVelocity, double brownianMean = 0.1, int type = 0);
+  virtual void generate(ParticleContainer& container) const = 0;
 };
