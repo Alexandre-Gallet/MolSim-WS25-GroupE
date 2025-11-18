@@ -21,7 +21,6 @@ void PlanetSimulation::runSimulation() {
   fileReader.readFile(getParticles(), getInputFile());
   double current_time = getTStart();
   int iteration = 0;
-
   // for this loop, we assume: current x, current f and current v are known
   while (current_time < getTEnd()) {
     StormerVerlet verlet;

@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "../inputReader/CuboidGenerator.h"
+#include "../inputReader/Cuboid.h"
 #include "Simulation.h"
 #include "inputReader/Arguments.h"
 

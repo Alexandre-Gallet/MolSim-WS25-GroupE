@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CuboidGenerator.h"
+#include "Cuboid.h"
 #include "outputWriter/OutputFormat.h"
 
 struct Arguments {
@@ -8,7 +8,7 @@ struct Arguments {
   double t_start = 0.0;
   double t_end = 1000.0;
   double delta_t = 0.014;
-  std::vector<CuboidGenerator> cuboids;
+  std::vector<Cuboid> cuboids;
 #ifdef ENABLE_VTK_OUTPUT
   OutputFormat output_format = OutputFormat::VTK;
 #else

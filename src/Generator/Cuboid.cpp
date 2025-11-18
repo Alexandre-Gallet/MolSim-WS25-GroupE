@@ -1,15 +1,14 @@
 // CuboidGenerator.cpp
-#include "CuboidGenerator.h"
-
+#include "Cuboid.h"
 #include "utils/MaxwellBoltzmannDistribution.h"
 
-void CuboidGenerator::generate(ParticleContainer& container) const {
+void Cuboid::generate(ParticleContainer& container) const {
   // Simply call the static helper with the stored parameters
   generateCuboid(container, origin_, numPerDim_, h_, mass_,
                  baseVelocity_, brownianMean_, type_);
 }
 
-void CuboidGenerator::generateCuboid(ParticleContainer &container,
+void Cuboid::generateCuboid(ParticleContainer &container,
                                      const std::array<double, 3> &origin,
                                      const std::array<std::size_t, 3> &numPerDim,
                                      double h,

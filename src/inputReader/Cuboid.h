@@ -2,7 +2,7 @@
 
 #include "../ParticleContainer.h"
 
-struct CuboidGenerator {
+struct Cuboid {
   ParticleContainer &container;
   const std::array<double, 3> &origin;
   const std::array<size_t, 3> &numPerDim;

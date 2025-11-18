@@ -1,8 +1,9 @@
 // DiscGenerator.cpp
-#include "DiscGenerator.h"
 #include <cmath>
 
-void DiscGenerator::generate(ParticleContainer& container) const {
+#include "Disc.h"
+
+void Disc::generate(ParticleContainer& container) const {
   const double physicalRadius = static_cast<double>(radiusCells_) * h_;
   const double R2 = physicalRadius * physicalRadius;
 

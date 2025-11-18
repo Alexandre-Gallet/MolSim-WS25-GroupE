@@ -10,9 +10,9 @@
  *
  * The disc is generated in the x-y plane; z remains constant.
  */
-class DiscGenerator : public ParticleGenerator {
+class Disc : public ParticleGenerator {
 public:
-  DiscGenerator(const std::array<double, 3>& center,
+  Disc(const std::array<double, 3>& center,
                 int radiusCells,
                 double h,
                 double mass,
