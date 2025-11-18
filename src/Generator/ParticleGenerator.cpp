@@ -1,6 +1,6 @@
-#include "ParticleGenerator.h"
+#include "../ParticleGenerator.h"
 
-#include "utils/MaxwellBoltzmannDistribution.h"
+#include "../utils/MaxwellBoltzmannDistribution.h"
 
 void ParticleGenerator::generateCuboid(ParticleContainer &container, const std::array<double, 3> &origin,
                                        const std::array<size_t, 3> &numPerDim, double h, double mass,

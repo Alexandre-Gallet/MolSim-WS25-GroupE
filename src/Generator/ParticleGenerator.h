@@ -1,9 +1,9 @@
 #pragma once
 #include <array>
 
-#include "Particle.h"
-#include "ParticleContainer.h"
-#include "utils/MaxwellBoltzmannDistribution.h"
+#include "../Particle.h"
+#include "../ParticleContainer.h"
+#include "../utils/MaxwellBoltzmannDistribution.h"
 
 class ParticleGenerator {
  public:

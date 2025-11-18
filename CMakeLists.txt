@@ -35,7 +35,14 @@ list(REMOVE_ITEM MY_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/MolSim.cpp")
 # Main executable (production)
 # -----------------------------
 add_executable(MolSim ${MY_SRC}
-                        src/MolSim.cpp)
+                        src/MolSim.cpp
+        tests/Unit/ParticleGeneratorDiscTest.cpp
+        tests/Unit/ParticleGeneratorDiscTest.h
+        src/Generator/DiscGenerator.cpp
+        src/Generator/DiscGenerator.h
+        src/Generator/CuboidGenerator.cpp
+        src/Generator/CuboidGenerator.h
+)
 
 target_include_directories(MolSim PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 

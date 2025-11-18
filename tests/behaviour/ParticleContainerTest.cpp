@@ -5,8 +5,8 @@
 #include <cmath>
 #include <sstream>
 
+#include "../../src/Generator/ParticleGenerator.h"
 #include "ParticleContainer.h"
-#include "ParticleGenerator.h"
 #include "Simulation/Simulation.h"
 #include "inputReader/FileReader.h"
 

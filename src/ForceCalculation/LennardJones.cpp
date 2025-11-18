@@ -13,7 +13,7 @@ double LennardJones::calculateU(const Particle &p1, const Particle &p2) const {
 }
 void LennardJones::calculateF(ParticleContainer &particles) {
   for (auto &p : particles) {
-    // initialize to 0 so the simulation runs as expected
+    // initialize to 0 so ,0003,0,03031the simulation runs as expected
     p.setOldF(p.getF());
     p.setF({0., 0., 0.});
   }

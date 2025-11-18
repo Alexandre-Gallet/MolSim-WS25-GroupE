@@ -5,8 +5,8 @@
 #include <filesystem>
 #include <iostream>
 
+#include "../Generator/ParticleGenerator.h"
 #include "ForceCalculation/LennardJones.h"
-#include "ParticleGenerator.h"
 #include "outputWriter/WriterFactory.h"
 
 MoleculeSimulation::MoleculeSimulation(Arguments &args, ParticleContainer &particles)
