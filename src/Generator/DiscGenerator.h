@@ -1,25 +1,37 @@
-//
-// Created by altay on 18.11.2025.
-//
+// DiscGenerator.h
+#pragma once
 
-#ifndef PSEMOLDYN_DISC_H
-#define PSEMOLDYN_DISC_H
-#include "../ParticleContainer.h"
+#include <array>
+#include "ParticleGenerator.h"
+#include "ParticleContainer.h"
 
-class DiscGenerator {
+/**
+ * @brief Generates particles arranged in a 2D disc.
+ *
+ * The disc is generated in the x-y plane; z remains constant.
+ */
+class DiscGenerator : public ParticleGenerator {
+public:
+  DiscGenerator(const std::array<double, 3>& center,
+                int radiusCells,
+                double h,
+                double mass,
+                const std::array<double, 3>& baseVelocity,
+                int type = 0)
+      : center_(center),
+        radiusCells_(radiusCells),
+        h_(h),
+        mass_(mass),
+        baseVelocity_(baseVelocity),
+        type_(type) {}
 
-DiscGenerator(double h, ParticleContainer &container, double mass, int radiusCells, const std::array<double, 3> &center, const std::array<double, 3> &initialVel):
-  center(center), initi
-
-
+  void generate(ParticleContainer& container) const override;
 
 private:
+  std::array<double, 3> center_;
+  int radiusCells_;
   double h_;
   double mass_;
-  int radiusCells_;
-  std::array<double,3> center_;
-  std::array<double,3> initialVel_;
-
+  std::array<double, 3> baseVelocity_;
+  int type_;
 };
-
-#endif  // PSEMOLDYN_DISC_H
