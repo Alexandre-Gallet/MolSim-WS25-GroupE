@@ -1,10 +1,22 @@
+// CuboidGenerator.cpp
 #include "CuboidGenerator.h"
 
-#include "../utils/MaxwellBoltzmannDistribution.h"
+#include "utils/MaxwellBoltzmannDistribution.h"
 
-void CuboidGenerator::generateCuboid(ParticleContainer &container, const std::array<double, 3> &origin,
-                                     const std::array<size_t, 3> &numPerDim, double h, double mass,
-                                     const std::array<double, 3> &baseVelocity, double brownianMean, int type) {
+void CuboidGenerator::generate(ParticleContainer& container) const {
+  // Simply call the static helper with the stored parameters
+  generateCuboid(container, origin_, numPerDim_, h_, mass_,
+                 baseVelocity_, brownianMean_, type_);
+}
+
+void CuboidGenerator::generateCuboid(ParticleContainer &container,
+                                     const std::array<double, 3> &origin,
+                                     const std::array<std::size_t, 3> &numPerDim,
+                                     double h,
+                                     double mass,
+                                     const std::array<double, 3> &baseVelocity,
+                                     double brownianMean,
+                                     int type) {
   const std::size_t total = numPerDim[0] * numPerDim[1] * numPerDim[2];
   container.reserve(container.size() + total);
 
@@ -19,7 +31,7 @@ void CuboidGenerator::generateCuboid(ParticleContainer &container, const std::ar
 
         std::array<double, 3> vel = baseVelocity;
 
-        // 3 for the Dimension
+        // 3 for the dimension
         auto brownian = maxwellBoltzmannDistributedVelocity(brownianMean, 3);
 
         vel[0] += brownian[0];
