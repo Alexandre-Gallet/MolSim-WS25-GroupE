@@ -38,10 +38,10 @@
                             src/MolSim.cpp
             tests/Unit/ParticleGeneratorDiscTest.cpp
             tests/Unit/ParticleGeneratorDiscTest.h
-            src/Generator/Disc.cpp
-            src/Generator/Disc.h
-            src/Generator/Cuboid.cpp
-            src/Generator/Cuboid.h
+            src/Generator/DiscGenerator.cpp
+            src/Generator/DiscGenerator.h
+            src/Generator/CuboidGenerator.cpp
+            src/Generator/CuboidGenerator.h
     )
 
     target_include_directories(MolSim PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)

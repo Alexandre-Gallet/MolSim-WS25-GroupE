@@ -13,7 +13,7 @@
  * Can be used both via the static helper function generateCuboid(...)
  * and as a concrete implementation of ParticleGenerator.
  */
-class Cuboid : public ParticleGenerator {
+class CuboidGenerator : public ParticleGenerator {
 public:
   /**
    * @brief Constructor for object-oriented usage (virtual interface).
@@ -26,7 +26,7 @@ public:
    * @param brownianMean   Mean value of the Brownian Motion.
    * @param type           Type/id of the particle.
    */
-  Cuboid(const std::array<double, 3>& origin,
+  CuboidGenerator(const std::array<double, 3>& origin,
                   const std::array<std::size_t, 3>& numPerDim,
                   double h,
                   double mass,
