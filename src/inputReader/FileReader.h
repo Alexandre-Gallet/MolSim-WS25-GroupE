@@ -9,8 +9,8 @@
 
 #include <list>
 
-#include "../Particle.h"
-#include "../ParticleContainer.h"
+#include "../Container/Particle.h"
+#include "../Container/ParticleContainer.h"
 
 class FileReader {
  public:

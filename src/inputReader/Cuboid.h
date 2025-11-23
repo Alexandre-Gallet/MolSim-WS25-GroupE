@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../ParticleContainer.h"
+#include "../Container/ParticleContainer.h"
 
 // Struct with the given parameters of the cuboid and a container for storing the particles
 struct Cuboid {

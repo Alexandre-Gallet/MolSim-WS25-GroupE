@@ -1,8 +1,7 @@
 #pragma once
 #include <array>
 
-#include "Particle.h"
-#include "ParticleContainer.h"
+#include "Container/ParticleContainer.h"
 #include "utils/MaxwellBoltzmannDistribution.h"
 
 class ParticleGenerator {
