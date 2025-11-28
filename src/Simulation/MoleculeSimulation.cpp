@@ -16,7 +16,7 @@ void MoleculeSimulation::runSimulation() {
     CuboidGenerator::generateCuboid(particles, c.origin, c.numPerDim, c.h, c.mass, c.baseVelocity, c.brownianMean,
                                       c.type);
   }
-  double current_time = args.t_start;
+  double current_time = args.t_start;a
   int iteration = 0;
   while (current_time < args.t_end) {
     LennardJones lj;
