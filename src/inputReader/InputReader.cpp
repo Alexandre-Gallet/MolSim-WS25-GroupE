@@ -8,6 +8,7 @@
 #include <ostream>
 #include <string>
 
+#include "../Simulation/SimulationType.h"
 #include "Arguments.h"
 #include "outputWriter/OutputFormat.h"
 
@@ -23,15 +24,15 @@ bool isequal(const std::string &a, const std::string &b) {
 }
 
 namespace inputReader {
-
 /**
  * @brief print help message for running the simulation
  */
 static void printUsage() {
-  std::cout << "Usage: ./MolSim <inputFile> [t_start] [t_end] [delta_t] [output_format]\n"
+  std::cout << "Usage: ./MolSim <input_file> <sim_type> [t_start] [t_end] [delta_t] [output_format]\n"
             << "Example: ./MolSim eingabe-sonne.txt 0 1000 0.014 VTK\n"
             << "Arguments:\n"
             << "\t<input_file>\t:\tPath to particle data (text file)\n"
+            << "\t<sim_type>\t:\tSimulation type: planet or molecule (default molecule)\n"
             << "\t[-s | --t_start <value>]\t:\tStart time of the simulation (default 0)\n"
             << "\t[-e | --t_end <value>]\t:\tEnd time of the simulation (default 1000)\n"
             << "\t[-d | --delta_t <value>]\t:\tTime step (default 0.014)\n"
@@ -50,12 +51,20 @@ void parseArguments(const int argc, char *argv[], Arguments &args) {
               << "Use -h or --help to display usage.\n";
     std::exit(EXIT_FAILURE);
   }
+  // print the help message if necessary
   if (std::string arg = argv[1]; arg == "-h" || arg == "--help") {
     printUsage();
     std::exit(EXIT_SUCCESS);
   }
   args.inputFile = argv[1];
-  for (int i = 2; i < argc; i++) {
+  if (argc < 3) {
+    std::cerr << "Invalid number of arguments\n"
+              << "Use -h or --help to display usage.\n";
+    std::exit(EXIT_FAILURE);
+  }
+  args.sim_type = parse_type(argv[2]);
+  // parse the arguments, checking the flags and saving the values for the simulation parameters
+  for (int i = 3; i < argc; i++) {
     std::string arg = argv[i];
     if (arg == "-h" || arg == "--help") {
       printUsage();
@@ -98,6 +107,7 @@ void parseArguments(const int argc, char *argv[], Arguments &args) {
       std::exit(EXIT_FAILURE);
     }
   }
+  // check the validity of the given parameters
   if (args.t_start > args.t_end) {
     std::cerr << "Start time must be greater than end time\n";
     std::exit(EXIT_FAILURE);

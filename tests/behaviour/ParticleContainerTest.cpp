@@ -6,7 +6,16 @@
 #include <sstream>
 
 #include "../../src/Generator/ParticleGenerator.h"
+
+#include <cmath>
+#include <sstream>
+
 #include "ParticleContainer.h"
+#include "Simulation/Simulation.h"
+#include "inputReader/FileReader.h"
+
+/*
+#include "ParticleGenerator.h"
 #include "Simulation/Simulation.h"
 #include "inputReader/FileReader.h"
 

@@ -3,7 +3,6 @@
  */
 #pragma once
 
-#include <list>
 #include <string>
 
 #include "ParticleContainer.h"
