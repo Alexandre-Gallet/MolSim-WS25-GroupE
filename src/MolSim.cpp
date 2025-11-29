@@ -31,7 +31,7 @@ int main(int argc, char *argsv[]) {
 
   SPDLOG_INFO("Creating simulation (input='{}')", args.inputFile);
 
-  auto *simulation = SimulationFactory::createSimulation(args.sim_type, args, particles);
+  auto simulation = SimulationFactory::createSimulation(args.sim_type, args, particles);
 
   SPDLOG_INFO("Starting simulation run...");
   simulation->runSimulation();

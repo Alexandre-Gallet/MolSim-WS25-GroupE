@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "../Container/ParticleContainer.h"
 #include "../inputReader/Arguments.h"
 #include "Simulation.h"
@@ -20,5 +22,5 @@ class SimulationFactory {
    * @param particles Container where all particles are stored
    * @return Simulation object of the given type
    */
-  static Simulation *createSimulation(SimulationType type, Arguments &args, ParticleContainer &particles);
+  static std::unique_ptr<Simulation> createSimulation(SimulationType type, Arguments &args, ParticleContainer &particles);
 };
