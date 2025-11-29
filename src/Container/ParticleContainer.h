@@ -117,6 +117,12 @@ class ParticleContainer {
   iterator end() noexcept;
 
   /// @brief Returns a const iterator to the first particle.
+  const_iterator begin() const noexcept;
+
+  /// @brief Returns a const iterator past the last particle.
+  const_iterator end() const noexcept;
+
+  /// @brief Returns a const iterator to the first particle.
   const_iterator cbegin() const noexcept;
 
   /// @brief Returns a const iterator past the last particle.
