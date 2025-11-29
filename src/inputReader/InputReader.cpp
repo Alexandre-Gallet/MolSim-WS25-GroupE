@@ -62,7 +62,7 @@ void parseArguments(const int argc, char *argv[], Arguments &args) {
               << "Use -h or --help to display usage.\n";
     std::exit(EXIT_FAILURE);
   }
-  args.sim_type = parse_type(argv[2]);
+  args.sim_type = parseType(argv[2]);
   // parse the arguments, checking the flags and saving the values for the simulation parameters
   for (int i = 3; i < argc; i++) {
     std::string arg = argv[i];
