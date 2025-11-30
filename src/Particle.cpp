@@ -15,7 +15,7 @@ Particle::Particle(int type_arg) : x(), v(), m(0) {
   old_f = {0., 0., 0.};
 
   // debug-level: particle creation (compiled out by default when LOG_LEVEL=INFO)
-  SPDLOG_DEBUG("Particle generated (type={})", type);
+  SPDLOG_TRACE("Particle generated (type={})", type);
 }
 
 Particle::Particle(const Particle &other) {
