@@ -6,16 +6,16 @@
 
 #include "ForceCalculation/LennardJones.h"
 #include "Generator/CuboidGenerator.h"
-#include "ParticleGenerator.h"
+#include "Generator/ParticleGenerator.h"
+#include "Generator/DiscGenerator.h"
 #include "inputReader/FileReaderCuboids.h"
 #include "outputWriter/WriterFactory.h"
 
 MoleculeSimulation::MoleculeSimulation(Arguments &args, ParticleContainer &particles)
     : args(args), particles(particles) {}
 void MoleculeSimulation::runSimulation() {
-  for (const auto &c : args.cuboids) {
-    CuboidGenerator::generateCuboid(particles, c.origin, c.numPerDim, c.h, c.mass, c.baseVelocity, c.brownianMean,
   std::vector<Cuboid> cuboids;
+
 
   // Read simulation setup from input file
   FileReaderCuboid::readFile(cuboids, args.inputFile);
@@ -23,7 +23,7 @@ void MoleculeSimulation::runSimulation() {
 
   // Generate particles for each cuboid
   for (const auto &c : cuboids) {
-    ParticleGenerator::generateCuboid(particles, c.origin, c.numPerDim, c.h, c.mass, c.baseVelocity, c.brownianMean,
+    CuboidGenerator::generateCuboid(particles, c.origin, c.numPerDim, c.h, c.mass, c.baseVelocity, c.brownianMean,
                                       c.type);
   }
   SPDLOG_INFO("Generated {} particles from cuboids.", particles.size());
@@ -55,6 +55,7 @@ void MoleculeSimulation::runSimulation() {
 
     current_time += args.delta_t;
   }
+
 
   SPDLOG_INFO("Molecule simulation completed after {} iterations (final t = {}).", iteration, current_time);
 }

@@ -36,8 +36,6 @@ list(REMOVE_ITEM MY_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/MolSim.cpp")
     # -----------------------------
     add_executable(MolSim ${MY_SRC}
                             src/MolSim.cpp
-            tests/Unit/ParticleGeneratorDiscTest.cpp
-            tests/Unit/ParticleGeneratorDiscTest.h
             src/Generator/DiscGenerator.cpp
             src/Generator/DiscGenerator.h
             src/Generator/CuboidGenerator.cpp
