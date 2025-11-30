@@ -1,5 +1,6 @@
 #include "ParticleContainer.h"
 
+#include <array>
 #include <utility>
 
 ParticleContainer::ParticleContainer(std::size_t reserve) { particles_.reserve(reserve); }
@@ -9,62 +10,63 @@ ParticleContainer::ParticleContainer(std::size_t reserve) { particles_.reserve(r
  *
  * @return Number of stored particles.
  */
-std::size_t ParticleContainer::size() const noexcept { return particles_.size(); }
+auto ParticleContainer::size() const noexcept -> std::size_t { return particles_.size(); }
 
 /**
  * @brief Check whether the container is empty.
  *
  * @return true if no particles are stored, false otherwise.
  */
-bool ParticleContainer::empty() const noexcept { return particles_.empty(); }
+auto ParticleContainer::empty() const noexcept -> bool { return particles_.empty(); }
 
-void ParticleContainer::reserve(std::size_t capacity) { particles_.reserve(capacity); }
+auto ParticleContainer::reserve(std::size_t capacity) -> void { particles_.reserve(capacity); }
 
 /**
  * @brief Remove all particles from the container.
  */
-void ParticleContainer::clear() noexcept { particles_.clear(); }
+auto ParticleContainer::clear() noexcept -> void { particles_.clear(); }
 
-Particle &ParticleContainer::addParticle(const Particle &particle) {
+auto ParticleContainer::addParticle(const Particle &particle) -> Particle & {
   particles_.push_back(particle);
   return particles_.back();
 }
 
-Particle &ParticleContainer::addParticle(Particle &&particle) {
+auto ParticleContainer::addParticle(Particle &&particle) -> Particle & {
   particles_.push_back(std::move(particle));
   return particles_.back();
 }
 
-/**
- * @brief Get an iterator to the beginning of the container.
- */
-ParticleContainer::iterator ParticleContainer::begin() noexcept { return particles_.begin(); }
+auto ParticleContainer::emplaceParticle(const std::array<double, 3> &pos, const std::array<double, 3> &vel,
+                                         double mass, int type) -> Particle & {
+  particles_.emplace_back(pos, vel, mass, type);
+  return particles_.back();
+}
 
-/**
- * @brief Get an iterator to the end of the container.
- */
-ParticleContainer::iterator ParticleContainer::end() noexcept { return particles_.end(); }
+auto ParticleContainer::emplaceParticle(const std::array<double, 3> &pos, const std::array<double, 3> &vel,
+                                         double mass) -> Particle & {
+  return emplaceParticle(pos, vel, mass, 0);
+}
 
-/**
- * @brief Get a const iterator to the beginning of the container.
- */
-ParticleContainer::const_iterator ParticleContainer::begin() const noexcept { return particles_.begin(); }
+auto ParticleContainer::addParticle(Particle &particle) -> Particle & {
+  return addParticle(static_cast<const Particle &>(particle));
+}
 
-/**
- * @brief Get a const iterator to the end of the container.
- */
-ParticleContainer::const_iterator ParticleContainer::end() const noexcept { return particles_.end(); }
+auto ParticleContainer::begin() noexcept -> iterator {
+  return {[this](std::size_t idx) { return &particles_[idx]; }, 0};
+}
 
-/**
- * @brief Get a const iterator to the beginning (read-only).
- *
- * Equivalent to begin() but ensures no modification is possible.
- */
-ParticleContainer::const_iterator ParticleContainer::cbegin() const noexcept { return particles_.cbegin(); }
+auto ParticleContainer::end() noexcept -> iterator {
+  return {[this](std::size_t idx) { return &particles_[idx]; }, particles_.size()};
+}
 
-/**
- * @brief Get a const iterator to the end (read-only).
- *
- * Equivalent to end() but ensures no modification is possible.
- */
-ParticleContainer::const_iterator ParticleContainer::cend() const noexcept { return particles_.cend(); }
+auto ParticleContainer::begin() const noexcept -> const_iterator {
+  return {[this](std::size_t idx) { return &particles_[idx]; }, 0};
+}
+
+auto ParticleContainer::end() const noexcept -> const_iterator {
+  return {[this](std::size_t idx) { return &particles_[idx]; }, particles_.size()};
+}
+
+auto ParticleContainer::cbegin() const noexcept -> const_iterator { return begin(); }
+
+auto ParticleContainer::cend() const noexcept -> const_iterator { return end(); }
