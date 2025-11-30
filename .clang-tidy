@@ -4,66 +4,50 @@
 # ===============================
 
 Checks: >
+  clang-analyzer-*,
   bugprone-*,
   performance-*,
-  readability-*,
   modernize-*,
+  readability-*,
   portability-*,
   cppcoreguidelines-*,
-  -cppcoreguidelines-owning-memory,       
+
+  -readability-magic-numbers,
+  -readability-identifier-length,
+  -readability-braces-around-statements,
+  -readability-redundant-declaration,
+  -readability-uppercase-literal-suffix,
+
+  -cppcoreguidelines-owning-memory,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-pro-type-vararg,
+  -cppcoreguidelines-avoid-goto,
+  -cppcoreguidelines-pro-type-member-init,
   -cppcoreguidelines-pro-type-reinterpret-cast,
   -cppcoreguidelines-pro-bounds-pointer-arithmetic,
-  -cppcoreguidelines-pro-type-vararg,
-  -cppcoreguidelines-avoid-magic-numbers, 
-  -cppcoreguidelines-avoid-goto,         
-  -readability-magic-numbers,             
-  -readability-braces-around-statements,  
-  -readability-identifier-length,         
-  -performance-no-int-to-ptr,             
-  -modernize-use-nodiscard               
+  -cppcoreguidelines-pro-bounds-constant-array-index,
+  -cppcoreguidelines-special-member-functions,
+  -cppcoreguidelines-non-private-member-variables-in-classes,
+
+  -portability-simd-intrinsics
 
 WarningsAsErrors: ''
 
-HeaderFilterRegex: '^$'
+HeaderFilterRegex: 'src/'
 
-FormatStyle:     none
+FormatStyle: none
 
 # ==========================================
 #  OPTIONS FOR SOME CHECKS
 # ==========================================
 CheckOptions:
-  - key:             readability-identifier-naming.VariableCase
-    value:           lower_case
-  - key:             readability-identifier-naming.ClassCase
-    value:           CamelCase
-  - key:             readability-identifier-naming.FunctionCase
-    value:           camelBack
-  - key:             modernize-loop-convert.MaxCopySize
-    value:           '16'
-  - key:             modernize-use-nullptr.NullMacros
-    value:           'NULL,0'
-
-# ==============================================
-# ADVANCED MODE (DISABLED for now)
-# ==============================================
-# Checks: >
-#   clang-analyzer-*,
-#   concurrency-*,
-#   hicpp-*,
-#   misc-*,
-#   performance-*,
-#   portability-*,
-#   modernize-*,
-#   readability-*,
-#   cppcoreguidelines-*,
-#   bugprone-*,
-#   -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
-#   -cppcoreguidelines-pro-bounds-pointer-arithmetic,
-#   -hicpp-no-array-decay,
-#   -hicpp-use-auto,
-#   -readability-function-cognitive-complexity
-#
-# Notes:
-# • advanced mode is MUCH stricter
-# • prepare your team before enabling it
-# • works best after the codebase stabilizes
+  - key: readability-identifier-naming.VariableCase
+    value: lower_case
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
+  - key: readability-identifier-naming.FunctionCase
+    value: camelBack
+  - key: modernize-loop-convert.MaxCopySize
+    value: '16'
+  - key: modernize-use-nullptr.NullMacros
+    value: 'NULL,0'
