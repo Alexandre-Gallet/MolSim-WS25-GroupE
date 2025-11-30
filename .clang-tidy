@@ -3,39 +3,30 @@
 #  Minimal but Effective Clang-Tidy remove those from cppcoreguidelines that would are not helpful
 # ===============================
 
+# remove clang analyzer, without this line checks are still done by default
 Checks: >
-  clang-analyzer-*,
+  -clang-analyzer-*,
+          
   bugprone-*,
   performance-*,
   modernize-*,
   readability-*,
-  portability-*,
   cppcoreguidelines-*,
+  portability-*,
 
-  -readability-magic-numbers,
+  # Disable noisy stylistic rules:
   -readability-identifier-length,
-  -readability-braces-around-statements,
-  -readability-redundant-declaration,
-  -readability-uppercase-literal-suffix,
-
-  -cppcoreguidelines-owning-memory,
-  -cppcoreguidelines-avoid-magic-numbers,
-  -cppcoreguidelines-pro-type-vararg,
-  -cppcoreguidelines-avoid-goto,
-  -cppcoreguidelines-pro-type-member-init,
-  -cppcoreguidelines-pro-type-reinterpret-cast,
-  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
-  -cppcoreguidelines-pro-bounds-constant-array-index,
-  -cppcoreguidelines-special-member-functions,
-  -cppcoreguidelines-non-private-member-variables-in-classes,
-
-  -portability-simd-intrinsics
-
-WarningsAsErrors: ''
+  -readability-magic-numbers,
+  -modernize-use-trailing-return-type,
+  -modernize-use-nodiscard,
+  -portability-avoid-pragma-once
 
 HeaderFilterRegex: 'src/'
 
+WarningsAsErrors: ''
+
 FormatStyle: none
+
 
 # ==========================================
 #  OPTIONS FOR SOME CHECKS
