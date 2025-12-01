@@ -5,7 +5,8 @@
 #include "MoleculeSimulation.h"
 #include "PlanetSimulation.h"
 
-auto SimulationFactory::createSimulation(SimulationType type, Arguments &args, ParticleContainer &particles) -> std::unique_ptr<Simulation> {
+auto SimulationFactory::createSimulation(SimulationType type, Arguments &args, ParticleContainer &particles)
+    -> std::unique_ptr<Simulation> {
   switch (type) {
     case SimulationType::Planet:
       return std::make_unique<PlanetSimulation>(args, particles);

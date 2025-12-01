@@ -18,8 +18,8 @@ class ParticleIterator {
   using iterator_category = std::forward_iterator_tag;
   using value_type = std::remove_const_t<Value>;
   using difference_type = std::ptrdiff_t;
-  using pointer = Value*;
-  using reference = Value&;
+  using pointer = Value *;
+  using reference = Value &;
 
   ParticleIterator() = default;
   ParticleIterator(std::function<pointer(std::size_t)> getter, std::size_t index)
@@ -28,7 +28,7 @@ class ParticleIterator {
   reference operator*() const { return *getter_(index_); }
   pointer operator->() const { return getter_(index_); }
 
-  ParticleIterator& operator++() {
+  ParticleIterator &operator++() {
     ++index_;
     return *this;
   }
@@ -38,10 +38,8 @@ class ParticleIterator {
     return tmp;
   }
 
-  friend bool operator==(const ParticleIterator& lhs, const ParticleIterator& rhs) {
-    return lhs.index_ == rhs.index_;
-  }
-  friend bool operator!=(const ParticleIterator& lhs, const ParticleIterator& rhs) { return !(lhs == rhs); }
+  friend bool operator==(const ParticleIterator &lhs, const ParticleIterator &rhs) { return lhs.index_ == rhs.index_; }
+  friend bool operator!=(const ParticleIterator &lhs, const ParticleIterator &rhs) { return !(lhs == rhs); }
 
  private:
   std::function<pointer(std::size_t)> getter_;
@@ -75,5 +73,4 @@ class Container {
 
   /// Iterate all unordered particle pairs.
   virtual auto forEachPair(const std::function<void(Particle &, Particle &)> &visitor) -> void = 0;
-
 };

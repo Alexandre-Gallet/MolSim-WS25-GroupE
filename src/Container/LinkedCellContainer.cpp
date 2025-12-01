@@ -2,13 +2,14 @@
 // Created by darig on 11/20/2025.
 //
 
+#include "LinkedCellContainer.h"
+
 #include <algorithm>
 #include <cmath>
-#include "LinkedCellContainer.h"
 
 LinkedCellContainer::LinkedCellContainer() : LinkedCellContainer(1.0, {1.0, 1.0, 1.0}) {}
 
-LinkedCellContainer::LinkedCellContainer(double r_cutoff, const std::array<double, 3>& domain_size)
+LinkedCellContainer::LinkedCellContainer(double r_cutoff, const std::array<double, 3> &domain_size)
     : r_cutoff(r_cutoff), domain_size(domain_size) {
   initDimensions();
   initCells();
@@ -41,8 +42,8 @@ void LinkedCellContainer::initCells() {
     for (std::size_t y = 0; y < padded_dims[1]; ++y) {
       for (std::size_t x = 0; x < padded_dims[0]; ++x) {
         LinkedCell cell{};
-        const bool is_halo = x == 0 || y == 0 || z == 0 || x == padded_dims[0] - 1 ||
-                             y == padded_dims[1] - 1 || z == padded_dims[2] - 1;
+        const bool is_halo =
+            x == 0 || y == 0 || z == 0 || x == padded_dims[0] - 1 || y == padded_dims[1] - 1 || z == padded_dims[2] - 1;
         const bool is_boundary = !is_halo && (x == 1 || y == 1 || z == 1 || x == padded_dims[0] - 2 ||
                                               y == padded_dims[1] - 2 || z == padded_dims[2] - 2);
 
@@ -73,19 +74,18 @@ void LinkedCellContainer::initHalo() {
 }
 
 void LinkedCellContainer::deleteHaloCells() {
-  std::vector<Particle*> to_delete;
+  std::vector<Particle *> to_delete;
   to_delete.reserve(size());
   for (auto *cell : halo_cells) {
     to_delete.insert(to_delete.end(), cell->particles.begin(), cell->particles.end());
     cell->particles.clear();
   }
 
-  owned_particles.erase(std::remove_if(owned_particles.begin(), owned_particles.end(),
-                                       [&](const auto &ptr) {
-                                         return std::find(to_delete.begin(), to_delete.end(), ptr.get()) !=
-                                                to_delete.end();
-                                       }),
-                        owned_particles.end());
+  owned_particles.erase(
+      std::remove_if(
+          owned_particles.begin(), owned_particles.end(),
+          [&](const auto &ptr) { return std::find(to_delete.begin(), to_delete.end(), ptr.get()) != to_delete.end(); }),
+      owned_particles.end());
 }
 
 auto LinkedCellContainer::addParticle(Particle &particle) -> Particle & {
@@ -108,15 +108,11 @@ auto LinkedCellContainer::emplaceParticle(const std::array<double, 3> &pos, cons
   return emplaceParticle(pos, vel, mass, 0);
 }
 
-auto LinkedCellContainer::size() const noexcept -> std::size_t {
-  return owned_particles.size();
-}
+auto LinkedCellContainer::size() const noexcept -> std::size_t { return owned_particles.size(); }
 
 auto LinkedCellContainer::empty() const noexcept -> bool { return size() == 0; }
 
-auto LinkedCellContainer::reserve(std::size_t capacity) -> void {
-  owned_particles.reserve(capacity);
-}
+auto LinkedCellContainer::reserve(std::size_t capacity) -> void { owned_particles.reserve(capacity); }
 
 auto LinkedCellContainer::clear() noexcept -> void {
   owned_particles.clear();

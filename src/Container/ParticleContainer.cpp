@@ -36,14 +36,14 @@ auto ParticleContainer::addParticle(Particle &&particle) -> Particle & {
   return particles_.back();
 }
 
-auto ParticleContainer::emplaceParticle(const std::array<double, 3> &pos, const std::array<double, 3> &vel,
-                                         double mass, int type) -> Particle & {
+auto ParticleContainer::emplaceParticle(const std::array<double, 3> &pos, const std::array<double, 3> &vel, double mass,
+                                        int type) -> Particle & {
   particles_.emplace_back(pos, vel, mass, type);
   return particles_.back();
 }
 
-auto ParticleContainer::emplaceParticle(const std::array<double, 3> &pos, const std::array<double, 3> &vel,
-                                         double mass) -> Particle & {
+auto ParticleContainer::emplaceParticle(const std::array<double, 3> &pos, const std::array<double, 3> &vel, double mass)
+    -> Particle & {
   return emplaceParticle(pos, vel, mass, 0);
 }
 

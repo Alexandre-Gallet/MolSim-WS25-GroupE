@@ -22,5 +22,6 @@ class SimulationFactory {
    * @param particles Container where all particles are stored
    * @return Simulation object of the given type
    */
-  static std::unique_ptr<Simulation> createSimulation(SimulationType type, Arguments &args, ParticleContainer &particles);
+  static std::unique_ptr<Simulation> createSimulation(SimulationType type, Arguments &args,
+                                                      ParticleContainer &particles);
 };

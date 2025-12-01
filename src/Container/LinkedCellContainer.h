@@ -21,7 +21,7 @@ enum class CellType : uint8_t { Inner, Boundary, Halo };
 
 struct LinkedCell {
   CellType type;
-  std::vector<Particle*> particles;
+  std::vector<Particle *> particles;
 };
 
 /**
@@ -32,8 +32,7 @@ struct LinkedCell {
  * holds pointers to particles owned by the container.
  */
 class LinkedCellContainer : public Container {
-
-public:
+ public:
   using storage_type = std::vector<LinkedCell>;
   using iterator = Container::iterator;
   using const_iterator = Container::const_iterator;
@@ -45,7 +44,7 @@ public:
    * @param r_cutoff Interaction cutoff; defines cell size.
    * @param domain_size Physical domain extents (x,y,z). Origin is (0,0,0).
    */
-  LinkedCellContainer(double r_cutoff, const std::array<double, 3>& domain_size);
+  LinkedCellContainer(double r_cutoff, const std::array<double, 3> &domain_size);
 
   template <typename Func>
   void forEachPair(Func visitor);
@@ -71,10 +70,9 @@ public:
   /// Place a particle into the appropriate cell (inner/boundary/halo).
   auto addParticle(Particle &particle) -> Particle & override;
   /// Emplace a particle with explicit state (Container interface).
-  auto emplaceParticle(const std::array<double, 3> &pos, const std::array<double, 3> &vel, double mass,
-                       int type) -> Particle & override;
-  auto emplaceParticle(const std::array<double, 3> &pos, const std::array<double, 3> &vel, double mass)
-      -> Particle &;
+  auto emplaceParticle(const std::array<double, 3> &pos, const std::array<double, 3> &vel, double mass, int type)
+      -> Particle & override;
+  auto emplaceParticle(const std::array<double, 3> &pos, const std::array<double, 3> &vel, double mass) -> Particle &;
   /// Total number of particles referenced by the grid.
   [[nodiscard]] auto size() const noexcept -> std::size_t override;
   /// Check if the grid currently holds no particles.
@@ -96,11 +94,11 @@ public:
 
   /// Convert 3D indices to a linear index in the grid.
   static constexpr auto toLinearIndex(std::size_t x, std::size_t y, std::size_t z,
-                                             const std::array<std::size_t, 3> &dims) -> std::size_t {
+                                      const std::array<std::size_t, 3> &dims) -> std::size_t {
     return x + (dims[0] * (y + (dims[1] * z)));
   }
 
-  private:
+ private:
   void placeParticle(Particle *particle);
   void initDimensions();
   void initCells();
@@ -117,8 +115,8 @@ public:
   std::array<double, 3> domain_size{};
   std::array<std::size_t, 3> cells_per_dim{};
   std::array<std::size_t, 3> padded_dims{};
-  std::vector<LinkedCell*> boundary_cells;
-  std::vector<LinkedCell*> halo_cells;
+  std::vector<LinkedCell *> boundary_cells;
+  std::vector<LinkedCell *> halo_cells;
 };
 
 template <typename Func>
@@ -162,7 +160,8 @@ inline void LinkedCellContainer::forEachPair(Func visitor) {
       const int nz = cz + offset[2];
 
       if (nx < 0 || ny < 0 || nz < 0) continue;
-      if (nx >= static_cast<int>(cells_x) || ny >= static_cast<int>(cells_y) || nz >= static_cast<int>(cells_z)) continue;
+      if (nx >= static_cast<int>(cells_x) || ny >= static_cast<int>(cells_y) || nz >= static_cast<int>(cells_z))
+        continue;
 
       const std::size_t neighbor_index = toLinearIndex(static_cast<std::size_t>(nx), static_cast<std::size_t>(ny),
                                                        static_cast<std::size_t>(nz), padded_dims);
