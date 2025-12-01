@@ -26,10 +26,7 @@ void LennardJones::calculateF(ParticleContainer &particles) {
 }
 void LennardJones::calc(Particle &p1, Particle &p2, double epsilon, double sigma) {
   const auto diff = ArrayUtils::elementWisePairOp(p1.getX(), p2.getX(), std::minus<>());
-  const double distance = ArrayUtils::L2Norm(diff);
-  if (distance == 0.0) {
-    return;
-  }
+  const double distance = std::max(ArrayUtils::L2Norm(diff), 1e-12);
   const double invR2 = 1.0 / (distance * distance);
   const double sr = sigma / distance;
   const double sr6 = std::pow(sr, 6);
