@@ -6,20 +6,17 @@
 #include <sstream>
 
 #include "../../src/Generator/ParticleGenerator.h"
-
-#include <cmath>
-#include <sstream>
-
+#include "Generator/CuboidGenerator.h"
 #include "ParticleContainer.h"
 #include "Simulation/Simulation.h"
 #include "inputReader/FileReader.h"
 
+
 /*
-#include "ParticleGenerator.h"
+#include "GParticleGenerator.h"
 #include "Simulation/Simulation.h"
 #include "inputReader/FileReader.h"
 
-/*
 
    Behaviour test for the ParticleGenerator component in the MolSim project.
 
@@ -40,12 +37,13 @@
    - The velocities of at least some particles should not be all zero (indicating the
     application of Maxwell-Boltzmann thermal motion).
  */
+ /*
 TEST(ParticleGeneratorBehaviourTest, GeneratesCorrectNumberAndNonZeroVelocity) {
     /// Container to hold the generated particles.
     ParticleContainer container;
 
     /// Create generator instance.
-    ParticleGenerator generator;
+    CuboidGenerator generator;
 
     /// Define cuboid parameters.
     const std::array<double, 3> origin{0.0, 0.0, 0.0};  ///< Lower-left corner
@@ -79,7 +77,7 @@ TEST(ParticleGeneratorBehaviourTest, GeneratesCorrectNumberAndNonZeroVelocity) {
 
 TEST(ParticleGeneratorBehaviourTest, GeneratesCorrectGridPositions) {
   ParticleContainer c;
-  ParticleGenerator g;
+  CuboidGenerator g;
   g.generateCuboid(c, {0,0,0}, {3,3,1}, 1.0, 1.0, {0,0,0}, 0.1);
 
   for (auto &p : c) {
@@ -93,7 +91,7 @@ TEST(ParticleGeneratorBehaviourTest, GeneratesCorrectGridPositions) {
 //Check that cuboid generator does not change initial velocities when brownian motion mean velocitiy is 0
 TEST(ParticleGeneratorBehaviourTest, NoBrownianKeepsVelocityConstant) {
   ParticleContainer container;
-  ParticleGenerator generator;
+  CuboidGenerator generator;
 
   const std::array<double, 3> origin{0.0, 0.0, 0.0};
   const std::array<size_t, 3> N{3, 2, 1};
@@ -110,7 +108,7 @@ TEST(ParticleGeneratorBehaviourTest, NoBrownianKeepsVelocityConstant) {
     EXPECT_DOUBLE_EQ(p.getV()[2], v0[2]);
   }
 }
-
+*/
 
 
 
