@@ -83,8 +83,13 @@ if(CLANG_TIDY_EXE)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
     add_custom_target(run_clang_tidy
-            COMMAND ${CLANG_TIDY_EXE} -p ${CMAKE_BINARY_DIR} ${ALL_CPP}
-            COMMENT "Running clang-tidy static analysis on CPP files only"
+            COMMAND ${CMAKE_COMMAND}
+            -DALL_CPP=${ALL_CPP}
+            -DCLANG_TIDY_EXE=${CLANG_TIDY_EXE}
+            -DCMAKE_BINARY_DIR=${CMAKE_BINARY_DIR}
+            -DCMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}
+            -P ${CMAKE_SOURCE_DIR}/cmake/modules/run_clang_tidy.cmake
+            COMMENT "Running clang-tidy on all source files"
             VERBATIM)
 endif()
 

@@ -55,7 +55,7 @@ void MoleculeSimulation::runSimulation() {
     current_time += args.delta_t;
   }
 
-  SPDLOG_INFO("Molecule simulation completed after {} iterations (final t = {}).", iteration, current_time);
+  SPDLOG_INFO("Molecule simulation completed after {} iterations (final t = {:.6g}).", iteration, current_time);
 }
 
 void MoleculeSimulation::plotParticles(ParticleContainer &particles, int iteration, OutputFormat format) {
