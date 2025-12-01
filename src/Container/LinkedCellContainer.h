@@ -20,8 +20,8 @@
 enum class CellType : uint8_t { Inner, Boundary, Halo };
 
 struct LinkedCell {
-  CellType type;                     ///< Cell classification: Inner, Boundary, or Halo.
-  std::vector<Particle*> particles;  ///< Pointers to particles located in this cell.
+  CellType type;
+  std::vector<Particle*> particles;
 };
 
 /**

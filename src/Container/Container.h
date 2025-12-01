@@ -13,7 +13,7 @@
 #include "Particle.h"
 
 template <typename Value>
-class ParticleIteratorImpl {
+class ParticleIterator {
  public:
   using iterator_category = std::forward_iterator_tag;
   using value_type = std::remove_const_t<Value>;
@@ -21,40 +21,37 @@ class ParticleIteratorImpl {
   using pointer = Value*;
   using reference = Value&;
 
-  ParticleIteratorImpl() = default;
-  ParticleIteratorImpl(std::function<pointer(std::size_t)> getter, std::size_t index)
+  ParticleIterator() = default;
+  ParticleIterator(std::function<pointer(std::size_t)> getter, std::size_t index)
       : getter_(std::move(getter)), index_(index) {}
 
   reference operator*() const { return *getter_(index_); }
   pointer operator->() const { return getter_(index_); }
 
-  ParticleIteratorImpl& operator++() {
+  ParticleIterator& operator++() {
     ++index_;
     return *this;
   }
-  ParticleIteratorImpl operator++(int) {
-    ParticleIteratorImpl tmp(*this);
+  ParticleIterator operator++(int) {
+    ParticleIterator tmp(*this);
     ++(*this);
     return tmp;
   }
 
-  friend bool operator==(const ParticleIteratorImpl& lhs, const ParticleIteratorImpl& rhs) {
+  friend bool operator==(const ParticleIterator& lhs, const ParticleIterator& rhs) {
     return lhs.index_ == rhs.index_;
   }
-  friend bool operator!=(const ParticleIteratorImpl& lhs, const ParticleIteratorImpl& rhs) { return !(lhs == rhs); }
+  friend bool operator!=(const ParticleIterator& lhs, const ParticleIterator& rhs) { return !(lhs == rhs); }
 
  private:
   std::function<pointer(std::size_t)> getter_;
   std::size_t index_{0};
 };
 
-using ParticleIterator = ParticleIteratorImpl<Particle>;
-using ConstParticleIterator = ParticleIteratorImpl<const Particle>;
-
 class Container {
  public:
-  using iterator = ParticleIterator;
-  using const_iterator = ConstParticleIterator;
+  using iterator = ParticleIterator<Particle>;
+  using const_iterator = ParticleIterator<const Particle>;
 
   virtual ~Container() = default;
 
