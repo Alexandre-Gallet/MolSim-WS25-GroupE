@@ -17,3 +17,5 @@ inline auto parseType(const std::string &sim_type) -> SimulationType {
   std::cerr << "Invalid simulation type";
   return SimulationType::Molecule;
 }
+
+// test
