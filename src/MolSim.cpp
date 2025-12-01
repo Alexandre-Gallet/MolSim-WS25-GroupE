@@ -7,6 +7,7 @@
 
 #include "Container/ParticleContainer.h"
 #include "Simulation/SimulationFactory.h"
+#include "Simulation/SimulationType.h"
 #include "inputReader/Arguments.h"
 #include "inputReader/InputReader.h"
 #include "logging.hpp"

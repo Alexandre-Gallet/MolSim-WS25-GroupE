@@ -5,7 +5,7 @@
 /**
  * Class to differentiate between the different simulation types
  */
-enum SimulationType : uint8_t { Planet, Molecule };
+enum SimulationType { Planet, Molecule };
 
 inline auto parseType(const std::string &sim_type) -> SimulationType {
   if (sim_type == "planet" || sim_type == "Planet") {
