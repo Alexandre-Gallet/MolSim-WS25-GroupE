@@ -8,12 +8,12 @@
 
 #include <array>
 #include <cassert>
-#include <cmath>
 #include <iostream>
 
 #include "gtest/gtest.h"
 #include "Particle.h"
 #include "ParticleContainer.h"
+#include "ParticleContainerTest.h"
 
 namespace {
 /*
