@@ -1,0 +1,44 @@
+---
+# ===============================
+#  Minimal but Effective Clang-Tidy remove those from cppcoreguidelines that would are not helpful
+# ===============================
+
+# remove clang analyzer, without this line checks are still done by default
+Checks: >
+  -clang-analyzer-*,
+          
+  bugprone-*,
+  performance-*,
+  modernize-*,
+  readability-*,
+  cppcoreguidelines-*,
+  portability-*,
+
+  # Disable noisy stylistic rules:
+  -readability-identifier-length,
+  -readability-magic-numbers,
+  -modernize-use-trailing-return-type,
+  -modernize-use-nodiscard,
+  -portability-avoid-pragma-once
+
+HeaderFilterRegex: 'src/'
+
+WarningsAsErrors: ''
+
+FormatStyle: none
+
+
+# ==========================================
+#  OPTIONS FOR SOME CHECKS
+# ==========================================
+CheckOptions:
+  - key: readability-identifier-naming.VariableCase
+    value: lower_case
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
+  - key: readability-identifier-naming.FunctionCase
+    value: camelBack
+  - key: modernize-loop-convert.MaxCopySize
+    value: '16'
+  - key: modernize-use-nullptr.NullMacros
+    value: 'NULL,0'
