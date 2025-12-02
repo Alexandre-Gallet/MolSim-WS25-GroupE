@@ -2,16 +2,19 @@
 
 #include "SimulationFactory.h"
 
+#include <memory>
+
 #include "MoleculeSimulation.h"
 #include "PlanetSimulation.h"
 
-Simulation *SimulationFactory::createSimulation(SimulationType type, Arguments &args, ParticleContainer &particles) {
+std::unique_ptr<Simulation> SimulationFactory::createSimulation(SimulationType type, Arguments &args,
+                                                                ParticleContainer &particles) {
   switch (type) {
-    case SimulationType::Planet:
-      return new PlanetSimulation(args, particles);
-    case SimulationType::Molecule:
-      return new MoleculeSimulation(args, particles);
-    default:
-      return new MoleculeSimulation(args, particles);
+    case SimulationType::Molecule: {
+      return std::make_unique<MoleculeSimulation>(args, particles);
+    }
+    default: {
+      return std::make_unique<PlanetSimulation>(args, particles);
+    }
   }
 }
