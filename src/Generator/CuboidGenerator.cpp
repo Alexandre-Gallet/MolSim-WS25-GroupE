@@ -7,7 +7,7 @@ void CuboidGenerator::generate(ParticleContainer& container) const {
   generateCuboid(container, origin_, numPerDim_, h_, mass_,
                  baseVelocity_, brownianMean_, type_);
 }
-
+// Have kept the generateCuboid function due to code structure, but also kept generate function as a design decision
 void CuboidGenerator::generateCuboid(ParticleContainer &container,
                                      const std::array<double, 3> &origin,
                                      const std::array<std::size_t, 3> &numPerDim,
