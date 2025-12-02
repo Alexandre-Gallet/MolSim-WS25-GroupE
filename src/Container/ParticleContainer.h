@@ -103,13 +103,14 @@ class ParticleContainer : public Container {
    */
   auto addParticle(Particle &&particle) -> Particle &;
 
-  /// Add an existing particle reference (Container interface).
+  // Add an existing particle reference (Container interface).
   auto addParticle(Particle &particle) -> Particle & override;
-  /// Emplace a particle with explicit state (Container interface).
-  auto emplaceParticle(const std::array<double, 3> &pos, const std::array<double, 3> &vel, double mass, int type)
-      -> Particle & override;
-  /// Convenience overload that uses the default type.
-  auto emplaceParticle(const std::array<double, 3> &pos, const std::array<double, 3> &vel, double mass) -> Particle &;
+  // Emplace a particle with explicit state (Container interface).
+  auto emplaceParticle(const std::array<double, 3> &pos, const std::array<double, 3> &vel, double mass,
+      int type) -> Particle & override;
+  // Convenience overload that uses the default type.
+  auto emplaceParticle(const std::array<double, 3> &pos, const std::array<double, 3> &vel, double mass)
+      -> Particle &;
 
   /**
    * @brief Constructs and adds a new particle in-place.

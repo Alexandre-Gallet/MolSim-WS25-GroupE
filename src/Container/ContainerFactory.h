@@ -4,7 +4,7 @@
 #include "Container.h"
 #include "ContainerType.h"
 namespace ContainerFactory {
-//TODO edit comments
+// TODO edit comments
 /**
  * @brief creates a new simulation of the specified type
  * @param type Type of simulation, default: Molecule

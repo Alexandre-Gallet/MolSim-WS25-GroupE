@@ -69,9 +69,10 @@ class LinkedCellContainer : public Container {
   /// Place a particle into the appropriate cell (inner/boundary/halo).
   auto addParticle(Particle &particle) -> Particle & override;
   /// Emplace a particle with explicit state (Container interface).
-  auto emplaceParticle(const std::array<double, 3> &pos, const std::array<double, 3> &vel, double mass, int type)
-      -> Particle & override;
-  auto emplaceParticle(const std::array<double, 3> &pos, const std::array<double, 3> &vel, double mass) -> Particle &;
+  auto emplaceParticle(const std::array<double, 3> &pos, const std::array<double, 3> &vel, double mass,
+      int type) -> Particle & override;
+  auto emplaceParticle(const std::array<double, 3> &pos, const std::array<double, 3> &vel, double mass)
+      -> Particle &;
   /// Total number of particles referenced by the grid.
   [[nodiscard]] auto size() const noexcept -> std::size_t override;
   /// Check if the grid currently holds no particles.
