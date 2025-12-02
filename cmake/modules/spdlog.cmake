@@ -1,6 +1,3 @@
-# -----------------------------
-# Logging: spdlog via FetchContent
-# -----------------------------
 include(FetchContent)
 
 FetchContent_Declare(
