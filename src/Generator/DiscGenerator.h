@@ -1,23 +1,26 @@
-// DiscGenerator.h
 #pragma once
 
 #include <array>
-#include "ParticleGenerator.h"
 #include "ParticleContainer.h"
 
 /**
- * @brief Generates particles arranged in a 2D disc.
+ * @brief Generates a 2D disc of particles in the XY-plane.
  *
- * The disc is generated in the x-y plane; z remains constant.
+ * Can be used in two ways:
+ *   1. Object-oriented usage: create DiscGenerator object and call generate().
+ *   2. Static helper: call DiscGenerator::generateDisc(...) directly.
  */
-class DiscGenerator : public ParticleGenerator {
+class DiscGenerator {
 public:
+  /**
+   * @brief Object-oriented constructor.
+   */
   DiscGenerator(const std::array<double, 3>& center,
                 int radiusCells,
                 double h,
                 double mass,
                 const std::array<double, 3>& baseVelocity,
-                int type = 0)
+                int type)
       : center_(center),
         radiusCells_(radiusCells),
         h_(h),
@@ -25,7 +28,29 @@ public:
         baseVelocity_(baseVelocity),
         type_(type) {}
 
-  void generate(ParticleContainer& container) const override;
+  /**
+   * @brief Object-oriented API: generates disc using stored parameters.
+   */
+  void generate(ParticleContainer& container) const;
+
+  /**
+   * @brief Static helper that generates a disc without constructing an object.
+   *
+   * @param container     ParticleContainer to fill
+   * @param center        Center of the disc
+   * @param radiusCells   Radius in lattice cells (integer)
+   * @param h             Spacing between particles
+   * @param mass          Particle mass
+   * @param baseVelocity  Initial velocity
+   * @param type          Particle type
+   */
+  static void generateDisc(ParticleContainer& container,
+                           const std::array<double, 3>& center,
+                           int radiusCells,
+                           double h,
+                           double mass,
+                           const std::array<double, 3>& baseVelocity,
+                           int type);
 
 private:
   std::array<double, 3> center_;
