@@ -50,6 +50,9 @@ docs/
 # remove the WSL specifc files
 *:Zone.Identifier
 
+# remove MAC-OS specific files
+.DS_Store
+
 # ignore Darinas auto generated testing folder the testing folder
 Testing/
 
@@ -58,6 +61,3 @@ tests/LastTest.log
 
 # ignore auto cmake generated folder
 cmake-build-debug/
-
-#ignore auto generated file
-.DS_store

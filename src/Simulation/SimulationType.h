@@ -18,5 +18,3 @@ inline auto parseType(const std::string &sim_type) -> SimulationType {
   SPDLOG_ERROR("Invalid simulation type: {}", sim_type);
   return SimulationType::Molecule;
 }
-
-// test

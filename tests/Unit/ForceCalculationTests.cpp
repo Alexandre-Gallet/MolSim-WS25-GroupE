@@ -1,11 +1,10 @@
 #include <gtest/gtest.h>
-
-#include <array>
 #include <cmath>
+#include <array>
 
-#include "../../src/Container/ParticleContainer.h"
-#include "../../src/ForceCalculation/LennardJones.h"
-#include "../../src/Container/Particle.h"
+#include "ForceCalculation/LennardJones.h"
+#include "ParticleContainer.h"
+#include "Particle.h"
 
 // --- Helper: vector norm ---
 double norm3D(const std::array<double,3>& v) {

@@ -1,13 +1,14 @@
 /**
- * @file MolSim.cpp
- * @brief Main entry point for the Molecular Dynamics simulation
+ * calculate the force for all particles
  */
 
-#include <spdlog/spdlog.h>
+/**
+ * calculate the position for all particles
+ */
+void calculateX();
 
-#include "Container/ParticleContainer.h"
+#include "ParticleContainer.h"
 #include "Simulation/SimulationFactory.h"
-#include "Simulation/SimulationType.h"
 #include "inputReader/Arguments.h"
 #include "inputReader/InputReader.h"
 #include "logging.hpp"

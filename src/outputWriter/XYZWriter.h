@@ -10,9 +10,9 @@
 #include <fstream>
 #include <list>
 
-#include "../Container/Particle.h"
-#include "../Container/ParticleContainer.h"
 #include "OutputWriter.h"
+#include "Particle.h"
+#include "ParticleContainer.h"
 
 namespace outputWriter {
 

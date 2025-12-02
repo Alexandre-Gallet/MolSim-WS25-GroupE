@@ -2,6 +2,8 @@
 
 #include "SimulationFactory.h"
 
+#include <memory>
+
 #include "MoleculeSimulation.h"
 #include "PlanetSimulation.h"
 

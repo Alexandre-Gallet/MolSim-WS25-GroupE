@@ -5,7 +5,7 @@
 
 #include <string>
 
-#include "../Container/ParticleContainer.h"
+#include "ParticleContainer.h"
 
 namespace outputWriter {
 /**
