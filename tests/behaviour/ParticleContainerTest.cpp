@@ -37,13 +37,12 @@
    - The velocities of at least some particles should not be all zero (indicating the
     application of Maxwell-Boltzmann thermal motion).
  */
- /*
+
 TEST(ParticleGeneratorBehaviourTest, GeneratesCorrectNumberAndNonZeroVelocity) {
     /// Container to hold the generated particles.
     ParticleContainer container;
 
     /// Create generator instance.
-    CuboidGenerator generator;
 
     /// Define cuboid parameters.
     const std::array<double, 3> origin{0.0, 0.0, 0.0};  ///< Lower-left corner
@@ -54,7 +53,7 @@ TEST(ParticleGeneratorBehaviourTest, GeneratesCorrectNumberAndNonZeroVelocity) {
     const double mbMeanVelocity = 0.1;                  ///< Mean velocity for Brownian motion
 
     /// Generate the cuboid of particles with Maxwell-Boltzmann noise.
-    generator.generateCuboid(container, origin, dims, h, mass, initVel, mbMeanVelocity);
+    CuboidGenerator::generateCuboid(container, origin, dims, h, mass, initVel, mbMeanVelocity);
 
     /// Verify that the total number of particles equals 3×2×1 = 6.
     EXPECT_EQ(container.size(), 6) << "ParticleGenerator did not produce the expected number of particles.";
@@ -77,8 +76,7 @@ TEST(ParticleGeneratorBehaviourTest, GeneratesCorrectNumberAndNonZeroVelocity) {
 
 TEST(ParticleGeneratorBehaviourTest, GeneratesCorrectGridPositions) {
   ParticleContainer c;
-  CuboidGenerator g;
-  g.generateCuboid(c, {0,0,0}, {3,3,1}, 1.0, 1.0, {0,0,0}, 0.1);
+  CuboidGenerator::generateCuboid(c, {0,0,0}, {3,3,1}, 1.0, 1.0, {0,0,0}, 0.1);
 
   for (auto &p : c) {
     auto x = p.getX();
@@ -91,7 +89,6 @@ TEST(ParticleGeneratorBehaviourTest, GeneratesCorrectGridPositions) {
 //Check that cuboid generator does not change initial velocities when brownian motion mean velocitiy is 0
 TEST(ParticleGeneratorBehaviourTest, NoBrownianKeepsVelocityConstant) {
   ParticleContainer container;
-  CuboidGenerator generator;
 
   const std::array<double, 3> origin{0.0, 0.0, 0.0};
   const std::array<size_t, 3> N{3, 2, 1};
@@ -100,7 +97,7 @@ TEST(ParticleGeneratorBehaviourTest, NoBrownianKeepsVelocityConstant) {
   const std::array<double, 3> v0{1.0, -0.5, 0.2};
   const double brownianMeanVelocity = 0.0;
 
-  generator.generateCuboid(container, origin, N, h, m, v0, brownianMeanVelocity);
+  CuboidGenerator::generateCuboid(container, origin, N, h, m, v0, brownianMeanVelocity);
 
   for (const auto &p : container) {
     EXPECT_DOUBLE_EQ(p.getV()[0], v0[0]);
@@ -108,7 +105,7 @@ TEST(ParticleGeneratorBehaviourTest, NoBrownianKeepsVelocityConstant) {
     EXPECT_DOUBLE_EQ(p.getV()[2], v0[2]);
   }
 }
-*/
+
 
 
 
