@@ -46,25 +46,7 @@ TEST(LennardJonesBehaviourTest, Newton3rdLawSymmetry) {
 }
 
 
-/*  TEST 2: Zero force at equilibrium distance  r_min = 2^(1/6) * sigma */
- /*TEST(LennardJonesBehaviourTest, ZeroForceAtEquilibriumDistance) {
-    double epsilon = 5.0;
-    double sigma   = 1.0;
 
-    double r_min = std::pow(2.0, 1.0/6.0) * sigma;
-
-    Particle p1, p2;
-    p1.setX({0,0,0});
-    p2.setX({r_min,0,0});
-    p1.setF({0,0,0});
-    p2.setF({0,0,0});
-
-    LennardJones::calc(p1, p2, epsilon, sigma);
-
-    EXPECT_NEAR(norm3D(p1.getF()), 0.0, 1e-6);
-    EXPECT_NEAR(norm3D(p2.getF()), 0.0, 1e-6);
-}
-*/
 
 
 /*  dot(F12, r12) < 0 means pushing apart. */
