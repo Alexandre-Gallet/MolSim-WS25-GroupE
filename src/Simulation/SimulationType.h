@@ -1,14 +1,16 @@
 #pragma once
 #include <spdlog/spdlog.h>
+
 #include <iostream>
 #include <string>
 
 /**
  * Class to differentiate between the different simulation types
  */
-enum SimulationType { Planet, Molecule };
 
-inline auto parseType(const std::string &sim_type) -> SimulationType {
+enum class SimulationType { Planet, Molecule };
+
+inline auto parseSimType(const std::string &sim_type) -> SimulationType {
   if (sim_type == "planet" || sim_type == "Planet") {
     return SimulationType::Planet;
   }

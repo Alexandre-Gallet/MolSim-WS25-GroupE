@@ -7,8 +7,6 @@
 #include <algorithm>
 #include <cmath>
 
-LinkedCellContainer::LinkedCellContainer() : LinkedCellContainer(1.0, {1.0, 1.0, 1.0}) {}
-
 LinkedCellContainer::LinkedCellContainer(double r_cutoff, const std::array<double, 3> &domain_size)
     : r_cutoff(r_cutoff), domain_size(domain_size) {
   initDimensions();

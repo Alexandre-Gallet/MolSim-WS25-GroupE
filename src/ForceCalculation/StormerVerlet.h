@@ -22,5 +22,5 @@ class StormerVerlet : public ForceCalculation {
    * @brief Calculates the forces using the Störmer-Verlet formulas
    * @param particles Particle container on which the calculations are performed
    */
-  void calculateF(ParticleContainer &particles) override;
+  void calculateF(Container &particles) override;
 };

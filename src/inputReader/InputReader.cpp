@@ -8,7 +8,6 @@
 #include <ostream>
 #include <string>
 
-#include "../Simulation/SimulationType.h"
 #include "Arguments.h"
 #include "outputWriter/OutputFormat.h"
 
@@ -28,11 +27,12 @@ namespace inputReader {
  * @brief print help message for running the simulation
  */
 static void printUsage() {
-  std::cout << "Usage: ./MolSim <input_file> <sim_type> [t_start] [t_end] [delta_t] [output_format]\n"
+  std::cout << "Usage: ./MolSim <input_file> <sim_type> [container] [t_start] [t_end] [delta_t] [output_format]\n"
             << "Example: ./MolSim eingabe-sonne.txt 0 1000 0.014 VTK\n"
             << "Arguments:\n"
             << "\t<input_file>\t:\tPath to particle data (text file)\n"
             << "\t<sim_type>\t:\tSimulation type: planet or molecule (default molecule)\n"
+            << "\t[-c | --container <value>]\t:\tContainer type: particle or cell (default particle)\n"
             << "\t[-s | --t_start <value>]\t:\tStart time of the simulation (default 0)\n"
             << "\t[-e | --t_end <value>]\t:\tEnd time of the simulation (default 1000)\n"
             << "\t[-d | --delta_t <value>]\t:\tTime step (default 0.014)\n"
@@ -62,7 +62,7 @@ void parseArguments(const int argc, char *argv[], Arguments &args) {
               << "Use -h or --help to display usage.\n";
     std::exit(EXIT_FAILURE);
   }
-  args.sim_type = parseType(argv[2]);
+  args.sim_type = parseSimType(argv[2]);
   // parse the arguments, checking the flags and saving the values for the simulation parameters
   for (int i = 3; i < argc; i++) {
     std::string arg = argv[i];
@@ -75,6 +75,13 @@ void parseArguments(const int argc, char *argv[], Arguments &args) {
         args.t_start = std::stod(argv[++i]);
       } else {
         std::cerr << "Missing value for \"-s\" argument\n";
+        std::exit(EXIT_FAILURE);
+      }
+    } else if (arg == "-c" || arg == "--container") {
+      if (i + 1 < argc) {
+        args.cont_type = parseContainerType(argv[++i]);
+      } else {
+        std::cerr << "Missing value for \"-c\" argument\n";
         std::exit(EXIT_FAILURE);
       }
     } else if (arg == "-e" || arg == "--t_end") {

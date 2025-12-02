@@ -15,7 +15,7 @@ double LennardJones::calculateU(const Particle &p1, const Particle &p2) const {
   const double sr6 = std::pow(sr, 6);
   return 4.0 * epsilon * (sr6 * sr6 - sr6);
 }
-void LennardJones::calculateF(ParticleContainer &particles) {
+void LennardJones::calculateF(Container &particles) {
   for (auto &p : particles) {
     // initialize to 0 so the simulation runs as expected
     p.setOldF(p.getF());

@@ -16,12 +16,13 @@
 
 #include "Container.h"
 #include "Particle.h"
+#include "inputReader/Arguments.h"
 
 enum class CellType : uint8_t { Inner, Boundary, Halo };
 
 struct LinkedCell {
-  CellType type;
-  std::vector<Particle *> particles;
+  CellType type;                      ///< Cell classification: Inner, Boundary, or Halo.
+  std::vector<Particle *> particles;  ///< Pointers to particles located in this cell.
 };
 
 /**
@@ -37,8 +38,6 @@ class LinkedCellContainer : public Container {
   using iterator = Container::iterator;
   using const_iterator = Container::const_iterator;
 
-  /// @brief Construct a minimal 1x1x1 grid with unit cutoff.
-  LinkedCellContainer();
   /**
    * @brief Construct a linked-cell grid for the given domain and cutoff.
    * @param r_cutoff Interaction cutoff; defines cell size.

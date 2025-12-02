@@ -8,7 +8,7 @@
 #include "../inputReader/FileReader.h"
 #include "../outputWriter/WriterFactory.h"
 
-PlanetSimulation::PlanetSimulation(const Arguments &args, ParticleContainer &particles)
+PlanetSimulation::PlanetSimulation(const Arguments &args, Container &particles)
     : inputFile(args.inputFile),
       t_start(args.t_start),
       t_end(args.t_end),
@@ -40,7 +40,7 @@ void PlanetSimulation::runSimulation() {
     current_time += getDeltaT();
   }
 }
-void PlanetSimulation::plotParticles(ParticleContainer &particles, int iteration, OutputFormat format) {
+void PlanetSimulation::plotParticles(Container &particles, int iteration, OutputFormat format) {
   std::filesystem::create_directories("output");
   std::string out_name("output/MD_vtk");
 

@@ -11,7 +11,7 @@ class PlanetSimulation : public Simulation {
   double t_end;
   double delta_t;
   OutputFormat outputFormat;
-  ParticleContainer &particles;
+  Container &particles;
 
  public:
   [[nodiscard]] char *getInputFile() const { return inputFile; }
@@ -19,12 +19,12 @@ class PlanetSimulation : public Simulation {
   [[nodiscard]] double getTEnd() const { return t_end; }
   [[nodiscard]] double getDeltaT() const { return delta_t; }
   [[nodiscard]] OutputFormat getOutputFormat() const { return outputFormat; }
-  [[nodiscard]] ParticleContainer &getParticles() const { return particles; }
-  explicit PlanetSimulation(const Arguments &args, ParticleContainer &particles);
+  [[nodiscard]] Container &getParticles() const { return particles; }
+  explicit PlanetSimulation(const Arguments &args, Container &particles);
   ~PlanetSimulation() override = default;
   /**
    * @brief main function for running the simulation
    */
   void runSimulation() override;
-  static void plotParticles(ParticleContainer &particles, int iteration, OutputFormat format);
+  static void plotParticles(Container &particles, int iteration, OutputFormat format);
 };

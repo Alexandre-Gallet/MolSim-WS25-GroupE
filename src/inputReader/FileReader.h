@@ -9,6 +9,7 @@
 
 #include <list>
 
+#include "../Container/Container.h"
 #include "../Container/Particle.h"
 #include "../Container/ParticleContainer.h"
 
@@ -17,5 +18,5 @@ class FileReader {
   FileReader();
   virtual ~FileReader();
 
-  void readFile(ParticleContainer &particles, char *filename);
+  void readFile(Container &particles, char *filename);
 };

@@ -22,6 +22,6 @@ class OutputWriter {
    * @param filename Output filename
    * @param iteration Current iteration number
    */
-  virtual void plotParticles(ParticleContainer &particles, const std::string &filename, int iteration) = 0;
+  virtual void plotParticles(Container &particles, const std::string &filename, int iteration) = 0;
 };
 }  // namespace outputWriter

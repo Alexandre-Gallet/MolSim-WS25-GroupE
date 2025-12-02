@@ -26,7 +26,7 @@ class LennardJones : public ForceCalculation {
    * @brief Calculates the forces using the Lennard-Jones formulas
    * @param particles Particle container on which the calculations are performed
    */
-  void calculateF(ParticleContainer &particles) override;
+  void calculateF(Container &particles) override;
   /**
    * @brief Calculate the force between two particles using Lennard-Jones formula
    * @param p1 First particle

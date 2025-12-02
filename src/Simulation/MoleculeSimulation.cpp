@@ -9,8 +9,7 @@
 #include "inputReader/FileReaderCuboids.h"
 #include "outputWriter/WriterFactory.h"
 
-MoleculeSimulation::MoleculeSimulation(Arguments &args, ParticleContainer &particles)
-    : args(args), particles(particles) {}
+MoleculeSimulation::MoleculeSimulation(Arguments &args, Container &particles) : args(args), particles(particles) {}
 
 void MoleculeSimulation::runSimulation() {
   std::vector<Cuboid> cuboids;
@@ -58,7 +57,7 @@ void MoleculeSimulation::runSimulation() {
   SPDLOG_INFO("Molecule simulation completed after {} iterations (final t = {:.6g}).", iteration, current_time);
 }
 
-void MoleculeSimulation::plotParticles(ParticleContainer &particles, int iteration, OutputFormat format) {
+void MoleculeSimulation::plotParticles(Container &particles, int iteration, OutputFormat format) {
   std::filesystem::create_directories("output");
   std::string out_name("output/MD_vtk");
 
