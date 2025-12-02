@@ -1,4 +1,5 @@
 #pragma once
+#include <spdlog/spdlog.h>
 #include <iostream>
 #include <string>
 
@@ -14,7 +15,7 @@ inline auto parseType(const std::string &sim_type) -> SimulationType {
   if (sim_type == "molecule" || sim_type == "Molecule") {
     return SimulationType::Molecule;
   }
-  std::cerr << "Invalid simulation type";
+  SPDLOG_ERROR("Invalid simulation type: {}", sim_type);
   return SimulationType::Molecule;
 }
 
