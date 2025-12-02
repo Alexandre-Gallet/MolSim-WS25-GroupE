@@ -6,7 +6,7 @@
 #include <sstream>
 
 #include "../../src/Container/ParticleContainer.h"
-#include "ParticleGenerator.h"
+#include "../../src/ParticleGenerator.h"
 #include "Simulation/Simulation.h"
 #include "inputReader/FileReader.h"
 

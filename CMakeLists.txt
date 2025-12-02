@@ -35,7 +35,7 @@ list(REMOVE_ITEM MY_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/MolSim.cpp")
 # Main executable (production)
 # -----------------------------
 add_executable(MolSim ${MY_SRC}
-                        src/MolSim.cpp)
+        src/MolSim.cpp)
 
 target_include_directories(MolSim PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
@@ -100,7 +100,18 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 include(vtk)
 include(clang-format)
 include(doxygen)
-include(spdlog)
+
+# -----------------------------
+# Logging: spdlog via FetchContent
+# -----------------------------
+include(FetchContent)
+
+FetchContent_Declare(
+        spdlog
+        URL https://github.com/gabime/spdlog/archive/refs/tags/v1.14.1.zip
+)
+
+FetchContent_MakeAvailable(spdlog)
 
 # Set log_level to default "INFO" and make it user configurable via cmake
 set(LOG_LEVEL "INFO" CACHE STRING "Minimum log level: TRACE, DEBUG, INFO, WARN, ERROR, CRITICAL, OFF")
@@ -118,7 +129,13 @@ include(CTest)   # Enables BUILD_TESTING option
 
 if(BUILD_TESTING)
 
-   include(gtest)
+    # -------- GoogleTest (via FetchContent, assignment compliant) ------
+    include(FetchContent)
+    FetchContent_Declare(
+            googletest
+            URL https://github.com/google/googletest/archive/refs/tags/v1.15.2.zip
+    )
+    FetchContent_MakeAvailable(googletest)
 
     # -----------------------------
     # Collect test source files
@@ -147,4 +164,3 @@ if(BUILD_TESTING)
     gtest_discover_tests(MolSimTests)
 
 endif()
-

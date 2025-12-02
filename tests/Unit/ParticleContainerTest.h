@@ -1,7 +1,7 @@
 #include <array>
 #include "gtest/gtest.h"
-#include "ParticleContainer.h"
-#include "Particle.h"
+#include "../../src/Container/ParticleContainer.h"
+#include "../../src/Container/Particle.h"
 
 /*
 Test fixture providing a ParticleContainer with two particles.
