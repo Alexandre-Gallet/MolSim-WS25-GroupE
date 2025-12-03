@@ -3,6 +3,7 @@
 #include "Container/ContainerFactory.h"
 #include "Container/ContainerType.h"
 #include "Container/ParticleContainer.h"
+#include "Generator/DiscGenerator.h"
 #include "Simulation/SimulationFactory.h"
 #include "inputReader/Arguments.h"
 #include "inputReader/InputReader.h"

@@ -2,15 +2,16 @@
 #include "CuboidGenerator.h"
 #include "utils/MaxwellBoltzmannDistribution.h"
 
-void CuboidGenerator::generate(ParticleContainer& container) const {
+void CuboidGenerator::generate(Container& container) const {
   // Simply call the static helper with the stored parameters
-  generateCuboid(container, origin_, numPerDim_, h_, mass_,
+  generateCuboid(container, origin_, numPerDim_, dom_size_, h_, mass_,
                  baseVelocity_, brownianMean_, type_);
 }
 // Have kept the generateCuboid function due to code structure, but also kept generate function as a design decision
-void CuboidGenerator::generateCuboid(ParticleContainer &container,
+void CuboidGenerator::generateCuboid(Container &container,
                                      const std::array<double, 3> &origin,
                                      const std::array<std::size_t, 3> &numPerDim,
+                                     const std::array<double, 3> &dom_size,
                                      double h,
                                      double mass,
                                      const std::array<double, 3> &baseVelocity,
@@ -35,7 +36,9 @@ void CuboidGenerator::generateCuboid(ParticleContainer &container,
 
         vel[0] += brownian[0];
         vel[1] += brownian[1];
-        vel[2] += brownian[2];
+        if (dom_size[2] > 1.) {
+          vel[2] += brownian[2];
+        }
 
         container.emplaceParticle(pos, vel, mass, type);
       }

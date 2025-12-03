@@ -24,9 +24,11 @@ void MoleculeSimulation::runSimulation() {
 
   // Generate particles for each cuboid
   for (const auto &c : cuboids) {
-    CuboidGenerator::generateCuboid(particles, c.origin, c.numPerDim, c.h, c.mass, c.baseVelocity, c.brownianMean,
+    CuboidGenerator::generateCuboid(particles, c.origin, c.numPerDim, args.domain_size, c.h, c.mass, c.baseVelocity, c.brownianMean,
                                       c.type);
   }
+  // DiscGenerator::generateDisc(particles, {60., 25., 10.}, 15, 1.1225, 1.0, {0., -10., 0}, 0);
+
   SPDLOG_INFO("Generated {} particles from cuboids.", particles.size());
 
   LennardJones lj;

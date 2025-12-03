@@ -1,7 +1,7 @@
 #pragma once
 
 #include <array>
-#include "ParticleContainer.h"
+#include "Container/Container.h"
 
 /**
  * @brief Generates a 2D disc of particles in the XY-plane.
@@ -31,12 +31,12 @@ public:
   /**
    * @brief Object-oriented API: generates disc using stored parameters.
    */
-  void generate(ParticleContainer& container) const;
+  void generate(Container& container) const;
 
   /**
    * @brief Static helper that generates a disc without constructing an object.
    *
-   * @param container     ParticleContainer to fill
+   * @param container     Container to fill
    * @param center        Center of the disc
    * @param radiusCells   Radius in lattice cells (integer)
    * @param h             Spacing between particles
@@ -44,7 +44,7 @@ public:
    * @param baseVelocity  Initial velocity
    * @param type          Particle type
    */
-  static void generateDisc(ParticleContainer& container,
+  static void generateDisc(Container& container,
                            const std::array<double, 3>& center,
                            int radiusCells,
                            double h,

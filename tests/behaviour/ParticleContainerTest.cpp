@@ -6,10 +6,8 @@
 #include <sstream>
 
 #include "../../src/Container/ParticleContainer.h"
-#include "../../src/ParticleGenerator.h"
 #include "../../src/Generator/ParticleGenerator.h"
 #include "Generator/CuboidGenerator.h"
-#include "ParticleContainer.h"
 #include "Simulation/Simulation.h"
 #include "inputReader/FileReader.h"
 
@@ -56,7 +54,7 @@ TEST(ParticleGeneratorBehaviourTest, GeneratesCorrectNumberAndNonZeroVelocity) {
     const double mbMeanVelocity = 0.1;                  ///< Mean velocity for Brownian motion
 
     /// Generate the cuboid of particles with Maxwell-Boltzmann noise.
-    CuboidGenerator::generateCuboid(container, origin, dims, h, mass, initVel, mbMeanVelocity);
+    CuboidGenerator::generateCuboid(container, origin, dims, domain_size, h, mass, initVel, mbMeanVelocity);
 
     /// Verify that the total number of particles equals 3×2×1 = 6.
     EXPECT_EQ(container.size(), 6) << "ParticleGenerator did not produce the expected number of particles.";
@@ -79,7 +77,7 @@ TEST(ParticleGeneratorBehaviourTest, GeneratesCorrectNumberAndNonZeroVelocity) {
 
 TEST(ParticleGeneratorBehaviourTest, GeneratesCorrectGridPositions) {
   ParticleContainer c;
-  CuboidGenerator::generateCuboid(c, {0,0,0}, {3,3,1}, 1.0, 1.0, {0,0,0}, 0.1);
+  CuboidGenerator::generateCuboid(c, {0,0,0}, {3,3,1}, {180., 90., 1.}, 1.0, 1.0, {0,0,0}, 0.1);
 
   for (auto &p : c) {
     auto x = p.getX();
@@ -101,7 +99,7 @@ TEST(ParticleGeneratorBehaviourTest, NoBrownianKeepsVelocityConstant) {
   const std::array<double, 3> v0{1.0, -0.5, 0.2};
   const double brownianMeanVelocity = 0.0;
 
-  CuboidGenerator::generateCuboid(container, origin, N, h, m, v0, brownianMeanVelocity);
+  CuboidGenerator::generateCuboid(container, origin, N, domain_size, h, m, v0, brownianMeanVelocity);
 
   for (const auto &p : container) {
     EXPECT_DOUBLE_EQ(p.getV()[0], v0[0]);
