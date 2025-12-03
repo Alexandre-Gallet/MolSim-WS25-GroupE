@@ -3,9 +3,9 @@
  */
 #pragma once
 
-#include "../inputReader/Cuboid.h"
 #include "Simulation.h"
 #include "inputReader/Arguments.h"
+#include "Container/Container.h"
 /**
  * Implementation of the molecule simulation using Lennard-Jones formulas
  */

@@ -8,7 +8,7 @@
 // Struct with all possible command line parameters and their default values
 struct Arguments {
   SimulationType sim_type;
-  ContainerType cont_type;
+  ContainerType cont_type = ContainerType::Cell;
   char *inputFile;
   double t_start = 0.0;
   double t_end = 1000.0;

@@ -13,6 +13,7 @@ auto createContainer(Arguments &args) -> std::unique_ptr<Container> {
       return std::make_unique<ParticleContainer>();
     default:
       // already checked in parseType, shouldn't be reached
+
       return std::make_unique<ParticleContainer>();
   }
 }

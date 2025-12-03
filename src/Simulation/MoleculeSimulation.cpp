@@ -8,6 +8,7 @@
 #include "ParticleGenerator.h"
 #include "inputReader/FileReaderCuboids.h"
 #include "outputWriter/WriterFactory.h"
+#include "Container/LinkedCellContainer.h"
 
 MoleculeSimulation::MoleculeSimulation(Arguments &args, Container &particles) : args(args), particles(particles) {}
 
@@ -40,6 +41,10 @@ void MoleculeSimulation::runSimulation() {
   while (current_time < args.t_end) {
     // calculate forces, position and velocity
     LennardJones::calculateX(particles, args.delta_t);
+    if (args.cont_type == ContainerType::Cell) {
+      static_cast<LinkedCellContainer*>(&particles)->rebuild();
+
+    }
     lj.calculateF(particles);
     LennardJones::calculateV(particles, args.delta_t);
 
