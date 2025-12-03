@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../Container/ParticleContainer.h"
-
 // Struct with the given parameters of the cuboid and a container for storing the particles
 struct Cuboid {
   std::array<double, 3> origin{};

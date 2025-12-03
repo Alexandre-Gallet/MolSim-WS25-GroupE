@@ -1,7 +1,9 @@
+/**
+ * @file Arguments.h
+ */
 #pragma once
 
 #include "Container/ContainerType.h"
-#include "Cuboid.h"
 #include "Simulation/SimulationType.h"
 #include "outputWriter/OutputFormat.h"
 

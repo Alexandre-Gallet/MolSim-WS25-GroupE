@@ -4,7 +4,6 @@
 #pragma once
 
 #include "../Container/Particle.h"
-#include "../Container/ParticleContainer.h"
 #include "ForceCalculation.h"
 /**
  * Class used to compute forces using the Lennard-Jones formulas

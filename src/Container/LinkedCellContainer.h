@@ -39,9 +39,9 @@ class LinkedCellContainer : public Container {
   using const_iterator = Container::const_iterator;
 
   /**
-   * @brief Construct a linked-cell grid for the given domain and cutoff.
-   * @param r_cutoff Interaction cutoff; defines cell size.
-   * @param domain_size Physical domain extents (x,y,z). Origin is (0,0,0).
+   * @brief Construct a linked-cell grid for the given domain and cutoff
+   * @param r_cutoff Interaction cutoff - defines cell size
+   * @param domain_size Domain extents (x,y,z). Origin is (0,0,0)
    */
   LinkedCellContainer(double r_cutoff, const std::array<double, 3> &domain_size);
 

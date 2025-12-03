@@ -1,16 +1,17 @@
-
+/**
+ * @file ContainerFactory.h
+ * @brief Factory class for creating containers
+ */
 #pragma once
+
 #include "../inputReader/Arguments.h"
 #include "Container.h"
-#include "ContainerType.h"
+
 namespace ContainerFactory {
-// TODO edit comments
 /**
- * @brief creates a new simulation of the specified type
- * @param type Type of simulation, default: Molecule
- * @param args Arguments parsed from input
- * @param particles Container where all particles are stored
- * @return Simulation object of the given type
+ *
+ * @param args Argument struct containing the container type parsed as input
+ * @return a new container of the specified type
  */
 std::unique_ptr<Container> createContainer(Arguments &args);
 }  // namespace ContainerFactory

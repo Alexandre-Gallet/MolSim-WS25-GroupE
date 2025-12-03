@@ -3,8 +3,9 @@
 #include "utils/MaxwellBoltzmannDistribution.h"
 
 void ParticleGenerator::generateCuboid(Container &container, const std::array<double, 3> &origin,
-                                       const std::array<size_t, 3> &numPerDim, const std::array<double, 3> &dom_size, double h, double mass,
-                                       const std::array<double, 3> &baseVelocity, double brownianMean, int type) {
+                                       const std::array<size_t, 3> &numPerDim, const std::array<double, 3> &dom_size,
+                                       double h, double mass, const std::array<double, 3> &baseVelocity,
+                                       double brownianMean, int type) {
   const std::size_t total = numPerDim[0] * numPerDim[1] * numPerDim[2];
   container.reserve(container.size() + total);
 

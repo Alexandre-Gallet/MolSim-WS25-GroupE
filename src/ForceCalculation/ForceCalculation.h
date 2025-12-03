@@ -4,7 +4,6 @@
 #pragma once
 
 #include "../Container/Container.h"
-#include "../Container/ParticleContainer.h"
 #include "utils/ArrayUtils.h"
 #include "utils/MaxwellBoltzmannDistribution.h"
 /**

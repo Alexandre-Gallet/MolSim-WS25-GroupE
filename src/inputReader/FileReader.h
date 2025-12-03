@@ -10,7 +10,6 @@
 #include <list>
 
 #include "../Container/Container.h"
-#include "../Container/Particle.h"
 #include "../Container/ParticleContainer.h"
 
 class FileReader {
