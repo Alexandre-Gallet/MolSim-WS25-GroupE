@@ -6,7 +6,9 @@
 
 #include "Container/LinkedCellContainer.h"
 #include "ForceCalculation/LennardJones.h"
-#include "ParticleGenerator.h"
+#include "Generator/CuboidGenerator.h"
+#include "Generator/ParticleGenerator.h"
+#include "Generator/DiscGenerator.h"
 #include "inputReader/FileReaderCuboids.h"
 #include "outputWriter/WriterFactory.h"
 
@@ -15,14 +17,15 @@ MoleculeSimulation::MoleculeSimulation(Arguments &args, Container &particles) : 
 void MoleculeSimulation::runSimulation() {
   std::vector<Cuboid> cuboids;
 
+
   // Read simulation setup from input file
   FileReaderCuboid::readFile(cuboids, args.inputFile);
   SPDLOG_INFO("Loaded {} cuboid(s) from input file '{}'.", cuboids.size(), args.inputFile);
 
   // Generate particles for each cuboid
   for (const auto &c : cuboids) {
-    ParticleGenerator::generateCuboid(particles, c.origin, c.numPerDim, args.domain_size, c.h, c.mass, c.baseVelocity,
-                                      c.brownianMean, c.type);
+    CuboidGenerator::generateCuboid(particles, c.origin, c.numPerDim, c.h, c.mass, c.baseVelocity, c.brownianMean,
+                                      c.type);
   }
   SPDLOG_INFO("Generated {} particles from cuboids.", particles.size());
 
