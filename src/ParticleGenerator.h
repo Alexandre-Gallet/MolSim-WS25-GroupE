@@ -2,6 +2,7 @@
 #include <array>
 
 #include "Container/ParticleContainer.h"
+#include "inputReader/Arguments.h"
 #include "utils/MaxwellBoltzmannDistribution.h"
 
 class ParticleGenerator {
@@ -18,6 +19,6 @@ class ParticleGenerator {
    * @param type       Type/id of the particle.
    */
   static void generateCuboid(Container &container, const std::array<double, 3> &origin,
-                             const std::array<size_t, 3> &numPerDim, double h, double mass,
+                             const std::array<size_t, 3> &numPerDim, const std::array<double, 3> &dom_size,double h, double mass,
                              const std::array<double, 3> &baseVelocity, double brownianMean = 0.1, int type = 0);
 };
