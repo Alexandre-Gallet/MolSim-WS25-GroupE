@@ -31,6 +31,11 @@ file(GLOB_RECURSE MY_SRC
 # ----------------------------------------------------------------------------------------------
 list(REMOVE_ITEM MY_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/MolSim.cpp")
 
+# -----------------------------
+# Main executable (production)
+# -----------------------------
+add_executable(MolSim ${MY_SRC}
+                        src/MolSim.cpp)
     # -----------------------------
     # Main executable (production)
     # -----------------------------
@@ -88,8 +93,13 @@ if(CLANG_TIDY_EXE)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
     add_custom_target(run_clang_tidy
-            COMMAND ${CLANG_TIDY_EXE} -p ${CMAKE_BINARY_DIR} ${ALL_CPP}
-            COMMENT "Running clang-tidy static analysis on CPP files only"
+            COMMAND ${CMAKE_COMMAND}
+            -DALL_CPP=${ALL_CPP}
+            -DCLANG_TIDY_EXE=${CLANG_TIDY_EXE}
+            -DCMAKE_BINARY_DIR=${CMAKE_BINARY_DIR}
+            -DCMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}
+            -P ${CMAKE_SOURCE_DIR}/cmake/modules/run_clang_tidy.cmake
+            COMMENT "Running clang-tidy on all source files"
             VERBATIM)
 endif()
 
@@ -97,21 +107,11 @@ endif()
 # Load custom modules
 # -----------------------------------
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
+
 include(vtk)
 include(clang-format)
 include(doxygen)
-
-# -----------------------------
-# Logging: spdlog via FetchContent
-# -----------------------------
-include(FetchContent)
-
-FetchContent_Declare(
-        spdlog
-        URL https://github.com/gabime/spdlog/archive/refs/tags/v1.14.1.zip
-)
-
-FetchContent_MakeAvailable(spdlog)
+include(spdlog)
 
 # Set log_level to default "INFO" and make it user configurable via cmake
 set(LOG_LEVEL "INFO" CACHE STRING "Minimum log level: TRACE, DEBUG, INFO, WARN, ERROR, CRITICAL, OFF")
@@ -129,13 +129,7 @@ include(CTest)   # Enables BUILD_TESTING option
 
 if(BUILD_TESTING)
 
-    # -------- GoogleTest (via FetchContent, assignment compliant) ------
-    include(FetchContent)
-    FetchContent_Declare(
-            googletest
-            URL https://github.com/google/googletest/archive/refs/tags/v1.15.2.zip
-    )
-    FetchContent_MakeAvailable(googletest)
+   include(gtest)
 
     # -----------------------------
     # Collect test source files
