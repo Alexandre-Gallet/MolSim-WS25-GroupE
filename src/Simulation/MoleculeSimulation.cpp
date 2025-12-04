@@ -81,7 +81,7 @@ void MoleculeSimulation::plotParticles(ParticleContainer &particles, int iterati
   std::filesystem::create_directories("output");
 
   // Output file name from Outputformat
-  std::string out_name = strcat("output/", OutputFormatToString(format));
+  std::string out_name = "output/outputVTK";
 
   const auto writer = WriterFactory::createWriter(format);
 

@@ -19,6 +19,6 @@ class ParticleGenerator {
    * @param type       Type/id of the particle.
    */
   static void generateCuboid(ParticleContainer &container, const std::array<double, 3> &origin,
-                             const std::array<size_t, 3> &numPerDim, double h, double mass,
+                             const std::array<int, 3> &numPerDim, double h, double mass,
                              const std::array<double, 3> &baseVelocity, double brownianMean = 0.1, int type = 0);
 };

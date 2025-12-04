@@ -146,9 +146,13 @@ if(BUILD_TESTING)
 
     target_link_libraries(MolSimTests PRIVATE GTest::gtest_main)
 
+   # Link yaml-cpp to testing executable
+   target_link_libraries(MolSimTests PRIVATE yaml-cpp)
+
     # GoogleTest automatic discovery of every test that begins with TEST, TEST_F, TEST_P
     include(GoogleTest)
     gtest_discover_tests(MolSimTests)
+
 
 endif()
 

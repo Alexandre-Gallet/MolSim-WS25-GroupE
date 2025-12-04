@@ -8,7 +8,6 @@
 #include "ParticleContainer.h"
 #include "ParticleGenerator.h"
 #include "Simulation/Simulation.h"
-#include "inputReader/FileReader.h"
 
 /*
 
@@ -40,7 +39,7 @@ TEST(ParticleGeneratorBehaviourTest, GeneratesCorrectNumberAndNonZeroVelocity) {
 
     /// Define cuboid parameters.
     const std::array<double, 3> origin{0.0, 0.0, 0.0};  ///< Lower-left corner
-    const std::array<size_t, 3> dims{3, 2, 1};             ///< Number of particles per dimension
+    const std::array<int, 3> dims{3, 2, 1};             ///< Number of particles per dimension
     const double h = 1.0;                               ///< Spacing between particles
     const double mass = 1.0;                            ///< Mass of each particle
     const std::array<double, 3> initVel{0.0, 0.0, 0.0}; ///< Initial base velocity
@@ -87,7 +86,7 @@ TEST(ParticleGeneratorBehaviourTest, NoBrownianKeepsVelocityConstant) {
   ParticleGenerator generator;
 
   const std::array<double, 3> origin{0.0, 0.0, 0.0};
-  const std::array<size_t, 3> N{3, 2, 1};
+  const std::array<int, 3> N{3, 2, 1};
   const double h = 1.0;
   const double m = 1.0;
   const std::array<double, 3> v0{1.0, -0.5, 0.2};

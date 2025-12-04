@@ -6,7 +6,8 @@ at **Technische Universität München**, Winter Semester **2025/2026**.
 
 ## Table of Contents
 - [Building the Project](#building-the-project)
-- [Running the Simulation](#running-the-simulation)
+- [Running the Simulation](#running-the-simulation) 
+- [YAML Configuration Format)(#yaml-configuration-format) 
 - [Running Tests](#running-tests)
 - [Doxygen Documentation](#doxygen-documentation)
 - [Clang-Tidy and Clang-Format](#clang-tidy-and-clang-format)
@@ -60,23 +61,100 @@ cmake --build build --target doc_doxygen
 After building, run the simulation from within the `build` directory:
 
 ```bash
-./MolSim <input_file> <sim_type> [t_start] [t_end] [delta_t] [output_format]
+./MolSim path/to/config.yml 
 ```
 
 ### Example
 
-Using the provided example input files:
+Using the provided example file eingabe.yml
 
 ```bash
-./MolSim ../input/eingabe-cuboids.txt Molecule -d 0.0002 -e 5
-./MolSim ../input/eingabe-sonne.txt Planet   -d 0.14
+./MolSim ../input/eingabe.yml 
 ```
 
-Simulation output files (VTK, XYZ, or both depending on `output_format`)
-will appear in the `output/` directory.
+Simulation output files (VTK, XYZ, or both depending on `output_format` as defined in the .yml file)
+will appear in the working directory.
 
 If logging is enabled (default), a `simulation.log` file is also generated
 in the working directory.
+
+
+## YAML Configuration Format
+
+MolSim is configured entirely through a YAML file. The structure is divided into five main sections: **simulation**, **output**, **cuboids**, **discs**, **linkedCell**
+
+### Top-Level Structure
+
+```yaml
+simulation:
+  sim_type: molecule | planet
+  t_start: <double>
+  t_end: <double>
+  delta_t: <double>
+  output_format: VTK | XYZ
+
+output:
+  write_frequency: <int>
+
+cuboids:
+  - origin: [x, y, z]
+    numPerDim: [nx, ny, nz]
+    baseVelocity: [vx, vy, vz]
+    h: <double>
+    mass: <double>
+    type: <int>
+    brownianMean: <double>
+
+discs:
+  - center: [x, y, z]
+    radiusCells: <int>
+    hDisc: <double>
+    mass: <double>
+    baseVelocityDisc: [vx, vy, vz]
+    typeDisc: <int>
+
+linkedCell:
+  - containerType: [Cell]
+    domainSize: [Lx, Ly, Lz]
+    rCutoff: <double>
+    boundaryConditions: [bc_x1, bc_x2, bc_y1, bc_y2, bc_z1, bc_z2]yy
+```
+
+YAML Section Overview (Table Format)
+-----------------------------------
+
+| Section     | Field               | Meaning                                                                 |
+|-------------|---------------------|-------------------------------------------------------------------------|
+| simulation  | sim_type            | Selects the simulation model (“molecule” or “planet”).                 |
+|             | t_start             | Start time of the simulation.                                          |
+|             | t_end               | End time of the simulation.                                            |
+|             | delta_t             | Time step size.                                                        |
+|             | output_format       | Format used for particle output files.                                 |
+|-------------|---------------------|------------------------------------------------------------------------|
+| output      | write_frequency     | Writes output every n-th iteration.                                    |
+|-------------|---------------------|-------------------------------------------------------------------------|
+| cuboids     | origin              | Position of the cuboid’s lower-left-front corner.                      |
+|             | numPerDim           | Number of particles along each dimension.                              |
+|             | baseVelocity        | Initial particle velocity.                                             |
+|             | h                   | Particle spacing (mesh width).                                         |
+|             | mass                | Mass of each particle.                                                 |
+|             | type                | Integer particle type identifier.                                      |
+|             | brownianMean        | Mean of Brownian/random velocity distribution.                         |
+|-------------|---------------------|-------------------------------------------------------------------------|
+| discs       | center              | Center position of the disc.                                           |
+|             | radiusCells         | Disc radius measured in grid cells.                                    |
+|             | hDisc               | Mesh width for disc particles.                                         |
+|             | mass                | Mass of each particle in the disc.                                     |
+|             | baseVelocityDisc    | Initial velocity of disc particles.                                    |
+|             | typeDisc            | Particle type identifier for disc particles.                           |
+|-------------|---------------------|-------------------------------------------------------------------------|
+| linkedCell  | containerType       | Container implementation (currently “Cell”).                           |
+|             | domainSize          | Size of the simulation domain.                                         |
+|             | rCutoff             | Lennard–Jones cutoff radius.                                           |
+|             | boundaryConditions  | Boundary types for ±x, ±y, ±z directions.                              |
+
+
+An example of a working yaml configuration file can be found at `input/eingabe.yml`
 
 ## Running Tests
 
@@ -86,13 +164,13 @@ ctest --test-dir build --output-on-failure -j"$(nproc)"
 
 ## Doxygen Documentation
 
-After generating documentation via:
+After having built the project, generate the documentation via:
 
 ```bash
 cmake --build build --target doc_doxygen
 ```
 
-open it from the `build` directory:
+open it from the `build` directory with:
 
 ```bash
 xdg-open docs/html/index.html
@@ -100,7 +178,7 @@ xdg-open docs/html/index.html
 
 ## Clang-Tidy and Clang-Format
 
-To run static analysis and formatting checks:
+To run static analysis and formatting checks manually use a clean build of the project:
 
 ```bash
 rm -rf build/

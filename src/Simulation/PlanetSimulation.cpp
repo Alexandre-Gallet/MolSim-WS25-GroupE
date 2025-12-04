@@ -58,7 +58,7 @@ void PlanetSimulation::runSimulation() {
 void PlanetSimulation::plotParticles(ParticleContainer &particles, int iteration, OutputFormat format) {
   std::filesystem::create_directories("output");
 
-  std::string out_name = strcat("output/", OutputFormatToString(format));
+  std::string out_name = "outputVTK";
 
   const auto writer = WriterFactory::createWriter(format);
 
