@@ -101,7 +101,7 @@ include(vtk)
 include(clang-format)
 include(doxygen)
 include(spdlog)
-include(yaml-cpp.cmake)
+include(yaml-cpp)
 
 # Set log_level to default "INFO" and make it user configurable via cmake
 set(LOG_LEVEL "INFO" CACHE STRING "Minimum log level: TRACE, DEBUG, INFO, WARN, ERROR, CRITICAL, OFF")
