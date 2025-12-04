@@ -9,13 +9,13 @@
 
 #include <list>
 
-#include "../Particle.h"
-#include "../ParticleContainer.h"
+#include "../Container/Container.h"
+#include "../Container/ParticleContainer.h"
 
 class FileReader {
  public:
   FileReader();
   virtual ~FileReader();
 
-  void readFile(ParticleContainer &particles, char *filename);
+  void readFile(Container &particles, char *filename);
 };

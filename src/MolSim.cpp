@@ -1,16 +1,13 @@
-/**
- * @file MolSim.cpp
- * @brief Main entry point for the Molecular Dynamics simulation
- */
 
-#include <spdlog/spdlog.h>
 
-#include "ParticleContainer.h"
+#include "Container/ContainerFactory.h"
+#include "Container/ContainerType.h"
+#include "Container/ParticleContainer.h"
+#include "Generator/DiscGenerator.h"
 #include "Simulation/SimulationFactory.h"
 #include "inputReader/Arguments.h"
 #include "inputReader/InputReader.h"
-#include "logging.hpp"
-
+#include "utils/logging.hpp"
 /**
  * @brief Main entry point of the molecular dynamics simulation
  * @param argc Number of command line arguments
@@ -21,17 +18,17 @@ int main(int argc, char *argsv[]) {
   // Initialize logging (console + simulation.log)
   logging::init_logging();
 
-  // Container holding all particles in the simulation - moved this inside main to avoid segmentation fault.
-  ParticleContainer particles;
-
   SPDLOG_INFO("MolSim starting...");
 
   Arguments args;
   inputReader::parseArguments(argc, argsv, args);
 
+  auto container = ContainerFactory::createContainer(args);
+  auto &particles = *container;
+
   SPDLOG_INFO("Creating simulation (input='{}')", args.inputFile);
 
-  auto simulation = SimulationFactory::createSimulation(args.sim_type, args, particles);
+  auto simulation = SimulationFactory::createSimulation(args, particles);
 
   SPDLOG_INFO("Starting simulation run...");
   simulation->runSimulation();

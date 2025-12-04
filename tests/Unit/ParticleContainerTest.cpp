@@ -11,9 +11,9 @@
 #include <cmath>
 #include <iostream>
 
+#include "../../src/Container/ParticleContainer.h"
+#include "../../src/Container/Particle.h"
 #include "gtest/gtest.h"
-#include "Particle.h"
-#include "ParticleContainer.h"
 #include "ParticleContainerTest.h"
 
 namespace {

@@ -3,7 +3,8 @@
  */
 #pragma once
 
-#include "../inputReader/Cuboid.h"
+#include "Container/Container.h"
+#include "Generator/DiscGenerator.h"
 #include "Simulation.h"
 #include "inputReader/Arguments.h"
 /**
@@ -11,14 +12,14 @@
  */
 class MoleculeSimulation : public Simulation {
   Arguments &args;
-  ParticleContainer &particles;
+  Container &particles;
 
  public:
-  explicit MoleculeSimulation(Arguments &args, ParticleContainer &particles);
+  explicit MoleculeSimulation(Arguments &args, Container &particles);
   ~MoleculeSimulation() override = default;
   /**
    *@brief main function for running the simulation
    */
   void runSimulation() override;
-  static void plotParticles(ParticleContainer &particles, int iteration, OutputFormat format);
+  static void plotParticles(Container &particles, int iteration, OutputFormat format);
 };

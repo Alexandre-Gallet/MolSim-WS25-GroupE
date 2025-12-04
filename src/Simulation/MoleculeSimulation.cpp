@@ -4,6 +4,7 @@
 
 #include <filesystem>
 
+#include "Container/LinkedCellContainer.h"
 #include "ForceCalculation/LennardJones.h"
 #include "Generator/CuboidGenerator.h"
 #include "Generator/DiscGenerator.h"
@@ -11,8 +12,8 @@
 #include "inputReader/FileReaderCuboids.h"
 #include "outputWriter/WriterFactory.h"
 
-MoleculeSimulation::MoleculeSimulation(Arguments &args, ParticleContainer &particles)
-    : args(args), particles(particles) {}
+MoleculeSimulation::MoleculeSimulation(Arguments &args, Container &particles) : args(args), particles(particles) {}
+
 void MoleculeSimulation::runSimulation() {
   std::vector<Cuboid> cuboids;
 
@@ -22,9 +23,10 @@ void MoleculeSimulation::runSimulation() {
 
   // Generate particles for each cuboid
   for (const auto &c : cuboids) {
-    CuboidGenerator::generateCuboid(particles, c.origin, c.numPerDim, c.h, c.mass, c.baseVelocity, c.brownianMean,
-                                    c.type);
+    CuboidGenerator::generateCuboid(particles, c.origin, c.numPerDim, args.domain_size, c.h, c.mass, c.baseVelocity,
+                                    c.brownianMean, c.type);
   }
+
   SPDLOG_INFO("Generated {} particles from cuboids.", particles.size());
 
   LennardJones lj;
@@ -39,13 +41,26 @@ void MoleculeSimulation::runSimulation() {
   SPDLOG_INFO("Starting molecule simulation: t_start={}, t_end={}, delta_t={}.", args.t_start, args.t_end,
               args.delta_t);
 
+  if (args.cont_type == ContainerType::Cell) {
+    static_cast<LinkedCellContainer *>(&particles)
+        ->setBoundaryConditions({BoundaryCondition::Outflow, BoundaryCondition::Outflow, BoundaryCondition::Outflow,
+                                 BoundaryCondition::Outflow, BoundaryCondition::Outflow, BoundaryCondition::Outflow});
+  }
+
   while (current_time < args.t_end) {
     // calculate forces, position and velocity
     LennardJones::calculateX(particles, args.delta_t);
+    if (args.cont_type == ContainerType::Cell) {
+      static_cast<LinkedCellContainer *>(&particles)->rebuild();
+    }
     lj.calculateF(particles);
     LennardJones::calculateV(particles, args.delta_t);
+
     iteration++;
     if (iteration % 10 == 0) {
+      if (args.cont_type == ContainerType::Cell) {
+        static_cast<LinkedCellContainer *>(&particles)->deleteHaloCells();
+      }
       SPDLOG_INFO("Writing output at iteration {} (t = {}).", iteration, current_time);
       plotParticles(particles, iteration, args.output_format);
     }
@@ -55,9 +70,10 @@ void MoleculeSimulation::runSimulation() {
     current_time += args.delta_t;
   }
 
-  SPDLOG_INFO("Molecule simulation completed after {} iterations (final t = {}).", iteration, current_time);
+  SPDLOG_INFO("Molecule simulation completed after {} iterations (final t = {:.6g}).", iteration, current_time);
 }
-void MoleculeSimulation::plotParticles(ParticleContainer &particles, int iteration, OutputFormat format) {
+
+void MoleculeSimulation::plotParticles(Container &particles, int iteration, OutputFormat format) {
   std::filesystem::create_directories("output");
   std::string out_name("output/MD_vtk");
 
