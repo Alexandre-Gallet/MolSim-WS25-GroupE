@@ -16,7 +16,9 @@
 
 #include "Container.h"
 #include "Particle.h"
-#include "inputReader/Arguments.h"
+
+enum class Face : uint8_t { XMin = 0, XMax = 1, YMin = 2, YMax = 3, ZMin = 4, ZMax = 5 };
+enum class BoundaryCondition : uint8_t { None, Outflow, Reflecting };
 
 enum class CellType : uint8_t { Inner, Boundary, Halo };
 
@@ -38,31 +40,21 @@ class LinkedCellContainer : public Container {
   using iterator = Container::iterator;
   using const_iterator = Container::const_iterator;
 
+  /// @brief Construct a minimal 1x1x1 grid with unit cutoff.
+  LinkedCellContainer();
   /**
-   * @brief Construct a linked-cell grid for the given domain and cutoff
-   * @param r_cutoff Interaction cutoff - defines cell size
-   * @param domain_size Domain extents (x,y,z). Origin is (0,0,0)
+   * @brief Construct a linked-cell grid for the given domain and cutoff.
+   * @param r_cutoff Interaction cutoff; defines cell size.
+   * @param domain_size Physical domain extents (x,y,z). Origin is (0,0,0).
    */
   LinkedCellContainer(double r_cutoff, const std::array<double, 3> &domain_size);
 
-  template <typename Func>
-  void forEachPair(Func visitor);
-  auto forEachPair(const std::function<void(Particle &, Particle &)> &visitor) -> void override {
-    forEachPair<const std::function<void(Particle &, Particle &)> &>(visitor);
-  }
+  /// Configure boundary condition handling applied during rebuild().
+  void setBoundaryConditions(const std::array<BoundaryCondition, 6> &conditions);
+  [[nodiscard]] auto getBoundaryConditions() const -> const std::array<BoundaryCondition, 6> &;
 
-  /**
-   * @brief Iterate over all boundary particles (inside domain, adjacent to halos).
-   */
-  template <typename Func>
-  void forEachBoundaryParticle(Func visitor);
-
-  /**
-   * @brief Iterate over all halo particles (outside domain, in padded layer).
-   */
-  template <typename Func>
-  void forEachHaloParticle(Func visitor);
-
+  /// Rebuild the cell structure (clears particles and reinitializes metadata).
+  void rebuild();
   /// Clear all halo particles.
   void deleteHaloCells();
 
@@ -80,6 +72,7 @@ class LinkedCellContainer : public Container {
   auto reserve(std::size_t capacity) -> void override;
   /// Remove all particle references from all cells.
   auto clear() noexcept -> void override;
+
   /// Iteration over owned particles.
   auto begin() -> iterator override;
   auto end() -> iterator override;
@@ -88,34 +81,72 @@ class LinkedCellContainer : public Container {
   auto cbegin() const -> const_iterator override;
   auto cend() const -> const_iterator override;
 
-  /// Rebuild the cell structure (clears particles and reinitializes metadata).
-  void rebuild();
+  /// Iterate over all unordered pairs.
+  template <typename Func>
+  void forEachPair(Func visitor);
+  auto forEachPair(const std::function<void(Particle &, Particle &)> &visitor) -> void override {
+    forEachPair<const std::function<void(Particle &, Particle &)> &>(visitor);
+  }
+  /**
+   * @brief Iterate over all boundary particles (inside domain, adjacent to halos).
+   */
+  template <typename Func>
+  void forEachBoundaryParticle(Func visitor);
+  /**
+   * @brief Iterate over all halo particles (outside domain, in padded layer).
+   */
+  template <typename Func>
+  void forEachHaloParticle(Func visitor);
 
+ private:
+  void initDimensions();
+  void initCells();
+  void placeParticle(Particle *particle);
+  void createGhostsForFace(Face face);
+  [[nodiscard]] auto to3DIndex(std::size_t linear_index) const -> std::array<std::size_t, 3>;
+  void logParticleCounts() const;
+
+  static constexpr auto computeTotalCells(const std::array<std::size_t, 3> &dims) -> std::size_t {
+    return dims[0] * dims[1] * dims[2];
+  }
   /// Convert 3D indices to a linear index in the grid.
   static constexpr auto toLinearIndex(std::size_t x, std::size_t y, std::size_t z,
                                       const std::array<std::size_t, 3> &dims) -> std::size_t {
     return x + (dims[0] * (y + (dims[1] * z)));
   }
 
- private:
-  void placeParticle(Particle *particle);
-  void initDimensions();
-  void initCells();
-  void initHalo();
-
-  static constexpr auto computeTotalCells(const std::array<std::size_t, 3> &dims) -> std::size_t {
-    return dims[0] * dims[1] * dims[2];
+  static constexpr int axisFromFace(Face face) {
+    switch (face) {
+      case Face::XMin:
+      case Face::XMax:
+        return 0;
+      case Face::YMin:
+      case Face::YMax:
+        return 1;
+      case Face::ZMin:
+      case Face::ZMax:
+        return 2;
+    }
+    return 0;
+  }
+  static constexpr auto isUpper(Face face) -> bool {
+    return face == Face::XMax || face == Face::YMax || face == Face::ZMax;
   }
 
   storage_type cells;
   std::vector<std::unique_ptr<Particle>> owned_particles;  ///< Owned particle storage.
+  std::vector<std::unique_ptr<Particle>> ghost_particles;  ///< Ghost particle storage (not counted as owned).
   double r_cutoff;
   std::array<double, 3> cell_dim{};
   std::array<double, 3> domain_size{};
+  std::array<double, 3> domain_min{};  ///< Optional shift of the domain origin (used for thin z-domains).
   std::array<std::size_t, 3> cells_per_dim{};
   std::array<std::size_t, 3> padded_dims{};
   std::vector<LinkedCell *> boundary_cells;
   std::vector<LinkedCell *> halo_cells;
+  std::array<BoundaryCondition, 6> boundary_conditions{BoundaryCondition::Outflow, BoundaryCondition::Outflow,
+                                                       BoundaryCondition::Outflow, BoundaryCondition::Outflow,
+                                                       BoundaryCondition::Outflow, BoundaryCondition::Outflow};
 };
 
 template <typename Func>

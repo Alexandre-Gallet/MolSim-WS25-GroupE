@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Container/Container.h"
+#include "Generator/DiscGenerator.h"
 #include "Simulation.h"
 #include "inputReader/Arguments.h"
 /**

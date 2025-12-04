@@ -7,8 +7,8 @@
 #include "Container/LinkedCellContainer.h"
 #include "ForceCalculation/LennardJones.h"
 #include "Generator/CuboidGenerator.h"
-#include "Generator/ParticleGenerator.h"
 #include "Generator/DiscGenerator.h"
+#include "Generator/ParticleGenerator.h"
 #include "inputReader/FileReaderCuboids.h"
 #include "outputWriter/WriterFactory.h"
 
@@ -17,17 +17,15 @@ MoleculeSimulation::MoleculeSimulation(Arguments &args, Container &particles) : 
 void MoleculeSimulation::runSimulation() {
   std::vector<Cuboid> cuboids;
 
-
   // Read simulation setup from input file
   FileReaderCuboid::readFile(cuboids, args.inputFile);
   SPDLOG_INFO("Loaded {} cuboid(s) from input file '{}'.", cuboids.size(), args.inputFile);
 
   // Generate particles for each cuboid
   for (const auto &c : cuboids) {
-    CuboidGenerator::generateCuboid(particles, c.origin, c.numPerDim, args.domain_size, c.h, c.mass, c.baseVelocity, c.brownianMean,
-                                      c.type);
+    CuboidGenerator::generateCuboid(particles, c.origin, c.numPerDim, args.domain_size, c.h, c.mass, c.baseVelocity,
+                                    c.brownianMean, c.type);
   }
-  // DiscGenerator::generateDisc(particles, {60., 25., 10.}, 15, 1.1225, 1.0, {0., -10., 0}, 0);
 
   SPDLOG_INFO("Generated {} particles from cuboids.", particles.size());
 
@@ -43,6 +41,12 @@ void MoleculeSimulation::runSimulation() {
   SPDLOG_INFO("Starting molecule simulation: t_start={}, t_end={}, delta_t={}.", args.t_start, args.t_end,
               args.delta_t);
 
+  if (args.cont_type == ContainerType::Cell) {
+    static_cast<LinkedCellContainer *>(&particles)
+        ->setBoundaryConditions({BoundaryCondition::Outflow, BoundaryCondition::Outflow, BoundaryCondition::Outflow,
+                                 BoundaryCondition::Outflow, BoundaryCondition::Outflow, BoundaryCondition::Outflow});
+  }
+
   while (current_time < args.t_end) {
     // calculate forces, position and velocity
     LennardJones::calculateX(particles, args.delta_t);
@@ -54,6 +58,9 @@ void MoleculeSimulation::runSimulation() {
 
     iteration++;
     if (iteration % 10 == 0) {
+      if (args.cont_type == ContainerType::Cell) {
+        static_cast<LinkedCellContainer *>(&particles)->deleteHaloCells();
+      }
       SPDLOG_INFO("Writing output at iteration {} (t = {}).", iteration, current_time);
       plotParticles(particles, iteration, args.output_format);
     }
