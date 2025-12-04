@@ -17,3 +17,11 @@ inline OutputFormat parse_output(const std::string &output_format) {
   }
   return OutputFormat::XYZ;
 }
+
+const char* OutputFormatToString(OutputFormat out) {
+  switch(out) {
+    case XYZ:   return "XYZ";
+    case VTK: return "VTK";
+    default: return "UNKNOWN";
+  }
+}

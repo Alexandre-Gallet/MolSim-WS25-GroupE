@@ -1,30 +1,45 @@
-
+/**
+* @file PlanetSimulation.h
+ * @brief Simulation of gravitational planetary dynamics using Störmer-Verlet.
+ */
 #pragma once
 
 #include "../ParticleContainer.h"
-#include "../inputReader/Arguments.h"
-#include "Simulation.h"
+#include "../Simulation/Simulation.h"
+#include "../inputReader/SimulationConfig.h"
 
+/**
+ * @brief Simulation class for gravitational planet motion.
+ *
+ */
 class PlanetSimulation : public Simulation {
-  char *inputFile;
-  double t_start;
-  double t_end;
-  double delta_t;
-  OutputFormat outputFormat;
-  ParticleContainer &particles;
+public:
+    /**
+     * @brief Construct a new PlanetSimulation.
+     *
+     * @param cfg YAML-based simulation configuration
+     * @param particles Reference to particle container
+     */
+    PlanetSimulation(const SimulationConfig &cfg, ParticleContainer &particles);
 
- public:
-  [[nodiscard]] char *getInputFile() const { return inputFile; }
-  [[nodiscard]] double getTStart() const { return t_start; }
-  [[nodiscard]] double getTEnd() const { return t_end; }
-  [[nodiscard]] double getDeltaT() const { return delta_t; }
-  [[nodiscard]] OutputFormat getOutputFormat() const { return outputFormat; }
-  [[nodiscard]] ParticleContainer &getParticles() const { return particles; }
-  explicit PlanetSimulation(const Arguments &args, ParticleContainer &particles);
-  ~PlanetSimulation() override = default;
-  /**
-   * @brief main function for running the simulation
-   */
-  void runSimulation() override;
-  static void plotParticles(ParticleContainer &particles, int iteration, OutputFormat format);
+    /**
+     * @brief Run the simulation.
+     */
+    void runSimulation() override;
+
+private:
+    /**
+     * @brief Write particle positions to an output file.
+     *
+     * @param particles Particle container
+     * @param iteration Current iteration number
+     * @param format Output format (XYZ or VTK)
+     */
+    void plotParticles(ParticleContainer &particles, int iteration, OutputFormat format);
+
+    /// Copy of simulation configuration from YAML.
+    SimulationConfig cfg_;
+
+    /// Reference to the main particle container updated during simulation.
+    ParticleContainer &particles_;
 };
