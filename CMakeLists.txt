@@ -101,6 +101,7 @@ include(vtk)
 include(clang-format)
 include(doxygen)
 include(spdlog)
+include(yaml-cpp.cmake)
 
 # Set log_level to default "INFO" and make it user configurable via cmake
 set(LOG_LEVEL "INFO" CACHE STRING "Minimum log level: TRACE, DEBUG, INFO, WARN, ERROR, CRITICAL, OFF")
@@ -110,6 +111,9 @@ set_property(CACHE LOG_LEVEL PROPERTY STRINGS TRACE DEBUG INFO WARN ERROR CRITIC
 target_link_libraries(MolSim PRIVATE spdlog::spdlog)
 target_compile_definitions(MolSim PRIVATE SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_${LOG_LEVEL})
 
+
+# Link yaml-cpp to main binary
+target_link_libraries(MolSim PRIVATE yaml-cpp)
 
 # -----------------------------------
 # Testing Support
