@@ -1,6 +1,7 @@
 #include "Generator/DiscGenerator.h"
+#include "gtest/gtest.h"
 
-//TEST 1;
+// TEST 1;
 // DiscGenerator + ParticleContainer should produce a dense region of particles
 // where at least some neighbor interactions (within cutoff) exist.
 TEST(DiscGeneratorBehaviourTest, DiscProducesNeighborsWithinCutoff) {

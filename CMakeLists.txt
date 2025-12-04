@@ -36,16 +36,7 @@ list(REMOVE_ITEM MY_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/MolSim.cpp")
 # -----------------------------
 add_executable(MolSim ${MY_SRC}
                         src/MolSim.cpp)
-    # -----------------------------
-    # Main executable (production)
-    # -----------------------------
-    add_executable(MolSim ${MY_SRC}
-                            src/MolSim.cpp
-            src/Generator/DiscGenerator.cpp
-            src/Generator/DiscGenerator.h
-            src/Generator/CuboidGenerator.cpp
-            src/Generator/CuboidGenerator.h
-    )
+
 
 target_include_directories(MolSim PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
@@ -143,7 +134,9 @@ if(BUILD_TESTING)
     # Test executable
     # -----------------------------
     # added MY_SRC so that MolSImTests can link correctly
-    add_executable(MolSimTests ${TEST_SRC} ${MY_SRC})
+    add_executable(MolSimTests ${TEST_SRC} ${MY_SRC}
+            tests/behaviour/DiscGeneratorTest.cpp
+            tests/behaviour/DiscGeneratorTest.h)
 
     # Link spdlog to test binary after MolSimTests was created
     target_link_libraries(MolSimTests PRIVATE spdlog::spdlog)
