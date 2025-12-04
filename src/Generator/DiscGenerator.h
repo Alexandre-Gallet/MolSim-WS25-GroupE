@@ -36,6 +36,10 @@ class DiscGenerator {
    * @param baseVelocity  Initial velocity
    * @param type          Particle type
    */
+
+ /*It wasn't specified if we should have brownian mean as a parameter and I thought I would look better without, so I left it out
+  *but can add it next week
+  */
   static void generateDisc(ParticleContainer &container, const std::array<double, 3> &center, int radiusCells, double h,
                            double mass, const std::array<double, 3> &baseVelocity, int type);
 
