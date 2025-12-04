@@ -2,7 +2,6 @@
 
 #include <array>
 
-#include "ParticleContainer.h"
 
 #include "Container/Container.h"
 

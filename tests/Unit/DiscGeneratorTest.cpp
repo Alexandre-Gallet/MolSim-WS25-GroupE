@@ -9,9 +9,8 @@
 
 #include "Generator/DiscGenerator.h"
 #include "Generator/ParticleGenerator.h"
-#include "Particle.h"
-#include "ParticleContainer.h"
-
+#include "../../src/Container/ParticleContainer.h"
+#include "../../src/Container/Particle.h"
 namespace {
 constexpr double tolerance = 1e-12; // tolerance for floating point comparisons
 const std::array<double, 3> ZERO{0.0, 0.0, 0.0};

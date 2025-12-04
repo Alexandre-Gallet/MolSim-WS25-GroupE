@@ -1,3 +1,6 @@
+#include <Container/ParticleContainer.h>
+
+#include "Container/Container.h"
 #include "Generator/DiscGenerator.h"
 #include "gtest/gtest.h"
 
