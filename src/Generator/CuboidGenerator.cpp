@@ -1,32 +1,23 @@
 // CuboidGenerator.cpp
 #include "CuboidGenerator.h"
+
 #include "utils/MaxwellBoltzmannDistribution.h"
 
-void CuboidGenerator::generate(ParticleContainer& container) const {
+void CuboidGenerator::generate(ParticleContainer &container) const {
   // Simply call the static helper with the stored parameters
-  generateCuboid(container, origin_, numPerDim_, h_, mass_,
-                 baseVelocity_, brownianMean_, type_);
+  generateCuboid(container, origin_, numPerDim_, h_, mass_, baseVelocity_, brownianMean_, type_);
 }
 // Have kept the generateCuboid function due to code structure, but also kept generate function as a design decision
-void CuboidGenerator::generateCuboid(ParticleContainer &container,
-                                     const std::array<double, 3> &origin,
-                                     const std::array<std::size_t, 3> &numPerDim,
-                                     double h,
-                                     double mass,
-                                     const std::array<double, 3> &baseVelocity,
-                                     double brownianMean,
-                                     int type) {
+void CuboidGenerator::generateCuboid(ParticleContainer &container, const std::array<double, 3> &origin,
+                                     const std::array<std::size_t, 3> &numPerDim, double h, double mass,
+                                     const std::array<double, 3> &baseVelocity, double brownianMean, int type) {
   const std::size_t total = numPerDim[0] * numPerDim[1] * numPerDim[2];
   container.reserve(container.size() + total);
 
   for (std::size_t i = 0; i < numPerDim[0]; ++i) {
     for (std::size_t j = 0; j < numPerDim[1]; ++j) {
       for (std::size_t k = 0; k < numPerDim[2]; ++k) {
-        std::array<double, 3> pos = {
-          origin[0] + i * h,
-          origin[1] + j * h,
-          origin[2] + k * h
-      };
+        std::array<double, 3> pos = {origin[0] + i * h, origin[1] + j * h, origin[2] + k * h};
 
         std::array<double, 3> vel = baseVelocity;
 

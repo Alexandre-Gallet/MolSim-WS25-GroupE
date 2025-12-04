@@ -14,7 +14,7 @@
  * and as a concrete implementation of ParticleGenerator.
  */
 class CuboidGenerator : public ParticleGenerator {
-public:
+ public:
   /**
    * @brief Constructor for object-oriented usage (virtual interface).
    *
@@ -26,13 +26,8 @@ public:
    * @param brownianMean   Mean value of the Brownian Motion.
    * @param type           Type/id of the particle.
    */
-  CuboidGenerator(const std::array<double, 3>& origin,
-                  const std::array<std::size_t, 3>& numPerDim,
-                  double h,
-                  double mass,
-                  const std::array<double, 3>& baseVelocity,
-                  double brownianMean = 0.1,
-                  int type = 0)
+  CuboidGenerator(const std::array<double, 3> &origin, const std::array<std::size_t, 3> &numPerDim, double h,
+                  double mass, const std::array<double, 3> &baseVelocity, double brownianMean = 0.1, int type = 0)
       : origin_(origin),
         numPerDim_(numPerDim),
         h_(h),
@@ -46,7 +41,7 @@ public:
    *
    * Generates the cuboid and inserts particles into the container.
    */
-  void generate(ParticleContainer& container) const override;
+  void generate(ParticleContainer &container) const override;
 
   /**
    * @brief Static helper method that mirrors your old API.
@@ -54,16 +49,11 @@ public:
    * This keeps existing call sites working:
    *   CuboidGenerator::generateCuboid(container, ...);
    */
-  static void generateCuboid(ParticleContainer &container,
-                             const std::array<double, 3> &origin,
-                             const std::array<std::size_t, 3> &numPerDim,
-                             double h,
-                             double mass,
-                             const std::array<double, 3> &baseVelocity,
-                             double brownianMean = 0.1,
-                             int type = 0);
+  static void generateCuboid(ParticleContainer &container, const std::array<double, 3> &origin,
+                             const std::array<std::size_t, 3> &numPerDim, double h, double mass,
+                             const std::array<double, 3> &baseVelocity, double brownianMean = 0.1, int type = 0);
 
-private:
+ private:
   std::array<double, 3> origin_;
   std::array<std::size_t, 3> numPerDim_;
   double h_;
