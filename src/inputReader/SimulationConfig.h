@@ -36,7 +36,7 @@ struct SimulationConfig {
 #endif
 
    /// Frequency of writing output (every n-th timestep).
-    int write_frequency = 20;
+    int write_frequency = 10;
 
     /// List of cuboids to be generated at the start of the simulation.
     std::vector<Cuboid> cuboids;
