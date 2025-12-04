@@ -20,8 +20,8 @@ inline OutputFormat parse_output(const std::string &output_format) {
 
 const char* OutputFormatToString(OutputFormat out) {
   switch(out) {
-    case XYZ:   return "XYZ";
-    case VTK: return "VTK";
+    case OutputFormat::XYZ:   return "XYZ";
+    case OutputFormat::VTK: return "VTK";
     default: return "UNKNOWN";
   }
 }
