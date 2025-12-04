@@ -5,6 +5,6 @@
 #ifndef PSEMOLDYN_PARTICLECONTAINERTEST_H
 #define PSEMOLDYN_PARTICLECONTAINERTEST_H
 
-class ParticleContainerTest {};
+class MoleculeSimTest {};
 
 #endif  // PSEMOLDYN_PARTICLECONTAINERTEST_H
