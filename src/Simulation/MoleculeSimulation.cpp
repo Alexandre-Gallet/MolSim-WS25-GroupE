@@ -54,8 +54,7 @@ void MoleculeSimulation::runSimulation() {
 
   if (cfg_.containerType == ContainerType::Cell) {
     static_cast<LinkedCellContainer *>(&particles_)
-        ->setBoundaryConditions({BoundaryCondition::Outflow, BoundaryCondition::Outflow, BoundaryCondition::Outflow,
-                                 BoundaryCondition::Outflow, BoundaryCondition::Outflow, BoundaryCondition::Outflow});
+        ->setBoundaryConditions(cfg_.boundaryConditions);
   }
 
   while (current_time < cfg_.t_end) {
