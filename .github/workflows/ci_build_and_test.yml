@@ -81,6 +81,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-deps-
 
+      # Install clang-format 21 to match local development environment
+      - name: Install clang-format 21
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format-21
+          sudo ln -sf /usr/bin/clang-format-21 /usr/bin/clang-format
+
       # Step 8: Configure CMake (needed to generate build system)
       - name: Configure project
         run: cmake -S . -B build
@@ -164,7 +171,3 @@ jobs:
       # Step 8: Run tests with asan build
       - name: Run ASan tests
         run: ctest --test-dir build_asan --output-on-failure -j"$(nproc)"
-
-      - name: Debug clang-format diff
-        run: |
-          git diff --color | sed -e 's/^/CF: /'
