@@ -83,46 +83,6 @@ in the working directory.
 
 MolSim is configured entirely through a YAML file. The structure is divided into five main sections: **simulation**, **output**, **cuboids**, **discs**, **linkedCell**
 
-### Top-Level Structure
-
-```yaml
-simulation:
-  sim_type: molecule | planet
-  t_start: <double>
-  t_end: <double>
-  delta_t: <double>
-  output_format: VTK | XYZ
-
-output:
-  write_frequency: <int>
-
-cuboids:
-  - origin: [x, y, z]
-    numPerDim: [nx, ny, nz]
-    baseVelocity: [vx, vy, vz]
-    h: <double>
-    mass: <double>
-    type: <int>
-    brownianMean: <double>
-
-discs:
-  - center: [x, y, z]
-    radiusCells: <int>
-    hDisc: <double>
-    mass: <double>
-    baseVelocityDisc: [vx, vy, vz]
-    typeDisc: <int>
-
-linkedCell:
-  - containerType: [Cell]
-    domainSize: [Lx, Ly, Lz]
-    rCutoff: <double>
-    boundaryConditions: [bc_x1, bc_x2, bc_y1, bc_y2, bc_z1, bc_z2]yy
-```
-
-YAML Section Overview
------------------------------------
-
 | Section     | Field               | Meaning                                                                 |
 |-------------|---------------------|-------------------------------------------------------------------------|
 | simulation  | sim_type            | Selects the simulation model (“molecule” or “planet”).                 |
@@ -154,7 +114,7 @@ YAML Section Overview
 |             | boundaryConditions  | Boundary types for ±x, ±y, ±z directions.                              |
 
 
-An example of a working yaml configuration file can be found at `input/eingabe.yml`
+Examples of a working yaml configuration files can be found at `input/eingabe.yml` and `input/eingabedisc.yml` 
 
 ## Running Tests
 
