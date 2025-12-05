@@ -7,7 +7,7 @@ at **Technische Universität München**, Winter Semester **2025/2026**.
 ## Table of Contents
 - [Building the Project](#building-the-project)
 - [Running the Simulation](#running-the-simulation) 
-- [YAML Configuration Format)(#yaml-configuration-format) 
+- [YAML Configuration Format](#yaml-configuration-format) 
 - [Running Tests](#running-tests)
 - [Doxygen Documentation](#doxygen-documentation)
 - [Clang-Tidy and Clang-Format](#clang-tidy-and-clang-format)
@@ -120,7 +120,7 @@ linkedCell:
     boundaryConditions: [bc_x1, bc_x2, bc_y1, bc_y2, bc_z1, bc_z2]yy
 ```
 
-YAML Section Overview (Table Format)
+YAML Section Overview
 -----------------------------------
 
 | Section     | Field               | Meaning                                                                 |
@@ -130,9 +130,9 @@ YAML Section Overview (Table Format)
 |             | t_end               | End time of the simulation.                                            |
 |             | delta_t             | Time step size.                                                        |
 |             | output_format       | Format used for particle output files.                                 |
-|-------------|---------------------|------------------------------------------------------------------------|
+|             |                     |                                                                        |
 | output      | write_frequency     | Writes output every n-th iteration.                                    |
-|-------------|---------------------|-------------------------------------------------------------------------|
+|             |                     |                                                                        |
 | cuboids     | origin              | Position of the cuboid’s lower-left-front corner.                      |
 |             | numPerDim           | Number of particles along each dimension.                              |
 |             | baseVelocity        | Initial particle velocity.                                             |
@@ -140,14 +140,14 @@ YAML Section Overview (Table Format)
 |             | mass                | Mass of each particle.                                                 |
 |             | type                | Integer particle type identifier.                                      |
 |             | brownianMean        | Mean of Brownian/random velocity distribution.                         |
-|-------------|---------------------|-------------------------------------------------------------------------|
+|             |                     |                                                                        |
 | discs       | center              | Center position of the disc.                                           |
 |             | radiusCells         | Disc radius measured in grid cells.                                    |
 |             | hDisc               | Mesh width for disc particles.                                         |
 |             | mass                | Mass of each particle in the disc.                                     |
 |             | baseVelocityDisc    | Initial velocity of disc particles.                                    |
 |             | typeDisc            | Particle type identifier for disc particles.                           |
-|-------------|---------------------|-------------------------------------------------------------------------|
+|             |                     |                                                                        |
 | linkedCell  | containerType       | Container implementation (currently “Cell”).                           |
 |             | domainSize          | Size of the simulation domain.                                         |
 |             | rCutoff             | Lennard–Jones cutoff radius.                                           |
