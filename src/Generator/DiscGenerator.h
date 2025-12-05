@@ -2,7 +2,6 @@
 
 #include <array>
 
-
 #include "Container/Container.h"
 
 /**

@@ -9,7 +9,6 @@
 #include "MoleculeSimulation.h"
 #include "PlanetSimulation.h"
 
-
 namespace SimulationFactory {
 auto createSimulation(const SimulationConfig &cfg, Container &particles) -> std::unique_ptr<Simulation> {
   switch (cfg.sim_type) {

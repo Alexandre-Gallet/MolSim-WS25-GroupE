@@ -10,8 +10,6 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "Container/LinkedCellContainer.h"
-#include "Container/ContainerType.h"
 #include "Simulation/SimulationType.h"
 #include "outputWriter/OutputFormat.h"
 
@@ -47,10 +45,9 @@ SimulationConfig YamlInputReader::parse() const {
   parseOutputSection(root["output"], cfg);
 
   // --- cuboids section ---
-  if (!root["cuboids"]) {
-    throw std::runtime_error("YAML error: missing 'cuboids' section");
+  if (root["cuboids"]) {
+    parseCuboidsSection(root["cuboids"], cfg);
   }
-  parseCuboidsSection(root["cuboids"], cfg);
 
   // --- discs section (optional) ---
   if (root["discs"]) {
@@ -111,9 +108,16 @@ void YamlInputReader::parseOutputSection(const YAML::Node &n, SimulationConfig &
 
 // Parsing Cuboids section
 
+// Parsing Cuboids section
+
 void YamlInputReader::parseCuboidsSection(const YAML::Node &n, SimulationConfig &cfg) const {
+  // Allow null or empty cuboids
+  if (!n || n.IsNull()) {
+    return;  // no cuboids defined
+  }
+
   if (!n.IsSequence()) {
-    throw std::runtime_error("YAML error: 'cuboids' must be a sequence");
+    throw std::runtime_error("YAML error: 'cuboids' must be a sequence or empty");
   }
 
   for (const auto &node : n) {
@@ -149,7 +153,7 @@ void YamlInputReader::parseCuboidsSection(const YAML::Node &n, SimulationConfig 
   }
 
   if (cfg.cuboids.empty()) {
-    throw std::runtime_error("YAML error: 'cuboids' must contain at least one cuboid");
+    // throw std::runtime_error("YAML error: 'cuboids' must contain at least one cuboid");
   }
 }
 
@@ -172,7 +176,6 @@ void YamlInputReader::parseDiscsSection(const YAML::Node &n, SimulationConfig &c
     cfg.discs.push_back(d);
   }
 }
-
 // Parsing Linked Cell section
 
 void YamlInputReader::parseLinkedCellSection(const YAML::Node &n, SimulationConfig &cfg) const {

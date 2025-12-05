@@ -9,14 +9,13 @@
 
 #include <filesystem>
 
-#include "Container/LinkedCellContainer.h"
 #include "Container/ContainerType.h"
+#include "Container/LinkedCellContainer.h"
 #include "ForceCalculation/LennardJones.h"
 #include "Generator/CuboidGenerator.h"
 #include "Generator/DiscGenerator.h"
 #include "Generator/ParticleGenerator.h"
 #include "outputWriter/WriterFactory.h"
-
 
 MoleculeSimulation::MoleculeSimulation(const SimulationConfig &cfg, Container &particles)
     : cfg_(cfg), particles_(particles) {}
@@ -28,11 +27,13 @@ void MoleculeSimulation::runSimulation() {
   SPDLOG_INFO("Generating particles from {} cuboid(s)...", cfg_.cuboids.size());
 
   for (const auto &c : cfg_.cuboids) {
-    CuboidGenerator::generateCuboid(particles_, c.origin, c.numPerDim, cfg_.domainSize, c.h, c.mass, c.baseVelocity, c.brownianMean,
-                                      c.type);
+    CuboidGenerator::generateCuboid(particles_, c.origin, c.numPerDim, cfg_.domainSize, c.h, c.mass, c.baseVelocity,
+                                    c.brownianMean, c.type);
   }
 
-
+  for (const auto &d : cfg_.discs) {
+    DiscGenerator::generateDisc(particles_, d.center, d.radiusCells, d.hDisc, d.mass, d.baseVelocity, d.typeDisc);
+  }
 
   SPDLOG_INFO("Generated {} particles from cuboids.", particles_.size());
 
@@ -53,8 +54,7 @@ void MoleculeSimulation::runSimulation() {
               cfg_.t_end, cfg_.delta_t, cfg_.write_frequency);
 
   if (cfg_.containerType == ContainerType::Cell) {
-    static_cast<LinkedCellContainer *>(&particles_)
-        ->setBoundaryConditions(cfg_.boundaryConditions);
+    static_cast<LinkedCellContainer *>(&particles_)->setBoundaryConditions(cfg_.boundaryConditions);
   }
 
   while (current_time < cfg_.t_end) {

@@ -5,11 +5,12 @@
 
 #include <spdlog/spdlog.h>
 
+#include <exception>
+
 #include "Container/ContainerFactory.h"
 #include "Container/ContainerType.h"
 #include "Container/ParticleContainer.h"
 #include "Generator/DiscGenerator.h"
-#include <exception>
 #include "Simulation/SimulationFactory.h"
 #include "inputReader/Arguments.h"
 #include "inputReader/InputReader.h"
@@ -36,7 +37,6 @@ int main(int argc, char *argv[]) {
   inputReader::parseArguments(argc, argv, args);
 
   SPDLOG_INFO("Reading YAML configuration from '{}'", args.inputFile);
-
 
   SPDLOG_INFO("Creating simulation (input='{}')", args.inputFile);
   // create and populate the simulation configuration struct

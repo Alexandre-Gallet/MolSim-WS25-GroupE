@@ -7,7 +7,7 @@
  * @brief Abstract base class for all particle generators.
  */
 class ParticleGenerator {
-public:
+ public:
   virtual ~ParticleGenerator() = default;
 
   /**

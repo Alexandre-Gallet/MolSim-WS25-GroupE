@@ -1,5 +1,6 @@
 // CuboidGenerator.cpp
 #include "CuboidGenerator.h"
+
 #include "utils/MaxwellBoltzmannDistribution.h"
 
 void CuboidGenerator::generate(Container &container) const {

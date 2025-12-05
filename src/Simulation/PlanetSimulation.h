@@ -5,10 +5,10 @@
 #pragma once
 
 #include "../Container/ParticleContainer.h"
-#include "../inputReader/Arguments.h"
-#include "Simulation.h"
 #include "../Simulation/Simulation.h"
+#include "../inputReader/Arguments.h"
 #include "../inputReader/SimulationConfig.h"
+#include "Simulation.h"
 
 /**
  * @brief Simulation class for gravitational planet motion.

@@ -13,7 +13,7 @@
  * and as a concrete implementation of ParticleGenerator.
  */
 class CuboidGenerator : public ParticleGenerator {
-public:
+ public:
   /**
    * @brief Constructor for object-oriented usage (virtual interface).
    *
@@ -52,9 +52,9 @@ public:
    *   CuboidGenerator::generateCuboid(container, ...);
    */
   static void generateCuboid(Container &container, const std::array<double, 3> &origin,
-                             const std::array<int, 3> &numPerDim, const std::array<double, 3> &dom_size,
-                             double h, double mass, const std::array<double, 3> &baseVelocity,
-                             double brownianMean = 0.1, int type = 0);
+                             const std::array<int, 3> &numPerDim, const std::array<double, 3> &dom_size, double h,
+                             double mass, const std::array<double, 3> &baseVelocity, double brownianMean = 0.1,
+                             int type = 0);
 
  private:
   std::array<double, 3> origin_;

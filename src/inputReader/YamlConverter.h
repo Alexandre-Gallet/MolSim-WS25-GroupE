@@ -1,10 +1,11 @@
 #include <yaml-cpp/yaml.h>
+
 #include "Container/ContainerType.h"
 
 namespace YAML {
-template<>
+template <>
 struct convert<ContainerType> {
-  static bool decode(const Node& node, ContainerType& rhs) {
+  static bool decode(const Node &node, ContainerType &rhs) {
     if (!node.IsScalar()) return false;
 
     const auto str = node.as<std::string>();
@@ -12,9 +13,9 @@ struct convert<ContainerType> {
     return true;
   }
 };
-template<>
+template <>
 struct convert<BoundaryCondition> {
-  static bool decode(const Node& node, BoundaryCondition& rhs) {
+  static bool decode(const Node &node, BoundaryCondition &rhs) {
     if (!node.IsScalar()) return false;
 
     const auto str = node.as<std::string>();
@@ -22,4 +23,4 @@ struct convert<BoundaryCondition> {
     return true;
   }
 };
-};
+};  // namespace YAML
