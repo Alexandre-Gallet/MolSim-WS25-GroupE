@@ -8,6 +8,7 @@
 #include <string>
 
 #include "SimulationConfig.h"
+#include "YamlConverter.h"
 
 // Forward declaration to avoid pulling in yaml-cpp in header consumers.
 namespace YAML {

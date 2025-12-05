@@ -5,21 +5,20 @@
 #pragma once
 #include <memory>
 
-#include "ParticleContainer.h"
+#include "../Container/ParticleContainer.h"
 #include "Simulation.h"
 #include "inputReader/SimulationConfig.h"
 
 /**
  * @brief Factory class responsible for creating concrete Simulation instances.
  */
-class SimulationFactory {
- public:
-  /**
-   * @brief Create a new Simulation instance based on the given configuration.
-   *
-   * @param cfg Simulation configuration (type, parameters, cuboids, etc.)
-   * @param particles Reference to the particle container used by the simulation
-   * @return std::unique_ptr<Simulation> Newly created simulation instance
-   */
-  static std::unique_ptr<Simulation> createSimulation(const SimulationConfig &cfg, ParticleContainer &particles);
-};
+namespace SimulationFactory {
+/**
+ * @brief creates a new simulation of the specified type
+ * @param type Type of simulation, default: Molecule
+ * @param args Arguments parsed from input
+ * @param particles Container where all particles are stored
+ * @return Simulation object of the given type
+ */
+std::unique_ptr<Simulation> createSimulation(const SimulationConfig &cfg, Container &particles);
+}  // namespace SimulationFactory

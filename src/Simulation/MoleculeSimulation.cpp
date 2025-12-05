@@ -9,11 +9,15 @@
 
 #include <filesystem>
 
+#include "Container/ContainerType.h"
+#include "Container/LinkedCellContainer.h"
 #include "ForceCalculation/LennardJones.h"
-#include "ParticleGenerator.h"
+#include "Generator/CuboidGenerator.h"
+#include "Generator/DiscGenerator.h"
+#include "Generator/ParticleGenerator.h"
 #include "outputWriter/WriterFactory.h"
 
-MoleculeSimulation::MoleculeSimulation(const SimulationConfig &cfg, ParticleContainer &particles)
+MoleculeSimulation::MoleculeSimulation(const SimulationConfig &cfg, Container &particles)
     : cfg_(cfg), particles_(particles) {}
 
 void MoleculeSimulation::runSimulation() {
@@ -23,8 +27,12 @@ void MoleculeSimulation::runSimulation() {
   SPDLOG_INFO("Generating particles from {} cuboid(s)...", cfg_.cuboids.size());
 
   for (const auto &c : cfg_.cuboids) {
-    ParticleGenerator::generateCuboid(particles_, c.origin, c.numPerDim, c.h, c.mass, c.baseVelocity, c.brownianMean,
-                                      c.type);
+    CuboidGenerator::generateCuboid(particles_, c.origin, c.numPerDim, cfg_.domainSize, c.h, c.mass, c.baseVelocity,
+                                    c.brownianMean, c.type);
+  }
+
+  for (const auto &d : cfg_.discs) {
+    DiscGenerator::generateDisc(particles_, d.center, d.radiusCells, d.hDisc, d.mass, d.baseVelocity, d.typeDisc);
   }
 
   SPDLOG_INFO("Generated {} particles from cuboids.", particles_.size());
@@ -45,9 +53,16 @@ void MoleculeSimulation::runSimulation() {
   SPDLOG_INFO("Starting molecule simulation: t_start={}, t_end={}, delta_t={}, output every {} steps.", cfg_.t_start,
               cfg_.t_end, cfg_.delta_t, cfg_.write_frequency);
 
+  if (cfg_.containerType == ContainerType::Cell) {
+    static_cast<LinkedCellContainer *>(&particles_)->setBoundaryConditions(cfg_.boundaryConditions);
+  }
+
   while (current_time < cfg_.t_end) {
     // integrate positions (x), then recompute forces, then velocities (v)
     LennardJones::calculateX(particles_, cfg_.delta_t);
+    if (cfg_.containerType == ContainerType::Cell) {
+      static_cast<LinkedCellContainer *>(&particles_)->rebuild();
+    }
     lj.calculateF(particles_);
     LennardJones::calculateV(particles_, cfg_.delta_t);
 
@@ -55,6 +70,9 @@ void MoleculeSimulation::runSimulation() {
 
     // Write output every cfg_.write_frequency
     if (iteration % cfg_.write_frequency == 0) {
+      if (cfg_.containerType == ContainerType::Cell) {
+        static_cast<LinkedCellContainer *>(&particles_)->deleteHaloCells();
+      }
       SPDLOG_INFO("Writing output at iteration {} (t = {:.6g}).", iteration, current_time);
       plotParticles(particles_, iteration, cfg_.output_format);
     }
@@ -67,7 +85,7 @@ void MoleculeSimulation::runSimulation() {
   SPDLOG_INFO("Molecule simulation completed after {} iterations (final t = {:.6g}).", iteration, current_time);
 }
 
-void MoleculeSimulation::plotParticles(ParticleContainer &particles, int iteration, OutputFormat format) {
+void MoleculeSimulation::plotParticles(Container &particles, int iteration, OutputFormat format) {
   std::filesystem::create_directories("output");
 
   // Output file name from Outputformat

@@ -7,14 +7,16 @@
 
 #include <exception>
 
-#include "ParticleContainer.h"
+#include "Container/ContainerFactory.h"
+#include "Container/ContainerType.h"
+#include "Container/ParticleContainer.h"
+#include "Generator/DiscGenerator.h"
 #include "Simulation/SimulationFactory.h"
 #include "inputReader/Arguments.h"
 #include "inputReader/InputReader.h"
 #include "inputReader/SimulationConfig.h"
 #include "inputReader/YamlInputReader.h"
-#include "logging.hpp"
-
+#include "utils/logging.hpp"
 /**
  * @brief Main entry point of the molecular dynamics simulation.
  *
@@ -29,8 +31,6 @@ int main(int argc, char *argv[]) {
   // Initialize logging (console + simulation.log).
   logging::init_logging();
 
-  ParticleContainer particles;
-
   SPDLOG_INFO("MolSim starting...");
 
   Arguments args{};
@@ -38,6 +38,7 @@ int main(int argc, char *argv[]) {
 
   SPDLOG_INFO("Reading YAML configuration from '{}'", args.inputFile);
 
+  SPDLOG_INFO("Creating simulation (input='{}')", args.inputFile);
   // create and populate the simulation configuration struct
   SimulationConfig cfg;
   try {
@@ -49,6 +50,9 @@ int main(int argc, char *argv[]) {
     inputReader::printUsage();
     return EXIT_FAILURE;
   }
+
+  auto container = ContainerFactory::createContainer(cfg);
+  auto &particles = *container;
 
   SPDLOG_INFO("Creating simulation (sim_type='{}')", static_cast<int>(cfg.sim_type));
 

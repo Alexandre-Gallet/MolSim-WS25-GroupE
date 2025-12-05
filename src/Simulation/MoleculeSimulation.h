@@ -4,7 +4,8 @@
  */
 #pragma once
 
-#include "../inputReader/Cuboid.h"
+#include "Container/Container.h"
+#include "Generator/DiscGenerator.h"
 #include "Simulation.h"
 #include "inputReader/SimulationConfig.h"
 
@@ -19,7 +20,7 @@ class MoleculeSimulation : public Simulation {
    * @param cfg Simulation configuration (read from YAML)
    * @param particles Reference to the particle container
    */
-  MoleculeSimulation(const SimulationConfig &cfg, ParticleContainer &particles);
+  MoleculeSimulation(const SimulationConfig &cfg, Container &particles);
 
   /**
    * @brief Run the molecular dynamics simulation.
@@ -29,12 +30,12 @@ class MoleculeSimulation : public Simulation {
   /**
    * @brief Plot Particles using writer classes (VTK, XYZ) for later visualization
    */
-  static void plotParticles(ParticleContainer &particles, int iteration, OutputFormat format);
+  static void plotParticles(Container &particles, int iteration, OutputFormat format);
 
   /// Copy of simulation configuration. This is very cheap!
   SimulationConfig cfg_;
 
   /// Reference to the particle container shared by the simulation system. Copying this would be extremly expensive here
   /// a refrence is better
-  ParticleContainer &particles_;
+  Container &particles_;
 };

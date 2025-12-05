@@ -12,7 +12,7 @@
 #include "../ForceCalculation/StormerVerlet.h"
 #include "../outputWriter/WriterFactory.h"
 
-PlanetSimulation::PlanetSimulation(const SimulationConfig &cfg, ParticleContainer &particles)
+PlanetSimulation::PlanetSimulation(const SimulationConfig &cfg, Container &particles)
     : cfg_(cfg), particles_(particles) {}
 
 void PlanetSimulation::runSimulation() {
@@ -54,8 +54,7 @@ void PlanetSimulation::runSimulation() {
 
   SPDLOG_INFO("Planet simulation completed after {} iterations (final t = {:.6g}).", iteration, current_time);
 }
-
-void PlanetSimulation::plotParticles(ParticleContainer &particles, int iteration, OutputFormat format) {
+void PlanetSimulation::plotParticles(Container &particles, int iteration, OutputFormat format) {
   std::filesystem::create_directories("output");
 
   std::string out_name = "outputVTK";

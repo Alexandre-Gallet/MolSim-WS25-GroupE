@@ -35,7 +35,7 @@ list(REMOVE_ITEM MY_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/MolSim.cpp")
 # Main executable (production)
 # -----------------------------
 add_executable(MolSim ${MY_SRC}
-                        src/MolSim.cpp)
+        src/MolSim.cpp)
 
 target_include_directories(MolSim PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
@@ -97,6 +97,7 @@ endif()
 # Load custom modules
 # -----------------------------------
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
+
 include(vtk)
 include(clang-format)
 include(doxygen)

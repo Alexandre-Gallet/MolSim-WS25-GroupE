@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+#include "Container/ContainerType.h"
+#include "Container/LinkedCellContainer.h"
 #include "Cuboid.h"
 #include "Simulation/SimulationType.h"
 #include "outputWriter/OutputFormat.h"
@@ -46,12 +48,12 @@ struct SimulationConfig {
   // --- Discs
   std::vector<Disc> discs;
 
-  std::string containerType = "Cell";  // containerType where all
+  ContainerType containerType = ContainerType::Cell;  // containerType where all
 
   double rCutoff = 0.0;  // cutoff radius
 
   std::array<double, 3> domainSize{};  // simulation domain size
 
   //
-  std::array<std::string, 6> boundaryConditions{};  // 6 boundaries
+  std::array<BoundaryCondition, 6> boundaryConditions{};  // 6 boundaries
 };

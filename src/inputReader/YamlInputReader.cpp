@@ -15,7 +15,7 @@
 
 // Forward declarations of existing helper functions.
 
-SimulationType parse_type(const std::string &s);
+SimulationType parseSimType(const std::string &s);
 OutputFormat parse_output(const std::string &s);
 
 YamlInputReader::YamlInputReader(const std::string &filename) : filename(filename) {}
@@ -45,10 +45,9 @@ SimulationConfig YamlInputReader::parse() const {
   parseOutputSection(root["output"], cfg);
 
   // --- cuboids section ---
-  if (!root["cuboids"]) {
-    throw std::runtime_error("YAML error: missing 'cuboids' section");
+  if (root["cuboids"]) {
+    parseCuboidsSection(root["cuboids"], cfg);
   }
-  parseCuboidsSection(root["cuboids"], cfg);
 
   // --- discs section (optional) ---
   if (root["discs"]) {
@@ -79,7 +78,7 @@ void YamlInputReader::parseSimulationSection(const YAML::Node &n, SimulationConf
   const std::string typeStr = n["sim_type"].as<std::string>();
   const std::string formatStr = n["output_format"].as<std::string>();
 
-  cfg.sim_type = parse_type(typeStr);
+  cfg.sim_type = parseSimType(typeStr);
   cfg.t_start = n["t_start"].as<double>();
   cfg.t_end = n["t_end"].as<double>();
   cfg.delta_t = n["delta_t"].as<double>();
@@ -109,9 +108,16 @@ void YamlInputReader::parseOutputSection(const YAML::Node &n, SimulationConfig &
 
 // Parsing Cuboids section
 
+// Parsing Cuboids section
+
 void YamlInputReader::parseCuboidsSection(const YAML::Node &n, SimulationConfig &cfg) const {
+  // Allow null or empty cuboids
+  if (!n || n.IsNull()) {
+    return;  // no cuboids defined
+  }
+
   if (!n.IsSequence()) {
-    throw std::runtime_error("YAML error: 'cuboids' must be a sequence");
+    throw std::runtime_error("YAML error: 'cuboids' must be a sequence or empty");
   }
 
   for (const auto &node : n) {
@@ -147,7 +153,7 @@ void YamlInputReader::parseCuboidsSection(const YAML::Node &n, SimulationConfig 
   }
 
   if (cfg.cuboids.empty()) {
-    throw std::runtime_error("YAML error: 'cuboids' must contain at least one cuboid");
+    // throw std::runtime_error("YAML error: 'cuboids' must contain at least one cuboid");
   }
 }
 
@@ -170,7 +176,6 @@ void YamlInputReader::parseDiscsSection(const YAML::Node &n, SimulationConfig &c
     cfg.discs.push_back(d);
   }
 }
-
 // Parsing Linked Cell section
 
 void YamlInputReader::parseLinkedCellSection(const YAML::Node &n, SimulationConfig &cfg) const {
@@ -182,7 +187,7 @@ void YamlInputReader::parseLinkedCellSection(const YAML::Node &n, SimulationConf
   // containerType (stored as list in YAML, take first entry)
   if (!node["containerType"] || !node["containerType"].IsSequence())
     throw std::runtime_error("YAML error: linkedCell.containerType must be a sequence");
-  cfg.containerType = node["containerType"][0].as<std::string>();
+  cfg.containerType = node["containerType"][0].as<ContainerType>();
 
   // domain size
   cfg.domainSize = parseVec3(node["domainSize"], "domainSize");
@@ -195,7 +200,7 @@ void YamlInputReader::parseLinkedCellSection(const YAML::Node &n, SimulationConf
     throw std::runtime_error("YAML error: linkedCell.boundaryConditions must have 6 items");
 
   for (int i = 0; i < 6; ++i) {
-    cfg.boundaryConditions[i] = node["boundaryConditions"][i].as<std::string>();
+    cfg.boundaryConditions[i] = node["boundaryConditions"][i].as<BoundaryCondition>();
   }
 }
 

@@ -9,14 +9,16 @@
 #include "MoleculeSimulation.h"
 #include "PlanetSimulation.h"
 
-std::unique_ptr<Simulation> SimulationFactory::createSimulation(const SimulationConfig &cfg,
-                                                                ParticleContainer &particles) {
+namespace SimulationFactory {
+auto createSimulation(const SimulationConfig &cfg, Container &particles) -> std::unique_ptr<Simulation> {
   switch (cfg.sim_type) {
-    case SimulationType::Molecule: {
-      return std::make_unique<MoleculeSimulation>(cfg, particles);
-    }
-    default: {
+    case SimulationType::Planet:
       return std::make_unique<PlanetSimulation>(cfg, particles);
-    }
+    case SimulationType::Molecule:
+      return std::make_unique<MoleculeSimulation>(cfg, particles);
+    default:
+      // already checked in parseType, shouldn't be reached
+      return std::make_unique<MoleculeSimulation>(cfg, particles);
   }
 }
+}  // namespace SimulationFactory
