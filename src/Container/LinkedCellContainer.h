@@ -5,6 +5,11 @@
  * This container organizes particles into a padded 3D grid (inner, boundary, halo cells)
  * to accelerate pairwise interactions. Particles are owned by the container; cells store
  * pointers into the owned storage.
+ *
+ * \image html runtime_per_iter.jpeg
+ * \image html runtime_wall_vs_particles.jpeg
+ * \image html runtime_time_per_particle.jpeg
+ * \image html runtime_wall_vs_particles.jpeg
  */
 
 #pragma once
