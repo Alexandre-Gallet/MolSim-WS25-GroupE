@@ -26,7 +26,7 @@ public:
    * @param brownianMean   Mean value of the Brownian Motion.
    * @param type           Type/id of the particle.
    */
-  CuboidGenerator(const std::array<double, 3> &origin, const std::array<std::size_t, 3> &numPerDim,
+  CuboidGenerator(const std::array<double, 3> &origin, const std::array<int, 3> &numPerDim,
                   const std::array<double, 3> &dom_size, double h, double mass,
                   const std::array<double, 3> &baseVelocity, double brownianMean = 0.1, int type = 0)
       : origin_(origin),
@@ -52,13 +52,13 @@ public:
    *   CuboidGenerator::generateCuboid(container, ...);
    */
   static void generateCuboid(Container &container, const std::array<double, 3> &origin,
-                             const std::array<std::size_t, 3> &numPerDim, const std::array<double, 3> &dom_size,
+                             const std::array<int, 3> &numPerDim, const std::array<double, 3> &dom_size,
                              double h, double mass, const std::array<double, 3> &baseVelocity,
                              double brownianMean = 0.1, int type = 0);
 
  private:
   std::array<double, 3> origin_;
-  std::array<std::size_t, 3> numPerDim_;
+  const std::array<int, 3> numPerDim_;
   const std::array<double, 3> &dom_size_;
   double h_;
   double mass_;

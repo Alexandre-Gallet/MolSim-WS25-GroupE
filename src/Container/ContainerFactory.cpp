@@ -4,10 +4,10 @@
 #include "ParticleContainer.h"
 
 namespace ContainerFactory {
-auto createContainer(Arguments &args) -> std::unique_ptr<Container> {
-  switch (args.cont_type) {
+auto createContainer(SimulationConfig &cfg) -> std::unique_ptr<Container> {
+  switch (cfg.containerType) {
     case ContainerType::Cell:
-      return std::make_unique<LinkedCellContainer>(args.r_cutoff, args.domain_size);
+      return std::make_unique<LinkedCellContainer>(cfg.rCutoff, cfg.domainSize);
     case ContainerType::Particle:
       return std::make_unique<ParticleContainer>();
     default:

@@ -9,13 +9,11 @@
 #include "../../src/Generator/ParticleGenerator.h"
 #include "Generator/CuboidGenerator.h"
 #include "Simulation/Simulation.h"
-#include "inputReader/FileReader.h"
 
 
 /*
 #include "GParticleGenerator.h"
 #include "Simulation/Simulation.h"
-#include "inputReader/FileReader.h"
 
 
    Behaviour test for the ParticleGenerator component in the MolSim project.
@@ -46,7 +44,7 @@ TEST(ParticleGeneratorBehaviourTest, GeneratesCorrectNumberAndNonZeroVelocity) {
 
     /// Define cuboid parameters.
     const std::array<double, 3> origin{0.0, 0.0, 0.0};  ///< Lower-left corner
-    const std::array<size_t, 3> dims{3, 2, 1};             ///< Number of particles per dimension
+    const std::array<int, 3> dims{3, 2, 1};             ///< Number of particles per dimension
     const std::array<double, 3> domain_size = {180., 90., 1}; ///< Size of the domain
     const double h = 1.0;                               ///< Spacing between particles
     const double mass = 1.0;                            ///< Mass of each particle
@@ -92,7 +90,7 @@ TEST(ParticleGeneratorBehaviourTest, NoBrownianKeepsVelocityConstant) {
   ParticleContainer container;
 
   const std::array<double, 3> origin{0.0, 0.0, 0.0};
-  const std::array<size_t, 3> N{3, 2, 1};
+  const std::array<int, 3> N{3, 2, 1};
   const std::array<double, 3> domain_size = {180., 90., 1};
   const double h = 1.0;
   const double m = 1.0;

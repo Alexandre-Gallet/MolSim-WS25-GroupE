@@ -21,10 +21,18 @@
 
 #include "Container.h"
 #include "Particle.h"
+#include "spdlog/spdlog.h"
 
 enum class Face : uint8_t { XMin = 0, XMax = 1, YMin = 2, YMax = 3, ZMin = 4, ZMax = 5 };
 enum class BoundaryCondition : uint8_t { None, Outflow, Reflecting };
+inline BoundaryCondition parseBoundaryCondition(const std::string& s) {
+  if (s == "None" || s == "none") return BoundaryCondition::None;
+  if (s == "Outflow" || s == "outflow") return BoundaryCondition::Outflow;
+  if (s == "Reflecting" || s == "reflecting") return BoundaryCondition::Reflecting;
 
+  SPDLOG_ERROR("Invalid boundary condition: {}", s);
+  return BoundaryCondition::None;  // safe fallback
+}
 enum class CellType : uint8_t { Inner, Boundary, Halo };
 
 struct LinkedCell {

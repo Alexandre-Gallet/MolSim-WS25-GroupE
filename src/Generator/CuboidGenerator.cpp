@@ -8,15 +8,15 @@ void CuboidGenerator::generate(Container &container) const {
 }
 // Have kept the generateCuboid function due to code structure, but also kept generate function as a design decision
 void CuboidGenerator::generateCuboid(Container &container, const std::array<double, 3> &origin,
-                                     const std::array<std::size_t, 3> &numPerDim, const std::array<double, 3> &dom_size,
+                                     const std::array<int, 3> &numPerDim, const std::array<double, 3> &dom_size,
                                      double h, double mass, const std::array<double, 3> &baseVelocity,
                                      double brownianMean, int type) {
-  const std::size_t total = numPerDim[0] * numPerDim[1] * numPerDim[2];
+  const int total = numPerDim[0] * numPerDim[1] * numPerDim[2];
   container.reserve(container.size() + total);
 
-  for (std::size_t i = 0; i < numPerDim[0]; ++i) {
-    for (std::size_t j = 0; j < numPerDim[1]; ++j) {
-      for (std::size_t k = 0; k < numPerDim[2]; ++k) {
+  for (int i = 0; i < numPerDim[0]; ++i) {
+    for (int j = 0; j < numPerDim[1]; ++j) {
+      for (int k = 0; k < numPerDim[2]; ++k) {
         std::array<double, 3> pos = {origin[0] + i * h, origin[1] + j * h, origin[2] + k * h};
 
         std::array<double, 3> vel = baseVelocity;
