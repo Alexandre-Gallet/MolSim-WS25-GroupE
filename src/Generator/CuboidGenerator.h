@@ -1,4 +1,4 @@
-// CuboidGenerator.h
+  // CuboidGenerator.h
 #pragma once
 #include <array>
 
