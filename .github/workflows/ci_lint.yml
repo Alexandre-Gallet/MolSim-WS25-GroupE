@@ -64,15 +64,59 @@ jobs:
           key: ${{ runner.os }}-cmake-${{ hashFiles('CMakeLists.txt', 'cmake/**/*.cmake') }}
           restore-keys: |
             ${{ runner.os }}-cmake-
+            
+
+      # additional steps to ensure that github actions use the same version of clang-format as our local machines. Needs reworking for caching and speedup
+      - name: Add LLVM repository
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget gnupg lsb-release
+          echo "deb http://apt.llvm.org/$(lsb_release -sc)/ llvm-toolchain-$(lsb_release -sc)-21 main" \
+            | sudo tee /etc/apt/sources.list.d/llvm21.list
+          wget -qO - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo apt-get update
+
+
+      - name: Install clang-format-21
+        run: |
+          sudo apt-get install -y clang-format-21
+          sudo ln -sf /usr/bin/clang-format-21 /usr/bin/clang-format
+
+      - name: Force GCC compiler
+        run: |
+          sudo update-alternatives --set cc /usr/bin/gcc
+          sudo update-alternatives --set c++ /usr/bin/g++
+          gcc --version
+          g++ --version
+
+      - name: Verify clang-format version
+        run: clang-format --version
+
 
       # Step 7: Configure CMake (needed for compile_commands.json for clang-tidy)
       - name: Configure project
         run: cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
-      # Step 9: Run clang-tidy using your custom CMake target
-      - name: Run clang-tidy
-        run: cmake --build build --target run_clang_tidy
+      # Step 8: Run clang-tidy on push but never fail
+      - name: Run clang-tidy (push)
+        if: github.event_name == 'push'
+        run: cmake --build build --target run_clang_tidy || true
 
-      # Step 10: Run clang-format using your custom CMake target
-      - name: Run clang-format check
-        run: cmake --build build --target clang_format_check
+      # Step 9: Run clang-tidy on PR and FAIL if warnings appear
+      - name: Run clang-tidy (pull request)
+        if: github.event_name == 'pull_request'
+        run: |
+          set -o pipefail
+          cmake --build build --target run_clang_tidy | tee /dev/null
+
+      # Step 10: Run clang-format on push but never fail
+      - name: Run clang-format (push)
+        if: github.event_name == 'push'
+        run: cmake --build build --target clang_format_check || true
+
+      # Step 11: Run clang-format on PR and FAIL if format errors appear
+      - name: Run clang-format (pull request)
+        if: github.event_name == 'pull_request'
+        run: |
+          set -o pipefail
+          cmake --build build --target clang_format_check | tee /dev/null

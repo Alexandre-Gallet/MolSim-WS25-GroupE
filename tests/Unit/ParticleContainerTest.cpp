@@ -1,4 +1,4 @@
-/*
+  /*
    Tests for ParticleContainer and its basic functionality.
 
   This file contains unit tests that verify creation, insertion, iteration,
@@ -8,11 +8,12 @@
 
 #include <array>
 #include <cassert>
+#include <cmath>
 #include <iostream>
 
+#include "../../src/Container/ParticleContainer.h"
+#include "../../src/Container/Particle.h"
 #include "gtest/gtest.h"
-#include "Particle.h"
-#include "ParticleContainer.h"
 #include "ParticleContainerTest.h"
 
 namespace {

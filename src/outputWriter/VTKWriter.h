@@ -14,9 +14,9 @@
 #include <list>
 #include <string>
 
+#include "../Container/Particle.h"
+#include "../Container/ParticleContainer.h"
 #include "OutputWriter.h"
-#include "Particle.h"
-#include "ParticleContainer.h"
 
 namespace outputWriter {
 
@@ -39,7 +39,7 @@ class VTKWriter : public OutputWriter {
    * @param filename Output filename
    * @param iteration Current iteration number
    */
-  void plotParticles(ParticleContainer &particles, const std::string &filename, int iteration) override;
+  void plotParticles(Container &particles, const std::string &filename, int iteration) override;
 };
 
 }  // namespace outputWriter

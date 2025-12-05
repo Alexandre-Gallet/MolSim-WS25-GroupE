@@ -35,7 +35,7 @@ list(REMOVE_ITEM MY_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/MolSim.cpp")
 # Main executable (production)
 # -----------------------------
 add_executable(MolSim ${MY_SRC}
-                        src/MolSim.cpp)
+        src/MolSim.cpp)
 
 target_include_directories(MolSim PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
@@ -97,10 +97,12 @@ endif()
 # Load custom modules
 # -----------------------------------
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
+
 include(vtk)
 include(clang-format)
 include(doxygen)
 include(spdlog)
+include(yaml-cpp)
 
 # Set log_level to default "INFO" and make it user configurable via cmake
 set(LOG_LEVEL "INFO" CACHE STRING "Minimum log level: TRACE, DEBUG, INFO, WARN, ERROR, CRITICAL, OFF")
@@ -110,6 +112,9 @@ set_property(CACHE LOG_LEVEL PROPERTY STRINGS TRACE DEBUG INFO WARN ERROR CRITIC
 target_link_libraries(MolSim PRIVATE spdlog::spdlog)
 target_compile_definitions(MolSim PRIVATE SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_${LOG_LEVEL})
 
+
+# Link yaml-cpp to main binary
+target_link_libraries(MolSim PRIVATE yaml-cpp)
 
 # -----------------------------------
 # Testing Support
@@ -142,9 +147,13 @@ if(BUILD_TESTING)
 
     target_link_libraries(MolSimTests PRIVATE GTest::gtest_main)
 
+   # Link yaml-cpp to testing executable
+   target_link_libraries(MolSimTests PRIVATE yaml-cpp)
+
     # GoogleTest automatic discovery of every test that begins with TEST, TEST_F, TEST_P
     include(GoogleTest)
     gtest_discover_tests(MolSimTests)
+
 
 endif()
 

@@ -1,27 +1,24 @@
 /**
- *@file SimulationFactory.h
+ * @file SimulationFactory.h
+ * @brief Factory for creating Simulation instances based on configuration.
  */
-
 #pragma once
-
 #include <memory>
 
-#include "../ParticleContainer.h"
-#include "../inputReader/Arguments.h"
+#include "../Container/ParticleContainer.h"
 #include "Simulation.h"
-#include "SimulationType.h"
+#include "inputReader/SimulationConfig.h"
+
 /**
- * Create desired simulation of the given type
+ * @brief Factory class responsible for creating concrete Simulation instances.
  */
-class SimulationFactory {
- public:
-  /**
-   * @brief creates a new simulation of the specified type
-   * @param type Type of simulation, default: Molecule
-   * @param args Arguments parsed from input
-   * @param particles Container where all particles are stored
-   * @return Simulation object of the given type
-   */
-  static std::unique_ptr<Simulation> createSimulation(SimulationType type, Arguments &args,
-                                                      ParticleContainer &particles);
-};
+namespace SimulationFactory {
+/**
+ * @brief creates a new simulation of the specified type
+ * @param type Type of simulation, default: Molecule
+ * @param args Arguments parsed from input
+ * @param particles Container where all particles are stored
+ * @return Simulation object of the given type
+ */
+std::unique_ptr<Simulation> createSimulation(const SimulationConfig &cfg, Container &particles);
+}  // namespace SimulationFactory

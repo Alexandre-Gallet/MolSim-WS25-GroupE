@@ -7,7 +7,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "utils/ArrayUtils.h"
+#include "../utils/ArrayUtils.h"
 
 Particle::Particle(int type_arg) : x(), v(), m(0) {
   type = type_arg;

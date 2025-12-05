@@ -3,7 +3,7 @@
  */
 #pragma once
 
-#include "../ParticleContainer.h"
+#include "../Container/Container.h"
 #include "utils/ArrayUtils.h"
 #include "utils/MaxwellBoltzmannDistribution.h"
 /**
@@ -19,13 +19,13 @@ class ForceCalculation {
    * @brief Function for calculating the force for each particle, implemented by each sub-class
    * @param particles Particle container on which the calculations are performed
    */
-  virtual void calculateF(ParticleContainer &particles) = 0;
+  virtual void calculateF(Container &particles) = 0;
   /**
    * @brief Function for calculating the position updates of the particles
    * @param particles Particle container on which the calculations are performed
    * @param delta_t Time step
    */
-  static void calculateX(ParticleContainer &particles, double delta_t) {
+  static void calculateX(Container &particles, double delta_t) {
     // calculate the position updates using the methods in the ArrayUtils class
     // since the formulas are the same regardless of simulation, the method is included in the base class
     for (auto &p : particles) {
@@ -43,7 +43,7 @@ class ForceCalculation {
    * @param particles Particle container on which the calculations are performed
    * @param delta_t Time step
    */
-  static void calculateV(ParticleContainer &particles, double delta_t) {
+  static void calculateV(Container &particles, double delta_t) {
     // calculate the forces using the methods in the ArrayUtils class
     // since the formulas are the same regardless of simulation, the method is included in the base class
     for (auto &p : particles) {

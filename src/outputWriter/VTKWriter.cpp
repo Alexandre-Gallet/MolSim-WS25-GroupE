@@ -21,7 +21,7 @@
 
 namespace outputWriter {
 
-void VTKWriter::plotParticles(ParticleContainer &particles, const std::string &filename, int iteration) {
+void VTKWriter::plotParticles(Container &particles, const std::string &filename, int iteration) {
   // Initialize points
   vtkNew<vtkPoints> points;
   const vtkIdType numPoints = static_cast<vtkIdType>(particles.size());

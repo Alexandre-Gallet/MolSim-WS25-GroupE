@@ -17,7 +17,7 @@ void StormerVerlet::calc(Particle &p1, Particle &p2) {
   p2.setF(ArrayUtils::elementWisePairOp(p2.getF(), newF, std::minus<>()));
 }
 
-void StormerVerlet::calculateF(ParticleContainer &particles) {
+void StormerVerlet::calculateF(Container &particles) {
   // Reset forces
   for (auto &p : particles) {
     p.setOldF(p.getF());
