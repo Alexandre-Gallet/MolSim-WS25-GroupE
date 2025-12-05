@@ -13,7 +13,7 @@
  * and as a concrete implementation of ParticleGenerator.
  */
 class CuboidGenerator : public ParticleGenerator {
- public:
+public:
   /**
    * @brief Constructor for object-oriented usage (virtual interface).
    *
