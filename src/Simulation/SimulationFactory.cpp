@@ -1,5 +1,5 @@
 /**
-* @file SimulationFactory.cpp
+ * @file SimulationFactory.cpp
  * @brief Implementation of the SimulationFactory.
  */
 #include "SimulationFactory.h"

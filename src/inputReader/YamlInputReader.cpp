@@ -4,11 +4,11 @@
  */
 #include "YamlInputReader.h"
 
+#include <yaml-cpp/yaml.h>
+
 #include <array>
 #include <sstream>
 #include <stdexcept>
-
-#include <yaml-cpp/yaml.h>
 
 #include "Simulation/SimulationType.h"
 #include "outputWriter/OutputFormat.h"
@@ -63,7 +63,6 @@ SimulationConfig YamlInputReader::parse() const {
   return cfg;
 }
 
-
 // Parsing of simulation section in input yml file
 
 void YamlInputReader::parseSimulationSection(const YAML::Node &n, SimulationConfig &cfg) const {
@@ -77,13 +76,13 @@ void YamlInputReader::parseSimulationSection(const YAML::Node &n, SimulationConf
     throw std::runtime_error("YAML error: simulation.output_format is required");
   }
 
-  const std::string typeStr   = n["sim_type"].as<std::string>();
+  const std::string typeStr = n["sim_type"].as<std::string>();
   const std::string formatStr = n["output_format"].as<std::string>();
 
-  cfg.sim_type      = parse_type(typeStr);
-  cfg.t_start       = n["t_start"].as<double>();
-  cfg.t_end         = n["t_end"].as<double>();
-  cfg.delta_t       = n["delta_t"].as<double>();
+  cfg.sim_type = parse_type(typeStr);
+  cfg.t_start = n["t_start"].as<double>();
+  cfg.t_end = n["t_end"].as<double>();
+  cfg.delta_t = n["delta_t"].as<double>();
   cfg.output_format = parse_output(formatStr);
 
   if (cfg.t_start > cfg.t_end) {
@@ -97,12 +96,11 @@ void YamlInputReader::parseSimulationSection(const YAML::Node &n, SimulationConf
 // Parsing of output Section
 
 void YamlInputReader::parseOutputSection(const YAML::Node &n, SimulationConfig &cfg) const {
-
- if (!n["write_frequency"]) {
+  if (!n["write_frequency"]) {
     throw std::runtime_error("YAML error: output.write_frequency is required");
   }
 
-  cfg.write_frequency  = n["write_frequency"].as<int>();
+  cfg.write_frequency = n["write_frequency"].as<int>();
 
   if (cfg.write_frequency <= 0) {
     throw std::runtime_error("YAML error: output.write_frequency must be > 0");
@@ -135,7 +133,7 @@ void YamlInputReader::parseCuboidsSection(const YAML::Node &n, SimulationConfig 
       throw std::runtime_error("YAML error: cuboid.mass is required");
     }
 
-    c.h    = node["h"].as<double>();
+    c.h = node["h"].as<double>();
     c.mass = node["mass"].as<double>();
 
     if (node["type"]) {
@@ -148,7 +146,6 @@ void YamlInputReader::parseCuboidsSection(const YAML::Node &n, SimulationConfig 
     cfg.cuboids.push_back(c);
   }
 
-
   if (cfg.cuboids.empty()) {
     throw std::runtime_error("YAML error: 'cuboids' must contain at least one cuboid");
   }
@@ -157,31 +154,26 @@ void YamlInputReader::parseCuboidsSection(const YAML::Node &n, SimulationConfig 
 // Parsing Discs section
 
 void YamlInputReader::parseDiscsSection(const YAML::Node &n, SimulationConfig &cfg) const {
-
-  if (!n.IsSequence())
-    throw std::runtime_error("YAML error: 'discs' must be a sequence");
+  if (!n.IsSequence()) throw std::runtime_error("YAML error: 'discs' must be a sequence");
 
   for (const auto &node : n) {
     Disc d;
 
-    d.center      = parseVec3(node["center"], "center");
+    d.center = parseVec3(node["center"], "center");
     d.radiusCells = node["radiusCells"].as<int>();
-    d.hDisc       = node["hDisc"].as<double>();
-    d.mass        = node["mass"].as<double>();
+    d.hDisc = node["hDisc"].as<double>();
+    d.mass = node["mass"].as<double>();
     d.baseVelocity = parseVec3(node["baseVelocityDisc"], "baseVelocityDisc");
 
-    if (node["typeDisc"])
-      d.typeDisc = node["typeDisc"].as<int>();
+    if (node["typeDisc"]) d.typeDisc = node["typeDisc"].as<int>();
 
     cfg.discs.push_back(d);
   }
 }
 
-
 // Parsing Linked Cell section
 
 void YamlInputReader::parseLinkedCellSection(const YAML::Node &n, SimulationConfig &cfg) const {
-
   if (!n.IsSequence() || n.size() != 1)
     throw std::runtime_error("YAML error: 'linkedCell' must contain exactly one element");
 
@@ -199,8 +191,7 @@ void YamlInputReader::parseLinkedCellSection(const YAML::Node &n, SimulationConf
   cfg.rCutoff = node["rCutoff"].as<double>();
 
   // boundary conditions
-  if (!node["boundaryConditions"] || !node["boundaryConditions"].IsSequence() ||
-      node["boundaryConditions"].size() != 6)
+  if (!node["boundaryConditions"] || !node["boundaryConditions"].IsSequence() || node["boundaryConditions"].size() != 6)
     throw std::runtime_error("YAML error: linkedCell.boundaryConditions must have 6 items");
 
   for (int i = 0; i < 6; ++i) {
@@ -208,9 +199,7 @@ void YamlInputReader::parseLinkedCellSection(const YAML::Node &n, SimulationConf
   }
 }
 
-
-std::array<double, 3> YamlInputReader::parseVec3(const YAML::Node &n,
-                                                 const std::string &fieldName) const {
+std::array<double, 3> YamlInputReader::parseVec3(const YAML::Node &n, const std::string &fieldName) const {
   if (!n || !n.IsSequence() || n.size() != 3) {
     std::ostringstream oss;
     oss << "YAML error: '" << fieldName << "' must be a list of 3 numbers";
@@ -219,8 +208,7 @@ std::array<double, 3> YamlInputReader::parseVec3(const YAML::Node &n,
   return {n[0].as<double>(), n[1].as<double>(), n[2].as<double>()};
 }
 
-std::array<int, 3> YamlInputReader::parseVec3Int(const YAML::Node &n,
-                                                 const std::string &fieldName) const {
+std::array<int, 3> YamlInputReader::parseVec3Int(const YAML::Node &n, const std::string &fieldName) const {
   if (!n || !n.IsSequence() || n.size() != 3) {
     std::ostringstream oss;
     oss << "YAML error: '" << fieldName << "' must be a list of 3 integers";

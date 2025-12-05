@@ -7,6 +7,7 @@
 #include <iostream>
 #include <ostream>
 #include <string>
+
 #include "Arguments.h"
 
 namespace {
@@ -20,9 +21,8 @@ namespace {
  */
 bool isequal(const std::string &a, const std::string &b) {
   if (a.size() != b.size()) return false;
-  return std::equal(a.begin(), a.end(), b.begin(), [](char ca, char cb) {
-    return std::tolower(ca) == std::tolower(cb);
-  });
+  return std::equal(a.begin(), a.end(), b.begin(),
+                    [](char ca, char cb) { return std::tolower(ca) == std::tolower(cb); });
 }
 
 }  // namespace
@@ -43,18 +43,18 @@ void printUsage() {
 }
 
 /**
-     * @brief Extract the values of the parameters used in the simulation.
-     *
-     * As of Assignment3 the command line arguments are:
-     *   - <config_file>: Path to the YAML configuration file.
-     *   - -h / --help  : Print help and exit.
-     *
-     * On invalid input print usage
-     *
-     * @param argc Number of command line arguments
-     * @param argv Array of command line argument strings
-     * @param args Parsed values for each argument (currently only inputFile is set)
-*/
+ * @brief Extract the values of the parameters used in the simulation.
+ *
+ * As of Assignment3 the command line arguments are:
+ *   - <config_file>: Path to the YAML configuration file.
+ *   - -h / --help  : Print help and exit.
+ *
+ * On invalid input print usage
+ *
+ * @param argc Number of command line arguments
+ * @param argv Array of command line argument strings
+ * @param args Parsed values for each argument (currently only inputFile is set)
+ */
 void parseArguments(const int argc, char *argv[], Arguments &args) {
   if (argc < 2) {
     std::cerr << "Invalid number of arguments.\n"

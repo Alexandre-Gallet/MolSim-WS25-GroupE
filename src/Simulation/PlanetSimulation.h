@@ -1,5 +1,5 @@
 /**
-* @file PlanetSimulation.h
+ * @file PlanetSimulation.h
  * @brief Simulation of gravitational planetary dynamics using Störmer-Verlet.
  */
 #pragma once
@@ -13,33 +13,33 @@
  *
  */
 class PlanetSimulation : public Simulation {
-public:
-    /**
-     * @brief Construct a new PlanetSimulation.
-     *
-     * @param cfg YAML-based simulation configuration
-     * @param particles Reference to particle container
-     */
-    PlanetSimulation(const SimulationConfig &cfg, ParticleContainer &particles);
+ public:
+  /**
+   * @brief Construct a new PlanetSimulation.
+   *
+   * @param cfg YAML-based simulation configuration
+   * @param particles Reference to particle container
+   */
+  PlanetSimulation(const SimulationConfig &cfg, ParticleContainer &particles);
 
-    /**
-     * @brief Run the simulation.
-     */
-    void runSimulation() override;
+  /**
+   * @brief Run the simulation.
+   */
+  void runSimulation() override;
 
-private:
-    /**
-     * @brief Write particle positions to an output file.
-     *
-     * @param particles Particle container
-     * @param iteration Current iteration number
-     * @param format Output format (XYZ or VTK)
-     */
-    void plotParticles(ParticleContainer &particles, int iteration, OutputFormat format);
+ private:
+  /**
+   * @brief Write particle positions to an output file.
+   *
+   * @param particles Particle container
+   * @param iteration Current iteration number
+   * @param format Output format (XYZ or VTK)
+   */
+  void plotParticles(ParticleContainer &particles, int iteration, OutputFormat format);
 
-    /// Copy of simulation configuration from YAML.
-    SimulationConfig cfg_;
+  /// Copy of simulation configuration from YAML.
+  SimulationConfig cfg_;
 
-    /// Reference to the main particle container updated during simulation.
-    ParticleContainer &particles_;
+  /// Reference to the main particle container updated during simulation.
+  ParticleContainer &particles_;
 };

@@ -1,11 +1,12 @@
 /**
-* @file MoleculeSimulation.cpp
+ * @file MoleculeSimulation.cpp
  * @brief Implementation of the molecular dynamics simulation using Lennard-Jones.
  */
 
 #include "MoleculeSimulation.h"
 
 #include <spdlog/spdlog.h>
+
 #include <filesystem>
 
 #include "ForceCalculation/LennardJones.h"
@@ -22,19 +23,11 @@ void MoleculeSimulation::runSimulation() {
   SPDLOG_INFO("Generating particles from {} cuboid(s)...", cfg_.cuboids.size());
 
   for (const auto &c : cfg_.cuboids) {
-    ParticleGenerator::generateCuboid(
-        particles_,
-        c.origin,
-        c.numPerDim,
-        c.h,
-        c.mass,
-        c.baseVelocity,
-        c.brownianMean,
-        c.type);
+    ParticleGenerator::generateCuboid(particles_, c.origin, c.numPerDim, c.h, c.mass, c.baseVelocity, c.brownianMean,
+                                      c.type);
   }
 
   SPDLOG_INFO("Generated {} particles from cuboids.", particles_.size());
-
 
   // Lennard-Jones force setup
   LennardJones lj;
@@ -45,13 +38,12 @@ void MoleculeSimulation::runSimulation() {
   lj.calculateF(particles_);
   SPDLOG_DEBUG("Initial Lennard-Jones forces computed (epsilon=5, sigma=1).");
 
-
   // Time integration loop
   double current_time = cfg_.t_start;
   int iteration = 0;
 
-  SPDLOG_INFO("Starting molecule simulation: t_start={}, t_end={}, delta_t={}, output every {} steps.",
-              cfg_.t_start, cfg_.t_end, cfg_.delta_t, cfg_.write_frequency);
+  SPDLOG_INFO("Starting molecule simulation: t_start={}, t_end={}, delta_t={}, output every {} steps.", cfg_.t_start,
+              cfg_.t_end, cfg_.delta_t, cfg_.write_frequency);
 
   while (current_time < cfg_.t_end) {
     // integrate positions (x), then recompute forces, then velocities (v)
@@ -72,10 +64,8 @@ void MoleculeSimulation::runSimulation() {
     current_time += cfg_.delta_t;
   }
 
-  SPDLOG_INFO("Molecule simulation completed after {} iterations (final t = {:.6g}).",
-              iteration, current_time);
+  SPDLOG_INFO("Molecule simulation completed after {} iterations (final t = {:.6g}).", iteration, current_time);
 }
-
 
 void MoleculeSimulation::plotParticles(ParticleContainer &particles, int iteration, OutputFormat format) {
   std::filesystem::create_directories("output");
@@ -85,8 +75,7 @@ void MoleculeSimulation::plotParticles(ParticleContainer &particles, int iterati
 
   const auto writer = WriterFactory::createWriter(format);
 
-  SPDLOG_DEBUG("Plotting {} particles at iteration {} to '{}'.",
-               particles.size(), iteration, out_name);
+  SPDLOG_DEBUG("Plotting {} particles at iteration {} to '{}'.", particles.size(), iteration, out_name);
 
   writer->plotParticles(particles, out_name, iteration);
 }

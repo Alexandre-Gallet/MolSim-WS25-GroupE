@@ -5,8 +5,9 @@
 
 #include "PlanetSimulation.h"
 
-#include <filesystem>
 #include <spdlog/spdlog.h>
+
+#include <filesystem>
 
 #include "../ForceCalculation/StormerVerlet.h"
 #include "../outputWriter/WriterFactory.h"
@@ -24,8 +25,8 @@ void PlanetSimulation::runSimulation() {
   double current_time = cfg_.t_start;
   int iteration = 0;
 
-  SPDLOG_INFO("Starting planet simulation: t_start={}, t_end={}, delta_t={}, output every {} steps.",
-               cfg_.t_start, cfg_.t_end, cfg_.delta_t, cfg_.write_frequency);
+  SPDLOG_INFO("Starting planet simulation: t_start={}, t_end={}, delta_t={}, output every {} steps.", cfg_.t_start,
+              cfg_.t_end, cfg_.delta_t, cfg_.write_frequency);
 
   // Time integration loop (Störmer–Verlet)
 
@@ -51,8 +52,7 @@ void PlanetSimulation::runSimulation() {
     current_time += cfg_.delta_t;
   }
 
-  SPDLOG_INFO("Planet simulation completed after {} iterations (final t = {:.6g}).",
-               iteration, current_time);
+  SPDLOG_INFO("Planet simulation completed after {} iterations (final t = {:.6g}).", iteration, current_time);
 }
 
 void PlanetSimulation::plotParticles(ParticleContainer &particles, int iteration, OutputFormat format) {

@@ -17,4 +17,3 @@ inline OutputFormat parse_output(const std::string &output_format) {
   }
   return OutputFormat::XYZ;
 }
-
