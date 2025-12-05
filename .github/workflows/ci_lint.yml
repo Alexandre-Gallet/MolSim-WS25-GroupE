@@ -64,6 +64,34 @@ jobs:
           key: ${{ runner.os }}-cmake-${{ hashFiles('CMakeLists.txt', 'cmake/**/*.cmake') }}
           restore-keys: |
             ${{ runner.os }}-cmake-
+            
+
+      # additional steps to ensure that github actions use the same version of clang-format as our local machines. Needs reworking for caching and speedup
+      - name: Add LLVM repository
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget gnupg lsb-release
+          echo "deb http://apt.llvm.org/$(lsb_release -sc)/ llvm-toolchain-$(lsb_release -sc)-21 main" \
+            | sudo tee /etc/apt/sources.list.d/llvm21.list
+          wget -qO - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo apt-get update
+
+
+      - name: Install clang-format-21
+        run: |
+          sudo apt-get install -y clang-format-21
+          sudo ln -sf /usr/bin/clang-format-21 /usr/bin/clang-format
+
+      - name: Force GCC compiler
+        run: |
+          sudo update-alternatives --set cc /usr/bin/gcc
+          sudo update-alternatives --set c++ /usr/bin/g++
+          gcc --version
+          g++ --version
+
+      - name: Verify clang-format version
+        run: clang-format --version
+
 
       # Step 7: Configure CMake (needed for compile_commands.json for clang-tidy)
       - name: Configure project
