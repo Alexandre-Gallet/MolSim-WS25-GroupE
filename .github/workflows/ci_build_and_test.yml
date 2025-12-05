@@ -164,3 +164,7 @@ jobs:
       # Step 8: Run tests with asan build
       - name: Run ASan tests
         run: ctest --test-dir build_asan --output-on-failure -j"$(nproc)"
+
+      - name: Debug clang-format diff
+        run: |
+          git diff --color | sed -e 's/^/CF: /'
