@@ -65,12 +65,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cmake-
 
-      # Install clang-format 21 to match local development environment
+          # Install clang-format 21 to match local version
       - name: Install clang-format 21
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-format-21
+          sudo apt-get install -y wget gnupg
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 21
           sudo ln -sf /usr/bin/clang-format-21 /usr/bin/clang-format
+
+      - name: Verify clang-format version
+        run: clang-format --version
 
       # Step 7: Configure CMake (needed for compile_commands.json for clang-tidy)
       - name: Configure project
