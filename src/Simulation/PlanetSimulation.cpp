@@ -1,48 +1,64 @@
+/**
+ * @file PlanetSimulation.cpp
+ * @brief Implementation of gravitational planet simulation.
+ */
 
 #include "PlanetSimulation.h"
 
+#include <spdlog/spdlog.h>
+
 #include <filesystem>
-#include <iostream>
 
 #include "../ForceCalculation/StormerVerlet.h"
-#include "../inputReader/FileReader.h"
 #include "../outputWriter/WriterFactory.h"
 
-PlanetSimulation::PlanetSimulation(const Arguments &args, ParticleContainer &particles)
-    : inputFile(args.inputFile),
-      t_start(args.t_start),
-      t_end(args.t_end),
-      delta_t(args.delta_t),
-      outputFormat(args.output_format),
-      particles(particles) {}
+PlanetSimulation::PlanetSimulation(const SimulationConfig &cfg, ParticleContainer &particles)
+    : cfg_(cfg), particles_(particles) {}
 
 void PlanetSimulation::runSimulation() {
-  FileReader fileReader;
-  fileReader.readFile(getParticles(), getInputFile());
-  double current_time = getTStart();
+  // Planet simulation initial condition setup
+
+  if (particles_.empty()) {
+    SPDLOG_WARN("PlanetSimulation: No initial particles present! Check YAML configuration.");
+  }
+
+  double current_time = cfg_.t_start;
   int iteration = 0;
 
-  // for this loop, we assume: current x, current f and current v are known
-  while (current_time < getTEnd()) {
-    StormerVerlet verlet;
-    // calculate new X
-    StormerVerlet::calculateX(getParticles(), getDeltaT());
-    // calculate new F
-    verlet.calculateF(getParticles());
-    // calculate new V
-    StormerVerlet::calculateV(getParticles(), getDeltaT());
-    iteration++;
-    if (iteration % 10 == 0) {
-      plotParticles(getParticles(), iteration, getOutputFormat());
-    }
-    std::cout << "Iteration " << iteration << " finished." << std::endl;
+  SPDLOG_INFO("Starting planet simulation: t_start={}, t_end={}, delta_t={}, output every {} steps.", cfg_.t_start,
+              cfg_.t_end, cfg_.delta_t, cfg_.write_frequency);
 
-    current_time += getDeltaT();
+  // Time integration loop (Störmer–Verlet)
+
+  StormerVerlet verlet;
+
+  while (current_time < cfg_.t_end) {
+    // calculate new positions
+    StormerVerlet::calculateX(particles_, cfg_.delta_t);
+
+    // calculate new forces
+    verlet.calculateF(particles_);
+
+    // calculate new velocities
+    StormerVerlet::calculateV(particles_, cfg_.delta_t);
+
+    iteration++;
+
+    if (iteration % cfg_.write_frequency == 0) {
+      SPDLOG_INFO("Writing output at iteration {} (t = {}).", iteration, current_time);
+      plotParticles(particles_, iteration, cfg_.output_format);
+    }
+
+    current_time += cfg_.delta_t;
   }
+
+  SPDLOG_INFO("Planet simulation completed after {} iterations (final t = {:.6g}).", iteration, current_time);
 }
+
 void PlanetSimulation::plotParticles(ParticleContainer &particles, int iteration, OutputFormat format) {
   std::filesystem::create_directories("output");
-  std::string out_name("output/MD_vtk");
+
+  std::string out_name = "outputVTK";
 
   const auto writer = WriterFactory::createWriter(format);
 

@@ -1,5 +1,7 @@
-
-
+/**
+ * @file SimulationFactory.cpp
+ * @brief Implementation of the SimulationFactory.
+ */
 #include "SimulationFactory.h"
 
 #include <memory>
@@ -7,14 +9,14 @@
 #include "MoleculeSimulation.h"
 #include "PlanetSimulation.h"
 
-std::unique_ptr<Simulation> SimulationFactory::createSimulation(SimulationType type, Arguments &args,
+std::unique_ptr<Simulation> SimulationFactory::createSimulation(const SimulationConfig &cfg,
                                                                 ParticleContainer &particles) {
-  switch (type) {
+  switch (cfg.sim_type) {
     case SimulationType::Molecule: {
-      return std::make_unique<MoleculeSimulation>(args, particles);
+      return std::make_unique<MoleculeSimulation>(cfg, particles);
     }
     default: {
-      return std::make_unique<PlanetSimulation>(args, particles);
+      return std::make_unique<PlanetSimulation>(cfg, particles);
     }
   }
 }
