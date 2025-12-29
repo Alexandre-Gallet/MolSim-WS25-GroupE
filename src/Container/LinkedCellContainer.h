@@ -1,10 +1,11 @@
 /**
  * @file LinkedCellContainer.h
- * @brief Linked-cell particle container for efficient neighbor queries.
+ * @brief Linked-cell particle container for efficient neighbor queries with boundary handling.
  *
  * This container organizes particles into a padded 3D grid (inner, boundary, halo cells)
- * to accelerate pairwise interactions. Particles are owned by the container; cells store
- * pointers into the owned storage.
+ * to accelerate pairwise interactions. It supports outflow, reflecting, and periodic boundary
+ * conditions by maintaining halos and generating ghost particles where needed. Particles are
+ * owned by the container; cells store pointers into the owned storage for fast traversal.
  *
  * \image html runtime_per_iter.jpeg
  * \image html runtime_wall_vs_particles.jpeg
@@ -17,6 +18,7 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <unordered_set>
 #include <vector>
 
 #include "Container.h"
@@ -24,11 +26,12 @@
 #include "spdlog/spdlog.h"
 
 enum class Face : uint8_t { XMin = 0, XMax = 1, YMin = 2, YMax = 3, ZMin = 4, ZMax = 5 };
-enum class BoundaryCondition : uint8_t { None, Outflow, Reflecting };
+enum class BoundaryCondition : uint8_t { None, Outflow, Reflecting, Periodic };
 inline BoundaryCondition parseBoundaryCondition(const std::string &s) {
   if (s == "None" || s == "none") return BoundaryCondition::None;
   if (s == "Outflow" || s == "outflow") return BoundaryCondition::Outflow;
   if (s == "Reflecting" || s == "reflecting") return BoundaryCondition::Reflecting;
+  if (s == "Periodic" || s == "periodic") return BoundaryCondition::Periodic;
 
   SPDLOG_ERROR("Invalid boundary condition: {}", s);
   return BoundaryCondition::None;  // safe fallback
@@ -45,7 +48,10 @@ struct LinkedCell {
  * @brief Grid-based particle container implementing the linked-cell algorithm.
  *
  * Cells are laid out in a padded grid (+1 layer per face) to include halos. Each cell
- * holds pointers to particles owned by the container.
+ * holds pointers to particles owned by the container. Boundary conditions are implemented
+ * by rebuilding halos on demand: outflow drops halo particles, reflecting mirrors boundary
+ * particles into halos with flipped velocity on the normal axis, and periodic copies
+ * boundary particles to the opposite halo shifted by the domain length.
  */
 class LinkedCellContainer : public Container {
  public:
@@ -58,32 +64,43 @@ class LinkedCellContainer : public Container {
   /**
    * @brief Construct a linked-cell grid for the given domain and cutoff.
    * @param r_cutoff Interaction cutoff; defines cell size.
-   * @param domain_size Physical domain extents (x,y,z). Origin is (0,0,0).
+   * @param domain_size Physical domain extents (x,y,z). Origin starts at (0,0,0) unless shifted for thin z-domains.
    */
   LinkedCellContainer(double r_cutoff, const std::array<double, 3> &domain_size);
 
-  /// Configure boundary condition handling applied during rebuild().
+  /**
+   * @brief Configure boundary conditions for each face.
+   * @param conditions Order: XMin, XMax, YMin, YMax, ZMin, ZMax.
+   *
+   * Settings are applied on the next @ref rebuild invocation.
+   */
   void setBoundaryConditions(const std::array<BoundaryCondition, 6> &conditions);
   [[nodiscard]] auto getBoundaryConditions() const -> const std::array<BoundaryCondition, 6> &;
 
-  /// Rebuild the cell structure (clears particles and reinitializes metadata).
+  /**
+   * @brief Rebuild cell occupancy and halos.
+   *
+   * Clears cell membership, wraps particles across periodic faces, reassigns particles to
+   * cells, removes halo particles for outflow/none, and generates reflecting or periodic
+   * ghosts as configured.
+   */
   void rebuild();
-  /// Clear all halo particles.
+  /// @brief Clear all halo particles (used by outflow and before ghost creation).
   void deleteHaloCells();
 
-  /// Place a particle into the appropriate cell (inner/boundary/halo).
+  /// @brief Store a copy of the given particle and place it in the grid.
   auto addParticle(Particle &particle) -> Particle & override;
-  /// Emplace a particle with explicit state (Container interface).
+  /// @brief Emplace a particle with explicit state (Container interface).
   auto emplaceParticle(const std::array<double, 3> &pos, const std::array<double, 3> &vel, double mass, int type)
       -> Particle & override;
   auto emplaceParticle(const std::array<double, 3> &pos, const std::array<double, 3> &vel, double mass) -> Particle &;
-  /// Total number of particles referenced by the grid.
+  /// @brief Total number of owned particles (ghosts excluded).
   [[nodiscard]] auto size() const noexcept -> std::size_t override;
-  /// Check if the grid currently holds no particles.
+  /// @brief Check if the grid currently holds no particles.
   [[nodiscard]] auto empty() const noexcept -> bool override;
-  /// Reserve capacity.
+  /// @brief Reserve storage for owned particles.
   auto reserve(std::size_t capacity) -> void override;
-  /// Remove all particle references from all cells.
+  /// @brief Remove all particles and clear cell membership.
   auto clear() noexcept -> void override;
 
   /// Iteration over owned particles.
@@ -102,11 +119,13 @@ class LinkedCellContainer : public Container {
   }
   /**
    * @brief Iterate over all boundary particles (inside domain, adjacent to halos).
+   * @param visitor Function called with each boundary particle pointer.
    */
   template <typename Func>
   void forEachBoundaryParticle(Func visitor);
   /**
    * @brief Iterate over all halo particles (outside domain, in padded layer).
+   * @param visitor Function called with each halo particle pointer.
    */
   template <typename Func>
   void forEachHaloParticle(Func visitor);
@@ -116,6 +135,8 @@ class LinkedCellContainer : public Container {
   void initCells();
   void placeParticle(Particle *particle);
   void createGhostsForFace(Face face);
+  void createPeriodicGhostsForFace(Face face);  ///< Mirror boundary particles into opposite halo for periodic BC.
+  void wrapPeriodicParticles();                  ///< Wrap owned particles back into domain for periodic BC.
   [[nodiscard]] auto to3DIndex(std::size_t linear_index) const -> std::array<std::size_t, 3>;
   void logParticleCounts() const;
 
@@ -144,6 +165,23 @@ class LinkedCellContainer : public Container {
   }
   static constexpr auto isUpper(Face face) -> bool {
     return face == Face::XMax || face == Face::YMax || face == Face::ZMax;
+  }
+  static constexpr Face opposite(Face face) {
+    switch (face) {
+      case Face::XMin:
+        return Face::XMax;
+      case Face::XMax:
+        return Face::XMin;
+      case Face::YMin:
+        return Face::YMax;
+      case Face::YMax:
+        return Face::YMin;
+      case Face::ZMin:
+        return Face::ZMax;
+      case Face::ZMax:
+        return Face::ZMin;
+    }
+    return Face::XMin;
   }
 
   storage_type cells;

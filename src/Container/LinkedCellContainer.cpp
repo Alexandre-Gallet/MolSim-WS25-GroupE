@@ -1,3 +1,7 @@
+//
+// Created by darig on 11/20/2025.
+//
+
 #include "LinkedCellContainer.h"
 
 #include <algorithm>
@@ -143,6 +147,8 @@ void LinkedCellContainer::rebuild() {
     cell.particles.clear();
   }
 
+  wrapPeriodicParticles();
+
   for (auto &p : owned_particles) {
     placeParticle(p.get());
   }
@@ -153,6 +159,8 @@ void LinkedCellContainer::rebuild() {
   for (std::size_t i = 0; i < faces.size(); ++i) {
     if (boundary_conditions.at(i) == BoundaryCondition::Reflecting) {
       createGhostsForFace(faces.at(i));
+    } else if (boundary_conditions.at(i) == BoundaryCondition::Periodic) {
+      createPeriodicGhostsForFace(faces.at(i));
     }
   }
 
@@ -265,5 +273,68 @@ void LinkedCellContainer::createGhostsForFace(Face face) {
     ghost->setX(ghost_pos);
     ghost->setV(ghost_vel);
     placeParticle(ghost);
+  }
+}
+
+void LinkedCellContainer::createPeriodicGhostsForFace(Face face) {
+  const auto bc = boundary_conditions.at(static_cast<std::size_t>(face));
+  if (bc != BoundaryCondition::Periodic) {
+    return;
+  }
+
+  const auto axis = axisFromFace(face);
+  const bool upper = isUpper(face);
+  const double shift = upper ? domain_size.at(axis) : -domain_size.at(axis);
+  const auto opposite_face = opposite(face);
+  const auto &source_cells = boundary_cells_by_face.at(static_cast<std::size_t>(opposite_face));
+
+  std::vector<Particle *> candidates;
+  for (auto *cell : source_cells) {
+    candidates.insert(candidates.end(), cell->particles.begin(), cell->particles.end());
+  }
+
+  for (auto *particle : candidates) {
+    ghost_particles.push_back(std::make_unique<Particle>(*particle));
+    auto *ghost = ghost_particles.back().get();
+
+    auto ghost_pos = ghost->getX();
+    ghost_pos.at(axis) += shift;
+    ghost->setX(ghost_pos);
+
+    placeParticle(ghost);
+  }
+}
+
+void LinkedCellContainer::wrapPeriodicParticles() {
+  for (auto &p : owned_particles) {
+    auto pos = p->getX();
+    bool changed = false;
+
+    for (int axis = 0; axis < 3; ++axis) {
+      const auto min_face = static_cast<std::size_t>(axis * 2);
+      const auto max_face = static_cast<std::size_t>(axis * 2 + 1);
+      const double lower = domain_min.at(axis);
+      const double upper = lower + domain_size.at(axis);
+      const double span = domain_size.at(axis);
+      if (span <= 0.0) {
+        continue;
+      }
+
+      if (pos.at(axis) < lower && boundary_conditions.at(min_face) == BoundaryCondition::Periodic) {
+        while (pos.at(axis) < lower) {
+          pos.at(axis) += span;
+        }
+        changed = true;
+      } else if (pos.at(axis) >= upper && boundary_conditions.at(max_face) == BoundaryCondition::Periodic) {
+        while (pos.at(axis) >= upper) {
+          pos.at(axis) -= span;
+        }
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      p->setX(pos);
+    }
   }
 }
