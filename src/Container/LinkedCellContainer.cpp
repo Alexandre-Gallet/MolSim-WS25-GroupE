@@ -1,12 +1,9 @@
-//
-// Created by darig on 11/20/2025.
-//
-
 #include "LinkedCellContainer.h"
 
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <unordered_set>
 
 LinkedCellContainer::LinkedCellContainer() : LinkedCellContainer(1.0, {1.0, 1.0, 1.0}) {}
 
@@ -53,6 +50,9 @@ void LinkedCellContainer::initCells() {
   cells.reserve(total_cells);
   halo_cells.clear();
   boundary_cells.clear();
+  for (auto &per_face : boundary_cells_by_face) {
+    per_face.clear();
+  }
 
   for (std::size_t z = 0; z < padded_dims[2]; ++z) {
     for (std::size_t y = 0; y < padded_dims[1]; ++y) {
@@ -77,6 +77,12 @@ void LinkedCellContainer::initCells() {
           halo_cells.push_back(stored);
         } else if (stored->type == CellType::Boundary) {
           boundary_cells.push_back(stored);
+          if (x == 1) boundary_cells_by_face[static_cast<std::size_t>(Face::XMin)].push_back(stored);
+          if (x == padded_dims[0] - 2) boundary_cells_by_face[static_cast<std::size_t>(Face::XMax)].push_back(stored);
+          if (y == 1) boundary_cells_by_face[static_cast<std::size_t>(Face::YMin)].push_back(stored);
+          if (y == padded_dims[1] - 2) boundary_cells_by_face[static_cast<std::size_t>(Face::YMax)].push_back(stored);
+          if (z == 1) boundary_cells_by_face[static_cast<std::size_t>(Face::ZMin)].push_back(stored);
+          if (z == padded_dims[2] - 2) boundary_cells_by_face[static_cast<std::size_t>(Face::ZMax)].push_back(stored);
         }
       }
     }
@@ -84,17 +90,16 @@ void LinkedCellContainer::initCells() {
 }
 
 void LinkedCellContainer::deleteHaloCells() {
-  std::vector<Particle *> to_delete;
-  to_delete.reserve(size());
+  std::unordered_set<Particle *> halo_particles;
+  halo_particles.reserve(size());
   for (auto *cell : halo_cells) {
-    to_delete.insert(to_delete.end(), cell->particles.begin(), cell->particles.end());
+    halo_particles.insert(cell->particles.begin(), cell->particles.end());
     cell->particles.clear();
   }
 
   owned_particles.erase(std::remove_if(owned_particles.begin(), owned_particles.end(),
                                        [&](const auto &ptr) -> bool {
-                                         return std::find(to_delete.begin(), to_delete.end(), ptr.get()) !=
-                                                to_delete.end();
+                                         return halo_particles.find(ptr.get()) != halo_particles.end();
                                        }),
                         owned_particles.end());
 }
@@ -133,7 +138,7 @@ auto LinkedCellContainer::clear() noexcept -> void {
 }
 
 void LinkedCellContainer::rebuild() {
-  ghost_particles.clear();  // drop ghosts from previous step
+  ghost_particles.clear();  
   for (auto &cell : cells) {
     cell.particles.clear();
   }
@@ -231,17 +236,12 @@ void LinkedCellContainer::createGhostsForFace(Face face) {
 
   const auto axis = axisFromFace(face);
   const bool upper = isUpper(face);
-  const auto boundary_coord = upper ? padded_dims.at(axis) - 2 : 1;
+  const auto face_index = static_cast<std::size_t>(face);
 
   std::vector<Particle *> candidates;
 
   // Collect particles first to avoid mutating cell storage while iterating it.
-  for (auto *cell : boundary_cells) {
-    const auto linear_index = static_cast<std::size_t>(cell - cells.data());
-    const auto coords = to3DIndex(linear_index);
-    if (coords.at(axis) != boundary_coord) {
-      continue;
-    }
+  for (auto *cell : boundary_cells_by_face.at(face_index)) {
     candidates.insert(candidates.end(), cell->particles.begin(), cell->particles.end());
   }
 

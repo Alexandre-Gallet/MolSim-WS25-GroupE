@@ -156,6 +156,7 @@ class LinkedCellContainer : public Container {
   std::array<std::size_t, 3> cells_per_dim{};
   std::array<std::size_t, 3> padded_dims{};
   std::vector<LinkedCell *> boundary_cells;
+  std::array<std::vector<LinkedCell *>, 6> boundary_cells_by_face;
   std::vector<LinkedCell *> halo_cells;
   std::array<BoundaryCondition, 6> boundary_conditions{BoundaryCondition::Outflow, BoundaryCondition::Outflow,
                                                        BoundaryCondition::Outflow, BoundaryCondition::Outflow,
