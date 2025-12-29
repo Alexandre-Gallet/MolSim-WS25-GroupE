@@ -115,7 +115,7 @@ TEST(LinkedCellContainerTest, OutflowRemovesHaloParticlesOnRebuild) {
   const auto &remaining = *container.begin();
   EXPECT_DOUBLE_EQ(remaining.getX().at(0), 1.0);
 }
-/*
+
 TEST(LinkedCellContainerTest, ReflectingFaceCreatesGhostAndFlushesOnNextRebuild) {
   LinkedCellContainer container(1.0, {3.0, 3.0, 3.0});
   std::array<BoundaryCondition, 6> bc{};
@@ -128,13 +128,13 @@ TEST(LinkedCellContainerTest, ReflectingFaceCreatesGhostAndFlushesOnNextRebuild)
 
   container.rebuild();
 
-  ASSERT_EQ(container.size(), 2u);  // original + mirrored ghost
+  ASSERT_EQ(container.size(), 1u);  // ghosts live in the halo, not owned storage
   int ghosts_on_negative_x = 0;
-  for (auto &p : container) {
-    const auto &pos = p.getX();
-    const auto &vel = p.getV();
+  container.forEachHaloParticle([&](Particle *p) {
+    const auto &pos = p->getX();
+    const auto &vel = p->getV();
+    ghosts_on_negative_x += pos[0] < 0.0 ? 1 : 0;
     if (pos[0] < 0.0) {
-      ghosts_on_negative_x++;
       EXPECT_DOUBLE_EQ(pos[0], -original.getX()[0]);
       EXPECT_DOUBLE_EQ(pos[1], original.getX()[1]);
       EXPECT_DOUBLE_EQ(pos[2], original.getX()[2]);
@@ -142,7 +142,7 @@ TEST(LinkedCellContainerTest, ReflectingFaceCreatesGhostAndFlushesOnNextRebuild)
       EXPECT_DOUBLE_EQ(vel[1], original.getV()[1]);
       EXPECT_DOUBLE_EQ(vel[2], original.getV()[2]);
     }
-  }
+  });
   EXPECT_EQ(ghosts_on_negative_x, 1);
 
   bc[static_cast<std::size_t>(Face::XMin)] = BoundaryCondition::Outflow;
@@ -151,9 +151,11 @@ TEST(LinkedCellContainerTest, ReflectingFaceCreatesGhostAndFlushesOnNextRebuild)
 
   EXPECT_EQ(container.size(), 1u);
   EXPECT_DOUBLE_EQ(container.begin()->getX()[0], original.getX()[0]);
+  int halo_after_flush = 0;
+  container.forEachHaloParticle([&](Particle *) { halo_after_flush++; });
+  EXPECT_EQ(halo_after_flush, 0);
 }
-*/
-/*
+
 TEST(LinkedCellContainerTest, OnlyReflectingFacesCreateGhosts) {
   LinkedCellContainer container(1.0, {3.0, 3.0, 3.0});
   std::array<BoundaryCondition, 6> bc{};
@@ -168,17 +170,15 @@ TEST(LinkedCellContainerTest, OnlyReflectingFacesCreateGhosts) {
 
   int ghosts_on_negative_x = 0;
   int particles_with_negative_y = 0;
-  for (auto &p : container) {
-    ghosts_on_negative_x += p.getX()[0] < 0.0 ? 1 : 0;
-    particles_with_negative_y += p.getX()[1] < 0.0 ? 1 : 0;
-  }
+  container.forEachHaloParticle([&](Particle *p) {
+    ghosts_on_negative_x += p->getX()[0] < 0.0 ? 1 : 0;
+    particles_with_negative_y += p->getX()[1] < 0.0 ? 1 : 0;
+  });
 
-  EXPECT_EQ(container.size(), 3u);  // two originals + one ghost
+  EXPECT_EQ(container.size(), 2u);  // only the two originals are owned
   EXPECT_EQ(ghosts_on_negative_x, 1);
   EXPECT_EQ(particles_with_negative_y, 0);
 }
-*/
-/*
 TEST(LinkedCellContainerTest, CornerParticleMirroredCorrectly) {
   LinkedCellContainer container(1.0, {3.0, 3.0, 3.0});
   std::array<BoundaryCondition, 6> bc{};
@@ -191,37 +191,36 @@ TEST(LinkedCellContainerTest, CornerParticleMirroredCorrectly) {
 
   container.rebuild();
 
-  EXPECT_EQ(container.size(), 3u);  // original + two ghosts (one per reflecting face)
+  EXPECT_EQ(container.size(), 1u);  // ghosts live in halo
 
   int ghosts_on_negative_x = 0;
   int ghosts_on_negative_y = 0;
   bool saw_x_ghost = false;
   bool saw_y_ghost = false;
-  for (auto &p : container) {
-    ghosts_on_negative_x += p.getX()[0] < 0.0 ? 1 : 0;
-    ghosts_on_negative_y += p.getX()[1] < 0.0 ? 1 : 0;
-    if (p.getX()[0] < 0.0) {
-      EXPECT_DOUBLE_EQ(p.getX()[0], -corner.getX()[0]);
-      EXPECT_DOUBLE_EQ(p.getX()[1], corner.getX()[1]);
-      EXPECT_DOUBLE_EQ(p.getV()[0], -corner.getV()[0]);
-      EXPECT_DOUBLE_EQ(p.getV()[1], corner.getV()[1]);
+  container.forEachHaloParticle([&](Particle *p) {
+    ghosts_on_negative_x += p->getX()[0] < 0.0 ? 1 : 0;
+    ghosts_on_negative_y += p->getX()[1] < 0.0 ? 1 : 0;
+    if (p->getX()[0] < 0.0) {
+      EXPECT_DOUBLE_EQ(p->getX()[0], -corner.getX()[0]);
+      EXPECT_DOUBLE_EQ(p->getX()[1], corner.getX()[1]);
+      EXPECT_DOUBLE_EQ(p->getV()[0], -corner.getV()[0]);
+      EXPECT_DOUBLE_EQ(p->getV()[1], corner.getV()[1]);
       saw_x_ghost = true;
     }
-    if (p.getX()[1] < 0.0) {
-      EXPECT_DOUBLE_EQ(p.getX()[0], corner.getX()[0]);
-      EXPECT_DOUBLE_EQ(p.getX()[1], -corner.getX()[1]);
-      EXPECT_DOUBLE_EQ(p.getV()[0], corner.getV()[0]);
-      EXPECT_DOUBLE_EQ(p.getV()[1], -corner.getV()[1]);
+    if (p->getX()[1] < 0.0) {
+      EXPECT_DOUBLE_EQ(p->getX()[0], corner.getX()[0]);
+      EXPECT_DOUBLE_EQ(p->getX()[1], -corner.getX()[1]);
+      EXPECT_DOUBLE_EQ(p->getV()[0], corner.getV()[0]);
+      EXPECT_DOUBLE_EQ(p->getV()[1], -corner.getV()[1]);
       saw_y_ghost = true;
     }
-  }
+  });
 
   EXPECT_EQ(ghosts_on_negative_x, 1);
   EXPECT_EQ(ghosts_on_negative_y, 1);
   EXPECT_TRUE(saw_x_ghost);
   EXPECT_TRUE(saw_y_ghost);
 }
-*/
 TEST(LinkedCellContainerTest, NoneBoundaryDoesNotReflectHaloParticles) {
   LinkedCellContainer container(1.0, {3.0, 3.0, 3.0});
   std::array<BoundaryCondition, 6> bc{};
@@ -237,7 +236,7 @@ TEST(LinkedCellContainerTest, NoneBoundaryDoesNotReflectHaloParticles) {
   EXPECT_EQ(container.size(), 1u);
   EXPECT_GT(container.begin()->getX()[0], 0.0);
 }
-/*
+
 TEST(LinkedCellContainerTest, ReflectingBoundaryMirrorsPositionAndVelocity) {
   LinkedCellContainer container(1.0, {3.0, 3.0, 3.0});
   std::array<BoundaryCondition, 6> bc{};
@@ -249,27 +248,24 @@ TEST(LinkedCellContainerTest, ReflectingBoundaryMirrorsPositionAndVelocity) {
 
   container.rebuild();
 
-  EXPECT_EQ(container.size(), 2u);
+  EXPECT_EQ(container.size(), 1u);  // ghost stays in halo
+
+  const auto &pos = container.begin()->getX();
+  const auto &vel = container.begin()->getV();
+  EXPECT_DOUBLE_EQ(pos[0], 0.25);
+  EXPECT_DOUBLE_EQ(vel[0], 1.5);
 
   int ghosts_on_negative_x = 0;
-  for (auto &p : container) {
-    const auto &pos = p.getX();
-    const auto &vel = p.getV();
-    if (&p == &original) {
-      EXPECT_DOUBLE_EQ(pos[0], 0.25);
-      EXPECT_DOUBLE_EQ(vel[0], 1.5);
-      continue;
-    }
-    if (pos[0] < 0.0) {
-      ghosts_on_negative_x++;
-      EXPECT_DOUBLE_EQ(pos[0], -original.getX()[0]);
-      EXPECT_DOUBLE_EQ(pos[1], original.getX()[1]);
-      EXPECT_DOUBLE_EQ(pos[2], original.getX()[2]);
-      EXPECT_DOUBLE_EQ(vel[0], -original.getV()[0]);
-      EXPECT_DOUBLE_EQ(vel[1], original.getV()[1]);
-      EXPECT_DOUBLE_EQ(vel[2], original.getV()[2]);
-    }
-  }
+  container.forEachHaloParticle([&](Particle *p) {
+    const auto &ghost_pos = p->getX();
+    const auto &ghost_vel = p->getV();
+    ghosts_on_negative_x += ghost_pos[0] < 0.0 ? 1 : 0;
+    EXPECT_DOUBLE_EQ(ghost_pos[0], -original.getX()[0]);
+    EXPECT_DOUBLE_EQ(ghost_pos[1], original.getX()[1]);
+    EXPECT_DOUBLE_EQ(ghost_pos[2], original.getX()[2]);
+    EXPECT_DOUBLE_EQ(ghost_vel[0], -original.getV()[0]);
+    EXPECT_DOUBLE_EQ(ghost_vel[1], original.getV()[1]);
+    EXPECT_DOUBLE_EQ(ghost_vel[2], original.getV()[2]);
+  });
   EXPECT_EQ(ghosts_on_negative_x, 1);
 }
-*/
