@@ -12,6 +12,7 @@ void CuboidGenerator::generateCuboid(Container &container, const std::array<doub
                                      const std::array<int, 3> &numPerDim, const std::array<double, 3> &dom_size,
                                      double h, double mass, const std::array<double, 3> &baseVelocity,
                                      double brownianMean, int type) {
+  int dimension = (numPerDim[2] > 1) ? 3 : 2;
   const int total = numPerDim[0] * numPerDim[1] * numPerDim[2];
   container.reserve(container.size() + total);
 
@@ -28,8 +29,8 @@ void CuboidGenerator::generateCuboid(Container &container, const std::array<doub
         vel[0] += brownian[0];
         vel[1] += brownian[1];
         // the simulation still doesn't work for 3D input, we're working on fixing this condition
-        if (dom_size[2] > 1.) {
-          // vel[2] += brownian[2];
+        if (dimension == 3) {
+          vel[2] += brownian[2];
         }
 
         container.emplaceParticle(pos, vel, mass, type);

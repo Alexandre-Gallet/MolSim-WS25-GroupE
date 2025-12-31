@@ -14,8 +14,8 @@
 #include <list>
 #include <string>
 
-#include "../Container/Particle.h"
-#include "../Container/ParticleContainer.h"
+#include "Container/Particle.h"
+#include "Container/ParticleContainer.h"
 #include "OutputWriter.h"
 
 namespace outputWriter {

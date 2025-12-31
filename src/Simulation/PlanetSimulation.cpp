@@ -9,8 +9,8 @@
 
 #include <filesystem>
 
-#include "../ForceCalculation/StormerVerlet.h"
-#include "../outputWriter/WriterFactory.h"
+#include "ForceCalculation/StormerVerlet.h"
+#include "outputWriter/WriterFactory.h"
 
 PlanetSimulation::PlanetSimulation(const SimulationConfig &cfg, Container &particles)
     : cfg_(cfg), particles_(particles) {}

@@ -5,7 +5,7 @@
 #pragma once
 #include <memory>
 
-#include "../Container/ParticleContainer.h"
+#include "Container/ParticleContainer.h"
 #include "Simulation.h"
 #include "inputReader/SimulationConfig.h"
 

@@ -4,10 +4,10 @@
  */
 #pragma once
 
-#include "../Container/ParticleContainer.h"
-#include "../Simulation/Simulation.h"
-#include "../inputReader/Arguments.h"
-#include "../inputReader/SimulationConfig.h"
+#include "Container/ParticleContainer.h"
+#include "Simulation/Simulation.h"
+#include "inputReader/Arguments.h"
+#include "inputReader/SimulationConfig.h"
 #include "Simulation.h"
 
 /**
