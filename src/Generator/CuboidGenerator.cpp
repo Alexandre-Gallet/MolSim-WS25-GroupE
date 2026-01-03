@@ -28,7 +28,6 @@ void CuboidGenerator::generateCuboid(Container &container, const std::array<doub
 
         vel[0] += brownian[0];
         vel[1] += brownian[1];
-        // the simulation still doesn't work for 3D input, we're working on fixing this condition
         if (dimension == 3) {
           vel[2] += brownian[2];
         }
