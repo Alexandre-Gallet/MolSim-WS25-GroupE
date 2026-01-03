@@ -160,6 +160,10 @@ void YamlInputReader::parseCuboidsSection(const YAML::Node &n, SimulationConfig 
 // Parsing Discs section
 
 void YamlInputReader::parseDiscsSection(const YAML::Node &n, SimulationConfig &cfg) const {
+  // Allow null or empty discs
+  if (!n || n.IsNull()) {
+    return;  // no discs defined
+  }
   if (!n.IsSequence()) throw std::runtime_error("YAML error: 'discs' must be a sequence");
 
   for (const auto &node : n) {
