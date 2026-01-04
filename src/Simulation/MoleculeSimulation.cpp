@@ -12,6 +12,7 @@
 #include "Container/ContainerType.h"
 #include "Container/LinkedCellContainer.h"
 #include "ForceCalculation/LennardJones.h"
+#include "inputReader/CheckpointReader.h"
 #include "Generator/CuboidGenerator.h"
 #include "Generator/DiscGenerator.h"
 #include "Generator/ParticleGenerator.h"
@@ -23,24 +24,35 @@ MoleculeSimulation::MoleculeSimulation(const SimulationConfig &cfg, Container &p
 void MoleculeSimulation::runSimulation() {
   SPDLOG_INFO("Setting up molecule simulation from YAML configuration...");
 
-  // Generate particles from cuboids defined in cfg_.cuboids
-  SPDLOG_INFO("Generating particles from {} cuboid(s)...", cfg_.cuboids.size());
+  const bool restarted = cfg_.restart_from_checkpoint;
+  if (restarted) {
+    SPDLOG_INFO("Loading particles from checkpoint '{}'.", cfg_.checkpoint_file);
+    inputReader::CheckpointReader::readFile(particles_, cfg_.checkpoint_file);
+    SPDLOG_INFO("Loaded {} particles from checkpoint.", particles_.size());
+  } else {
+    // Generate particles from cuboids defined in cfg_.cuboids
+    SPDLOG_INFO("Generating particles from {} cuboid(s)...", cfg_.cuboids.size());
 
-  for (const auto &c : cfg_.cuboids) {
-    CuboidGenerator::generateCuboid(particles_, c.origin, c.numPerDim, cfg_.domainSize, c.h, c.mass, c.baseVelocity,
-                                    c.brownianMean, c.type);
+    for (const auto &c : cfg_.cuboids) {
+      CuboidGenerator::generateCuboid(particles_, c.origin, c.numPerDim, cfg_.domainSize, c.h, c.mass, c.baseVelocity,
+                                      c.brownianMean, c.type);
+    }
+    SPDLOG_INFO("Generated {} particles from cuboids.", particles_.size());
   }
 
+  // Discs can also be added on top of a checkpoint (used for the falling drop).
   for (const auto &d : cfg_.discs) {
     DiscGenerator::generateDisc(particles_, d.center, d.radiusCells, d.hDisc, d.mass, d.baseVelocity, d.typeDisc);
   }
-
-  SPDLOG_INFO("Generated {} particles from cuboids.", particles_.size());
+  if (!cfg_.discs.empty()) {
+    SPDLOG_INFO("Added {} disc(s); particle count is now {}.", cfg_.discs.size(), particles_.size());
+  }
 
   // Lennard-Jones force setup
   LennardJones lj;
   lj.setEpsilon(5);
   lj.setSigma(1);
+  lj.setGravity(cfg_.gravity);
 
   // Initial force evaluation
   lj.calculateF(particles_);
@@ -82,6 +94,15 @@ void MoleculeSimulation::runSimulation() {
     current_time += cfg_.delta_t;
   }
 
+  // Ensure a final checkpoint is written when requested, even if the loop did not land on write_frequency.
+  if (cfg_.output_format == OutputFormat::Checkpoint && iteration % cfg_.write_frequency != 0) {
+    if (cfg_.containerType == ContainerType::Cell) {
+      static_cast<LinkedCellContainer *>(&particles_)->deleteHaloCells();
+    }
+    SPDLOG_INFO("Writing final checkpoint at iteration {} (t = {:.6g}).", iteration, current_time);
+    plotParticles(particles_, iteration, cfg_.output_format);
+  }
+
   SPDLOG_INFO("Molecule simulation completed after {} iterations (final t = {:.6g}).", iteration, current_time);
 }
 
@@ -89,7 +110,7 @@ void MoleculeSimulation::plotParticles(Container &particles, int iteration, Outp
   std::filesystem::create_directories("output");
 
   // Output file name from Outputformat
-  std::string out_name = "output/outputVTK";
+  std::string out_name = (format == OutputFormat::Checkpoint) ? "output/checkpoint" : "output/outputVTK";
 
   const auto writer = WriterFactory::createWriter(format);
 

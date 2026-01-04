@@ -1,0 +1,27 @@
+simulation:
+  sim_type: molecule
+  t_start: 0.0
+  t_end: 15.0
+  delta_t: 0.0005
+  gravity: [0.0, -12.44, 0.0]
+  output_format: Checkpoint
+
+output:
+  write_frequency: 1000
+
+cuboids:
+  - origin: [1.5, 2.0, 0.0]
+    numPerDim: [250, 50, 1]
+    baseVelocity: [0.0, 0.0, 0.0]
+    h: 1.2
+    mass: 1.0
+    type: 0
+    brownianMean: 0.0
+
+discs: []
+
+linkedCell:
+  - containerType: [Cell]
+    domainSize: [303.0, 180.0, 1.0]
+    rCutoff: 2.5
+    boundaryConditions: [Reflecting, Reflecting, Reflecting, Reflecting, Reflecting, Reflecting]

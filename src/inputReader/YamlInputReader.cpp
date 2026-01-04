@@ -84,6 +84,14 @@ void YamlInputReader::parseSimulationSection(const YAML::Node &n, SimulationConf
   cfg.delta_t = n["delta_t"].as<double>();
   cfg.output_format = parse_output(formatStr);
 
+  if (n["checkpoint_file"]) {
+    cfg.restart_from_checkpoint = true;
+    cfg.checkpoint_file = n["checkpoint_file"].as<std::string>();
+  }
+  if (n["gravity"]) {
+    cfg.gravity = parseVec3(n["gravity"], "gravity");
+  }
+
   if (cfg.t_start > cfg.t_end) {
     throw std::runtime_error("YAML error: simulation.t_start must be <= simulation.t_end");
   }

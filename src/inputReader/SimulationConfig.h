@@ -42,6 +42,13 @@ struct SimulationConfig {
 
   int write_frequency = 10;
 
+  // Optional restart from checkpoint file
+  bool restart_from_checkpoint = false;
+  std::string checkpoint_file;
+
+  // External acceleration (e.g., gravity)
+  std::array<double, 3> gravity{0.0, 0.0, 0.0};
+
   // --- Cuboids ---
   std::vector<Cuboid> cuboids;
 

@@ -3,6 +3,8 @@
  */
 #pragma once
 
+#include <array>
+
 #include "../Container/Particle.h"
 #include "ForceCalculation.h"
 /**
@@ -11,6 +13,7 @@
 class LennardJones : public ForceCalculation {
   double epsilon{};
   double sigma{};
+  std::array<double, 3> gravity_{0.0, 0.0, 0.0};
 
  public:
   LennardJones();
@@ -20,6 +23,8 @@ class LennardJones : public ForceCalculation {
   [[nodiscard]] double getSigma() const { return sigma; }
   void setEpsilon(double eps) { this->epsilon = eps; }
   void setSigma(double sig) { this->sigma = sig; }
+  void setGravity(const std::array<double, 3> &g) { gravity_ = g; }
+  [[nodiscard]] const std::array<double, 3> &getGravity() const { return gravity_; }
   [[nodiscard]] double calculateU(const Particle &p1, const Particle &p2) const;
   /**
    * @brief Calculates the forces using the Lennard-Jones formulas

@@ -18,7 +18,8 @@ void LennardJones::calculateF(Container &particles) {
   for (auto &p : particles) {
     // initialize to 0 so the simulation runs as expected
     p.setOldF(p.getF());
-    p.setF({0., 0., 0.});
+    auto gravityForce = ArrayUtils::elementWiseScalarOp(p.getM(), gravity_, std::multiplies<>());
+    p.setF(gravityForce);
   }
   // Use pair iterator to calculates forces between each pair of particles
   particles.forEachPair([this](Particle &p1, Particle &p2) { calc(p1, p2, epsilon, sigma); });
