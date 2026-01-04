@@ -136,7 +136,7 @@ class LinkedCellContainer : public Container {
   void placeParticle(Particle *particle);
   void createGhostsForFace(Face face);
   void createPeriodicGhostsForFace(Face face);  ///< Mirror boundary particles into opposite halo for periodic BC.
-  void wrapPeriodicParticles();                  ///< Wrap owned particles back into domain for periodic BC.
+  void wrapPeriodicParticles();                 ///< Wrap owned particles back into domain for periodic BC.
   [[nodiscard]] auto to3DIndex(std::size_t linear_index) const -> std::array<std::size_t, 3>;
   void logParticleCounts() const;
 

@@ -101,11 +101,10 @@ void LinkedCellContainer::deleteHaloCells() {
     cell->particles.clear();
   }
 
-  owned_particles.erase(std::remove_if(owned_particles.begin(), owned_particles.end(),
-                                       [&](const auto &ptr) -> bool {
-                                         return halo_particles.find(ptr.get()) != halo_particles.end();
-                                       }),
-                        owned_particles.end());
+  owned_particles.erase(
+      std::remove_if(owned_particles.begin(), owned_particles.end(),
+                     [&](const auto &ptr) -> bool { return halo_particles.find(ptr.get()) != halo_particles.end(); }),
+      owned_particles.end());
 }
 
 auto LinkedCellContainer::addParticle(Particle &particle) -> Particle & {
@@ -142,7 +141,7 @@ auto LinkedCellContainer::clear() noexcept -> void {
 }
 
 void LinkedCellContainer::rebuild() {
-  ghost_particles.clear();  
+  ghost_particles.clear();
   for (auto &cell : cells) {
     cell.particles.clear();
   }
