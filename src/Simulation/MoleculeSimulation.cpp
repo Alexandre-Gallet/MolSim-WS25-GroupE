@@ -50,13 +50,14 @@ void MoleculeSimulation::runSimulation() {
 
   // Lennard-Jones force setup
   LennardJones lj;
-  lj.setEpsilon(5);
-  lj.setSigma(1);
+  lj.setEpsilon(cfg_.lj_epsilon);
+  lj.setSigma(cfg_.lj_sigma);
+  lj.setTypeParameters(cfg_.lj_types);
   lj.setGravity(cfg_.gravity);
 
   // Initial force evaluation
   lj.calculateF(particles_);
-  SPDLOG_DEBUG("Initial Lennard-Jones forces computed (epsilon=5, sigma=1).");
+  SPDLOG_DEBUG("Initial Lennard-Jones forces computed (epsilon={}, sigma={}).", cfg_.lj_epsilon, cfg_.lj_sigma);
 
   // Time integration loop
   double current_time = cfg_.t_start;

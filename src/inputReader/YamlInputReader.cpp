@@ -54,6 +54,11 @@ SimulationConfig YamlInputReader::parse() const {
     parseDiscsSection(root["discs"], cfg);
   }
 
+  // --- types section (optional Lennard-Jones overrides) ---
+  if (root["types"]) {
+    parseTypesSection(root["types"], cfg);
+  }
+
   // --- linked cell section (optional) ---
   if (root["linkedCell"]) {
     parseLinkedCellSection(root["linkedCell"], cfg);
@@ -83,6 +88,12 @@ void YamlInputReader::parseSimulationSection(const YAML::Node &n, SimulationConf
   cfg.t_end = n["t_end"].as<double>();
   cfg.delta_t = n["delta_t"].as<double>();
   cfg.output_format = parse_output(formatStr);
+  if (n["epsilon"]) {
+    cfg.lj_epsilon = n["epsilon"].as<double>();
+  }
+  if (n["sigma"]) {
+    cfg.lj_sigma = n["sigma"].as<double>();
+  }
 
   if (n["checkpoint_file"]) {
     cfg.restart_from_checkpoint = true;
@@ -228,4 +239,19 @@ std::array<int, 3> YamlInputReader::parseVec3Int(const YAML::Node &n, const std:
     throw std::runtime_error(oss.str());
   }
   return {n[0].as<int>(), n[1].as<int>(), n[2].as<int>()};
+}
+
+void YamlInputReader::parseTypesSection(const YAML::Node &n, SimulationConfig &cfg) const {
+  if (!n.IsSequence()) throw std::runtime_error("YAML error: 'types' must be a sequence");
+
+  for (const auto &node : n) {
+    if (!node["id"] || !node["epsilon"] || !node["sigma"]) {
+      throw std::runtime_error("YAML error: types entries require 'id', 'epsilon', and 'sigma'");
+    }
+    LJTypeParams params;
+    params.type = node["id"].as<int>();
+    params.epsilon = node["epsilon"].as<double>();
+    params.sigma = node["sigma"].as<double>();
+    cfg.lj_types.push_back(params);
+  }
 }

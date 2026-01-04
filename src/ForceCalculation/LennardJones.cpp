@@ -1,6 +1,16 @@
 #include "LennardJones.h"
 
+#include <cmath>
+
 #include "../utils/ArrayUtils.h"
+
+namespace {
+std::pair<double, double> mixParameters(const std::pair<double, double> &a, const std::pair<double, double> &b) {
+  const double sigma = 0.5 * (a.second + b.second);
+  const double epsilon = std::sqrt(a.first * b.first);
+  return {epsilon, sigma};
+}
+}  // namespace
 
 LennardJones::LennardJones() = default;
 LennardJones::~LennardJones() = default;
@@ -22,7 +32,19 @@ void LennardJones::calculateF(Container &particles) {
     p.setF(gravityForce);
   }
   // Use pair iterator to calculates forces between each pair of particles
-  particles.forEachPair([this](Particle &p1, Particle &p2) { calc(p1, p2, epsilon, sigma); });
+  particles.forEachPair([this](Particle &p1, Particle &p2) {
+    auto lookup = [this](int type) {
+      auto it = type_params_.find(type);
+      if (it != type_params_.end()) {
+        return it->second;
+      }
+      return std::make_pair(epsilon, sigma);
+    };
+    auto params1 = lookup(p1.getType());
+    auto params2 = lookup(p2.getType());
+    const auto mixed = mixParameters(params1, params2);
+    calc(p1, p2, mixed.first, mixed.second);
+  });
 }
 void LennardJones::calc(Particle &p1, Particle &p2, double epsilon, double sigma) {
   const auto diff = ArrayUtils::elementWisePairOp(p1.getX(), p2.getX(), std::minus<>());
