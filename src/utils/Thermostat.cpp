@@ -1,6 +1,3 @@
-//
-// Created by darig on 12/29/2025.
-//
 
 #include "Thermostat.h"
 
@@ -22,18 +19,22 @@ Thermostat::Thermostat(double t_init, size_t dimensions, size_t n_thermostat, do
   }
 }
 void Thermostat::apply(Container &particles, size_t step) {
+  // only apply the thermostat every n_thermostat steps
   if (step % n_thermostat != 0) {
     return;
   }
+  // if specified, initialize the brownian motion
   if (step == 0 && brownian_motion) {
     initializeBrownianMotion(particles);
   }
   calculateKineticEnergy(particles);
   calculateTemperature(particles);
+  // if the current temperature has reached the desired one, don't update the velocities
   if (std::abs(current_temperature - t_target) < 1e-9) {
     return;
   }
   calculateScalingFactor();
+  // update velocities with the scaling factor
   for (auto &p : particles) {
     std::array<double, 3> vel = ArrayUtils::elementWiseScalarOp(scaling_factor, p.getV(), std::multiplies<>());
     p.setV(vel);
@@ -57,10 +58,12 @@ void Thermostat::calculateTemperature(const Container &particles) {
       2 * kinetic_energy / (static_cast<double>(dimensions) * static_cast<double>(particles.size()) * 1);
 }
 void Thermostat::calculateScalingFactor() {
+  // avoid division by null
   if (current_temperature == 0.) {
     return;
   }
   double diff = t_target - current_temperature;
+  // if delta_t is specified, update the temperature gradually by at most delta_t, otherwise set the temperature directly
   if (std::abs(diff) > delta_t) {
     if (diff > 0.) {
       diff = delta_t;
