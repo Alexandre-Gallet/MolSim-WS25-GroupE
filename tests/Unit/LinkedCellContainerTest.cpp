@@ -6,8 +6,8 @@
 #include <utility>
 #include <vector>
 
-#include "../../src/Container/LinkedCellContainer.h"
-#include "../../src/Container/Particle.h"
+#include "Container/LinkedCellContainer.h"
+#include "Container/Particle.h"
 
 namespace {
 // Store pairs with deterministic ordering to simplify lookups.
