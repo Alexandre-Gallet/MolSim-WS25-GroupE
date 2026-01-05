@@ -1,10 +1,10 @@
 #include "CheckpointWriter.h"
 
+#include <spdlog/spdlog.h>
+
 #include <fstream>
 #include <iomanip>
 #include <sstream>
-
-#include <spdlog/spdlog.h>
 
 namespace {
 std::string makeFilename(const std::string &base, int iteration) {

@@ -33,7 +33,7 @@ struct ThermostatConfig {
   size_t n_thermostat;
   size_t dimensions;
   bool brownian_motion;
-  bool enable_thermostat = false; // Check if a thermostat should be used, so that old simulations still function
+  bool enable_thermostat = false;  // Check if a thermostat should be used, so that old simulations still function
 };
 
 /// Lennard-Jones parameters for a specific particle type.

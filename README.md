@@ -70,6 +70,7 @@ Using the provided example file eingabe.yml
 
 ```bash
 ./MolSim ../input/eingabe.yml 
+./MolSim ../input/rayleighTaylorSmall.yml
 ```
 
 Simulation output files (VTK, XYZ, or both depending on `output_format` as defined in the .yml file)

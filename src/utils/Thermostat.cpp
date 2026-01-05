@@ -63,7 +63,8 @@ void Thermostat::calculateScalingFactor() {
     return;
   }
   double diff = t_target - current_temperature;
-  // if delta_t is specified, update the temperature gradually by at most delta_t, otherwise set the temperature directly
+  // if delta_t is specified, update the temperature gradually by at most delta_t, otherwise set the temperature
+  // directly
   if (std::abs(diff) > delta_t) {
     if (diff > 0.) {
       diff = delta_t;

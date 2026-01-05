@@ -3,9 +3,9 @@
 
 #include <memory>
 
+#include "outputWriter/CheckpointWriter.h"
 #include "outputWriter/OutputFormat.h"
 #include "outputWriter/OutputWriter.h"
-#include "outputWriter/CheckpointWriter.h"
 #ifdef ENABLE_VTK_OUTPUT
 #include "VTKWriter.h"
 #endif

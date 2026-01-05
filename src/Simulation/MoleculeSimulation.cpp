@@ -12,10 +12,10 @@
 #include "Container/ContainerType.h"
 #include "Container/LinkedCellContainer.h"
 #include "ForceCalculation/LennardJones.h"
-#include "inputReader/CheckpointReader.h"
 #include "Generator/CuboidGenerator.h"
 #include "Generator/DiscGenerator.h"
 #include "Generator/ParticleGenerator.h"
+#include "inputReader/CheckpointReader.h"
 #include "outputWriter/WriterFactory.h"
 
 MoleculeSimulation::MoleculeSimulation(const SimulationConfig &cfg, Container &particles)
@@ -53,14 +53,9 @@ void MoleculeSimulation::runSimulation() {
   // Initialize thermostat
   std::unique_ptr<Thermostat> thermostat = nullptr;
   if (cfg_.thermostat.enable_thermostat) {
-    thermostat = std::make_unique<Thermostat>(
-     cfg_.thermostat.t_init,
-     cfg_.thermostat.dimensions,
-     cfg_.thermostat.n_thermostat,
-     cfg_.thermostat.t_target,
-     cfg_.thermostat.delta_t,
-     cfg_.thermostat.brownian_motion
-     );
+    thermostat = std::make_unique<Thermostat>(cfg_.thermostat.t_init, cfg_.thermostat.dimensions,
+                                              cfg_.thermostat.n_thermostat, cfg_.thermostat.t_target,
+                                              cfg_.thermostat.delta_t, cfg_.thermostat.brownian_motion);
   }
 
   // Lennard-Jones force setup

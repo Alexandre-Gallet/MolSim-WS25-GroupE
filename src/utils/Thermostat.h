@@ -12,15 +12,15 @@
  */
 class Thermostat {
  public:
- /**
-  * @brief Constructs a Thermostat object.
-  * @param t_init Initial temperature of the system.
-  * @param dimensions The number of dimensions in the simulation (2 or 3).
-  * @param n_thermostat Interval (in time steps) at which the thermostat is applied.
-  * @param t_target The desired temperature.
-  * @param delta_t Maximum allowed temperature change per thermostat application.
-  * @param brownian_motion If true, initializes velocities using Maxwell-Boltzmann distribution at step 0.
-  */
+  /**
+   * @brief Constructs a Thermostat object.
+   * @param t_init Initial temperature of the system.
+   * @param dimensions The number of dimensions in the simulation (2 or 3).
+   * @param n_thermostat Interval (in time steps) at which the thermostat is applied.
+   * @param t_target The desired temperature.
+   * @param delta_t Maximum allowed temperature change per thermostat application.
+   * @param brownian_motion If true, initializes velocities using Maxwell-Boltzmann distribution at step 0.
+   */
   Thermostat(double t_init, size_t dimensions, size_t n_thermostat, double t_target, double delta_t,
              bool brownian_motion);
   /**

@@ -66,7 +66,7 @@ SimulationConfig YamlInputReader::parse() const {
 
   // --- thermostat section ---
   if (root["thermostat"]) {
-    parseThermostatSection(root["Thermostat"], cfg);
+    parseThermostatSection(root["thermostat"], cfg);
   }
 
   return cfg;
@@ -172,7 +172,6 @@ void YamlInputReader::parseCuboidsSection(const YAML::Node &n, SimulationConfig 
     if (node["brownianMean"]) {
       c.brownianMean = node["brownianMean"].as<double>();
     }
-
     cfg.cuboids.push_back(c);
   }
 
@@ -260,7 +259,6 @@ void YamlInputReader::parseThermostatSection(const YAML::Node &n, SimulationConf
     cfg.thermostat.delta_t = std::numeric_limits<double>::infinity();
   }
 }
-
 
 std::array<double, 3> YamlInputReader::parseVec3(const YAML::Node &n, const std::string &fieldName) const {
   if (!n || !n.IsSequence() || n.size() != 3) {

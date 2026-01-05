@@ -101,10 +101,11 @@ void LinkedCellContainer::deleteHaloCells() {
     cell->particles.clear();
   }
 
-  owned_particles.erase(
-      std::remove_if(owned_particles.begin(), owned_particles.end(),
-                     [&](const auto &ptr) -> bool { return halo_particles.find(ptr.get()) != halo_particles.end(); }),
-      owned_particles.end());
+  owned_particles.erase(std::remove_if(owned_particles.begin(), owned_particles.end(),
+                                       [&](const auto &ptr) -> bool {
+                                         return halo_particles.find(ptr.get()) != halo_particles.end();
+                                       }),
+                        owned_particles.end());
 }
 
 auto LinkedCellContainer::addParticle(Particle &particle) -> Particle & {
@@ -155,13 +156,16 @@ void LinkedCellContainer::rebuild() {
   deleteHaloCells();
 
   static constexpr std::array<Face, 6> faces{Face::XMin, Face::XMax, Face::YMin, Face::YMax, Face::ZMin, Face::ZMax};
+
+  // Reflecting ghosts: keep as face-based
   for (std::size_t i = 0; i < faces.size(); ++i) {
     if (boundary_conditions.at(i) == BoundaryCondition::Reflecting) {
       createGhostsForFace(faces.at(i));
-    } else if (boundary_conditions.at(i) == BoundaryCondition::Periodic) {
-      createPeriodicGhostsForFace(faces.at(i));
     }
   }
+
+  // Periodic ghosts: create all required images incl. edges/corners
+  createAllPeriodicGhosts();
 
   // logParticleCounts();
 }
@@ -247,7 +251,6 @@ void LinkedCellContainer::createGhostsForFace(Face face) {
 
   std::vector<Particle *> candidates;
 
-  // Collect particles first to avoid mutating cell storage while iterating it.
   for (auto *cell : boundary_cells_by_face.at(face_index)) {
     candidates.insert(candidates.end(), cell->particles.begin(), cell->particles.end());
   }
@@ -275,32 +278,82 @@ void LinkedCellContainer::createGhostsForFace(Face face) {
   }
 }
 
-void LinkedCellContainer::createPeriodicGhostsForFace(Face face) {
-  const auto bc = boundary_conditions.at(static_cast<std::size_t>(face));
-  if (bc != BoundaryCondition::Periodic) {
-    return;
+void LinkedCellContainer::createAllPeriodicGhosts() {
+  bool any_periodic = false;
+  for (std::size_t i = 0; i < boundary_conditions.size(); ++i) {
+    if (boundary_conditions[i] == BoundaryCondition::Periodic) {
+      any_periodic = true;
+      break;
+    }
   }
-
-  const auto axis = axisFromFace(face);
-  const bool upper = isUpper(face);
-  const double shift = upper ? domain_size.at(axis) : -domain_size.at(axis);
-  const auto opposite_face = opposite(face);
-  const auto &source_cells = boundary_cells_by_face.at(static_cast<std::size_t>(opposite_face));
+  if (!any_periodic) return;
 
   std::vector<Particle *> candidates;
-  for (auto *cell : source_cells) {
+  candidates.reserve(size());
+  for (auto *cell : boundary_cells) {
     candidates.insert(candidates.end(), cell->particles.begin(), cell->particles.end());
   }
 
+  // Thickness of the "boundary layer" that needs periodic images.
+  // r_cutoff is the physically correct choice: only particles within cutoff
+  // of a periodic boundary can interact across it.
+  const double layer = r_cutoff;
+
   for (auto *particle : candidates) {
-    ghost_particles.push_back(std::make_unique<Particle>(*particle));
-    auto *ghost = ghost_particles.back().get();
+    const auto pos = particle->getX();
 
-    auto ghost_pos = ghost->getX();
-    ghost_pos.at(axis) += shift;
-    ghost->setX(ghost_pos);
+    // For each axis, gather possible shifts we should generate.
+    // Always include 0. Add +L or -L depending on which periodic boundary
+    // the particle is close to.
+    std::array<std::vector<double>, 3> shifts;
+    for (int axis = 0; axis < 3; ++axis) {
+      shifts[axis].clear();
+      shifts[axis].push_back(0.0);
 
-    placeParticle(ghost);
+      const double span = domain_size.at(axis);
+      if (span <= 0.0) continue;
+
+      const double lower = domain_min.at(axis);
+      const double upper = lower + span;
+
+      const auto min_face = static_cast<std::size_t>(axis * 2);
+      const auto max_face = static_cast<std::size_t>(axis * 2 + 1);
+
+      const bool per_min = boundary_conditions.at(min_face) == BoundaryCondition::Periodic;
+      const bool per_max = boundary_conditions.at(max_face) == BoundaryCondition::Periodic;
+
+      // If particle is within 'layer' of the lower boundary, then the matching
+      // periodic image is shifted by +L (from the opposite side).
+      if (per_min && pos.at(axis) < lower + layer) {
+        shifts[axis].push_back(+span);
+      }
+
+      // If particle is within 'layer' of the upper boundary, then the matching
+      // periodic image is shifted by -L.
+      if (per_max && pos.at(axis) >= upper - layer) {
+        shifts[axis].push_back(-span);
+      }
+    }
+
+    // Generate all non-zero combinations (up to 26 in 3D).
+    for (double sx : shifts[0]) {
+      for (double sy : shifts[1]) {
+        for (double sz : shifts[2]) {
+          if (sx == 0.0 && sy == 0.0 && sz == 0.0) continue;
+
+          ghost_particles.push_back(std::make_unique<Particle>(*particle));
+          auto *ghost = ghost_particles.back().get();
+
+          auto gpos = ghost->getX();
+          gpos[0] += sx;
+          gpos[1] += sy;
+          gpos[2] += sz;
+          ghost->setX(gpos);
+
+          placeParticle(ghost);
+        }
+      }
+    }
   }
 }
 

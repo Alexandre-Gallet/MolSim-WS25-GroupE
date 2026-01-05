@@ -8,9 +8,8 @@
 #include <vector>
 
 #include "../Container/Particle.h"
-#include "ForceCalculation.h"
-
 #include "../inputReader/SimulationConfig.h"
+#include "ForceCalculation.h"
 /**
  * Class used to compute forces using the Lennard-Jones formulas
  */
