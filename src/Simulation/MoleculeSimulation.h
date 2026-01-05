@@ -7,6 +7,7 @@
 #include "Container/Container.h"
 #include "Generator/DiscGenerator.h"
 #include "Simulation.h"
+#include "utils/Thermostat.h"
 #include "inputReader/SimulationConfig.h"
 
 /**

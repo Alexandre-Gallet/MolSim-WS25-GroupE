@@ -13,6 +13,7 @@
 #include "Cuboid.h"
 #include "Simulation/SimulationType.h"
 #include "outputWriter/OutputFormat.h"
+#include "utils/Thermostat.h"
 
 /// Disc definition
 struct Disc {
@@ -22,6 +23,17 @@ struct Disc {
   double mass = 1.0;                     // particle mass
   std::array<double, 3> baseVelocity{};  // [vx,vy,vz]
   int typeDisc = 0;                      // particle type
+};
+
+/// Thermostat definition
+struct ThermostatConfig {
+  double t_init;
+  double t_target;
+  double delta_t;
+  size_t n_thermostat;
+  size_t dimensions;
+  bool brownian_motion;
+  bool enable_thermostat = false; // Check if a thermostat should be used, so that old simulations still function
 };
 
 /**
@@ -56,4 +68,7 @@ struct SimulationConfig {
 
   //
   std::array<BoundaryCondition, 6> boundaryConditions{};  // 6 boundaries
+
+  // --- Thermostat
+  ThermostatConfig thermostat;
 };

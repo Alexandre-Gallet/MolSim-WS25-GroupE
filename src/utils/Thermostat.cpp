@@ -30,17 +30,17 @@ void Thermostat::apply(Container &particles, size_t step) {
   }
   calculateKineticEnergy(particles);
   calculateTemperature(particles);
-  if (current_temperature == t_target) {
+  if (std::abs(current_temperature - t_target) < 1e-9) {
     return;
   }
   calculateScalingFactor();
-  for (auto p : particles) {
+  for (auto &p : particles) {
     std::array<double, 3> vel = ArrayUtils::elementWiseScalarOp(scaling_factor, p.getV(), std::multiplies<>());
     p.setV(vel);
   }
 }
 void Thermostat::initializeBrownianMotion(Container &particles) const {
-  for (auto p : particles) {
+  for (auto &p : particles) {
     double factor = std::sqrt(t_init / p.getM());
     p.setV(maxwellBoltzmannDistributedVelocity(factor, dimensions));
   }

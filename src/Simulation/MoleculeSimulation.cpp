@@ -31,11 +31,26 @@ void MoleculeSimulation::runSimulation() {
                                     c.brownianMean, c.type);
   }
 
+  // Generate particles from discs defined in cfg_.discs
+  SPDLOG_INFO("Generating particles from {} disc(s)...", cfg_.discs.size());
   for (const auto &d : cfg_.discs) {
     DiscGenerator::generateDisc(particles_, d.center, d.radiusCells, d.hDisc, d.mass, d.baseVelocity, d.typeDisc);
   }
 
-  SPDLOG_INFO("Generated {} particles from cuboids.", particles_.size());
+  SPDLOG_INFO("Generated {} particles", particles_.size());
+
+  // Initialize thermostat
+  std::unique_ptr<Thermostat> thermostat = nullptr;
+  if (cfg_.thermostat.enable_thermostat) {
+    thermostat = std::make_unique<Thermostat>(
+     cfg_.thermostat.t_init,
+     cfg_.thermostat.dimensions,
+     cfg_.thermostat.n_thermostat,
+     cfg_.thermostat.t_target,
+     cfg_.thermostat.delta_t,
+     cfg_.thermostat.brownian_motion
+     );
+  }
 
   // Lennard-Jones force setup
   LennardJones lj;
@@ -65,6 +80,11 @@ void MoleculeSimulation::runSimulation() {
     }
     lj.calculateF(particles_);
     LennardJones::calculateV(particles_, cfg_.delta_t);
+
+    // Thermostat application
+    if (thermostat) {
+      thermostat->apply(particles_, iteration);
+    }
 
     iteration++;
 

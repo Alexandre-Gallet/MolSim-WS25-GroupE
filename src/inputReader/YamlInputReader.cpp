@@ -44,7 +44,7 @@ SimulationConfig YamlInputReader::parse() const {
   }
   parseOutputSection(root["output"], cfg);
 
-  // --- cuboids section ---
+  // --- cuboids section (optional) ---
   if (root["cuboids"]) {
     parseCuboidsSection(root["cuboids"], cfg);
   }
@@ -57,6 +57,11 @@ SimulationConfig YamlInputReader::parse() const {
   // --- linked cell section (optional) ---
   if (root["linkedCell"]) {
     parseLinkedCellSection(root["linkedCell"], cfg);
+  }
+
+  // --- thermostat section ---
+  if (root["thermostat"]) {
+    parseThermostatSection(root["Thermostat"], cfg);
   }
 
   return cfg;
@@ -207,6 +212,36 @@ void YamlInputReader::parseLinkedCellSection(const YAML::Node &n, SimulationConf
     cfg.boundaryConditions[i] = node["boundaryConditions"][i].as<BoundaryCondition>();
   }
 }
+
+void YamlInputReader::parseThermostatSection(const YAML::Node &n, SimulationConfig &cfg) const {
+  if (!n || n.IsNull()) {
+    return;
+  }
+
+  cfg.thermostat.enable_thermostat = true;
+
+  // Required parameters
+  if (!n["t_init"] || !n["n_thermostat"] || !n["dimensions"] || !n["brownian_motion"]) {
+    throw std::runtime_error("YAML error: t_init, n_thermostat, dimensions, brownian_motion are required parameters!");
+  }
+  cfg.thermostat.t_init = n["t_init"].as<double>();
+  cfg.thermostat.n_thermostat = n["n_thermostat"].as<size_t>();
+  cfg.thermostat.dimensions = n["dimensions"].as<size_t>();
+  cfg.thermostat.brownian_motion = n["brownian_motion"].as<bool>();
+
+  // Optional parameters
+  if (n["t_target"]) {
+    cfg.thermostat.t_target = n["t_target"].as<double>();
+  } else {
+    cfg.thermostat.t_target = cfg.thermostat.t_init;
+  }
+  if (n["delta_t"]) {
+    cfg.thermostat.delta_t = n["delta_t"].as<double>();
+  } else {
+    cfg.thermostat.delta_t = std::numeric_limits<double>::infinity();
+  }
+}
+
 
 std::array<double, 3> YamlInputReader::parseVec3(const YAML::Node &n, const std::string &fieldName) const {
   if (!n || !n.IsSequence() || n.size() != 3) {
