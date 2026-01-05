@@ -5,6 +5,7 @@
 
 #include "outputWriter/OutputFormat.h"
 #include "outputWriter/OutputWriter.h"
+#include "outputWriter/CheckpointWriter.h"
 #ifdef ENABLE_VTK_OUTPUT
 #include "VTKWriter.h"
 #endif
@@ -19,6 +20,8 @@ std::unique_ptr<outputWriter::OutputWriter> WriterFactory::createWriter(OutputFo
 #ifdef ENABLE_VTK_OUTPUT
       return std::make_unique<outputWriter::VTKWriter>();
 #endif
+    case OutputFormat::Checkpoint:
+      return std::make_unique<outputWriter::CheckpointWriter>();
     default:
       return std::make_unique<outputWriter::XYZWriter>();
   }

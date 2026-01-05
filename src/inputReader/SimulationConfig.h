@@ -36,6 +36,13 @@ struct ThermostatConfig {
   bool enable_thermostat = false; // Check if a thermostat should be used, so that old simulations still function
 };
 
+/// Lennard-Jones parameters for a specific particle type.
+struct LJTypeParams {
+  int type = 0;
+  double epsilon = 5.0;
+  double sigma = 1.0;
+};
+
 /**
  * @brief Bundles all simulation configuration options.
  */
@@ -53,6 +60,19 @@ struct SimulationConfig {
 #endif
 
   int write_frequency = 10;
+
+  // Optional restart from checkpoint file
+  bool restart_from_checkpoint = false;
+  std::string checkpoint_file;
+
+  // External acceleration (e.g., gravity)
+  std::array<double, 3> gravity{0.0, 0.0, 0.0};
+
+  // Default Lennard-Jones parameters (used if no per-type override)
+  double lj_epsilon = 5.0;
+  double lj_sigma = 1.0;
+  // Optional per-type Lennard-Jones parameters
+  std::vector<LJTypeParams> lj_types;
 
   // --- Cuboids ---
   std::vector<Cuboid> cuboids;

@@ -116,6 +116,11 @@ MolSim is configured entirely through a YAML file. The structure is divided into
 
 Examples of a working yaml configuration files can be found at `input/eingabe.yml` and `input/eingabedisc.yml` 
 
+### Task 3: falling drop workflow
+- **Equilibration**: run `input/task3_equilibrate.yml` (reflecting walls, gravity [0, -12.44, 0], checkpoint output every 1000 steps). After `t_end=15` the final state is in `output/checkpoint_30000.state`.
+- **Drop run**: use `input/task3_drop.yml`, which restarts from the checkpoint and adds a disc-shaped droplet. Update `simulation.checkpoint_file` if you change `write_frequency` or `delta_t`.
+- **Checkpointing**: set `simulation.output_format: Checkpoint` to write `.state` files; set `simulation.checkpoint_file` to restart from an existing state. Gravity is optional via `simulation.gravity: [gx, gy, gz]`.
+
 ## Running Tests
 
 ```bash

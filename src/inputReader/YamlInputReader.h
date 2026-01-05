@@ -59,6 +59,9 @@ class YamlInputReader {
   /// parse LinkedCell section in YAML file
   void parseLinkedCellSection(const YAML::Node &node, SimulationConfig &cfg) const;
 
+  /// Parse optional Lennard-Jones type parameter overrides.
+  void parseTypesSection(const YAML::Node &node, SimulationConfig &cfg) const;
+
   /// parse Thermostat section in YAML file
   void parseThermostatSection(const YAML::Node &Node, SimulationConfig &cfg) const;
 
