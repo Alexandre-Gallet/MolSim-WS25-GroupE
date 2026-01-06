@@ -13,7 +13,7 @@ void expectArrayEq(const std::array<double, 3> &a, const std::array<double, 3> &
   EXPECT_DOUBLE_EQ(a[2], b[2]);
 }
 }  // namespace
-
+// Particle state should be the same
 TEST(CheckpointIOTest, RoundtripPersistsParticleState) {
   ParticleContainer original;
 
