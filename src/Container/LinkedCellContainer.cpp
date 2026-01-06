@@ -1,6 +1,3 @@
-//
-// Created by darig on 11/20/2025.
-//
 
 #include "LinkedCellContainer.h"
 
@@ -101,11 +98,10 @@ void LinkedCellContainer::deleteHaloCells() {
     cell->particles.clear();
   }
 
-  owned_particles.erase(std::remove_if(owned_particles.begin(), owned_particles.end(),
-                                       [&](const auto &ptr) -> bool {
-                                         return halo_particles.find(ptr.get()) != halo_particles.end();
-                                       }),
-                        owned_particles.end());
+  owned_particles.erase(
+      std::remove_if(owned_particles.begin(), owned_particles.end(),
+                     [&](const auto &ptr) -> bool { return halo_particles.find(ptr.get()) != halo_particles.end(); }),
+      owned_particles.end());
 }
 
 auto LinkedCellContainer::addParticle(Particle &particle) -> Particle & {
