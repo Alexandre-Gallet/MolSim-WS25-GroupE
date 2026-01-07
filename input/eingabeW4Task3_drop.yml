@@ -6,6 +6,8 @@ simulation:
   gravity: [0.0, -12.44, 0.0]
   output_format: VTK
   checkpoint_file: output/checkpoint_30000.state  # adjust if write_frequency changes
+  restart_from_checkpoint: true
+
 
 output:
   write_frequency: 500
