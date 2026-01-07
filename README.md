@@ -8,10 +8,10 @@ at **Technische Universität München**, Winter Semester **2025/2026**.
 - [Building the Project](#building-the-project)
 - [Running the Simulation](#running-the-simulation) 
 - [YAML Configuration Format](#yaml-configuration-format) 
+- [Checkpointing](#checkpointing)
 - [Running Tests](#running-tests)
 - [Doxygen Documentation](#doxygen-documentation)
 - [Clang-Tidy and Clang-Format](#clang-tidy-and-clang-format)
-- [Checkpointing](#checkpointing)
 
 ## Building the Project
 
@@ -118,11 +118,18 @@ MolSim is configured entirely through a YAML file. The structure is divided into
 
 Examples of a working yaml configuration files can be found at `input/eingabe.yml` and `input/eingabedisc.yml` 
 
-###  Checkpointing
-This section describes how checkpointing is used in Worksheet 4 to separate the falling drop simulation into an equilibration phase and a subsequent production run that restarts from a saved simulation state.
-- **Equilibration**: run `input/task3_equilibrate.yml` (reflecting walls, gravity [0, -12.44, 0], checkpoint output every 1000 steps). After `t_end=15` the final state is in `output/checkpoint_30000.state`.
-- **Drop run**: use `input/task3_drop.yml`, which restarts from the checkpoint and adds a disc-shaped droplet. Update `simulation.checkpoint_file` if you change `write_frequency` or `delta_t`.
-- **Checkpointing**: set `simulation.output_format: Checkpoint` to write `.state` files; set `simulation.checkpoint_file` to restart from an existing state. Gravity is optional via `simulation.gravity: [gx, gy, gz]`.
+##  Checkpointing
+Checkpointing is used in Worksheet 4 to split the falling drop simulation into an equilibration phase and a subsequent production run that restarts from a saved simulation state.
+
+- The checkpoint filename depends on the total number of steps and `output.write_frequency`. Total steps = `(t_end - t_start) / delta_t`. Example: `t_end=15`, `delta_t=0.0005` ⇒ 30,000 steps. With `write_frequency=1000` the final file is `checkpoint_30000.state`; with `write_frequency=500` it would be `checkpoint_60000.state`. Checkpoints are written under `build/output/`.
+- The drop run resumes from the checkpoint created by the equilibration run. Set `simulation.checkpoint_file` to that `.state` file and `restart_from_checkpoint: true`. Only the initial phase space is restored; timing/output parameters (`t_start`, `t_end`, `delta_t`, `write_frequency`) come from the new YAML.
+- Run from the `build` directory, passing the YAML as input (you do not “run” the YAML itself):
+  - Equilibration: `./MolSim ../input/eingabeW4Task3_equilibrate.yml`
+  - Drop: `./MolSim ../input/eingabeW4Task3_drop.yml`
+```bash
+./MolSim ../input/eingabeW4Task3_equilibrate.yml
+./MolSim ../input/eingabeW4Task3_drop.yml
+```
 
 ## Running Tests
 
