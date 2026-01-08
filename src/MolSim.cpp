@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
   // Print results to command line. Independent of logging flag passed during compilation
   std::cout << "Runtime [s]: " << runtime_seconds << '\n';
   std::cout << "Molecule updates per second: " << molecule_updates_per_second << '\n';
-
+  std::cout << std::flush; 
 
   return EXIT_SUCCESS;
 }
