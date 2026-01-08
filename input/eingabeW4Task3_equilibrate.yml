@@ -4,7 +4,9 @@ simulation:
   t_end: 15.0
   delta_t: 0.0005
   gravity: [0.0, -12.44, 0.0]
-  output_format: checkpoint
+  output_format: CHECKPOINT
+  epsilon: 1.0
+  sigma: 1.2
 
 output:
   write_frequency: 1000
@@ -25,3 +27,14 @@ linkedCell:
     domainSize: [303.0, 180.0, 1.0]
     rCutoff: 2.5
     boundaryConditions: [Reflecting, Reflecting, Reflecting, Reflecting, Reflecting, Reflecting]
+
+thermostat:
+  t_init: 0.5
+  n_thermostat: 1000
+  dimensions: 2
+  brownian_motion: false
+
+types:
+  - id: 0
+    epsilon: 1.0
+    sigma: 1.2

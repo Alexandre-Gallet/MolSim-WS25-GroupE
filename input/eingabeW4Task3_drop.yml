@@ -5,6 +5,8 @@ simulation:
   delta_t: 0.0005
   gravity: [0.0, -12.44, 0.0]
   output_format: VTK
+  epsilon: 1.0
+  sigma: 1.2
   checkpoint_file: output/checkpoint_30000.state  # adjust if write_frequency changes
   restart_from_checkpoint: true
 
@@ -27,3 +29,11 @@ linkedCell:
     domainSize: [303.0, 180.0, 1.0]
     rCutoff: 2.5
     boundaryConditions: [Reflecting, Reflecting, Reflecting, Reflecting, Reflecting, Reflecting]
+
+types:
+  - id: 0
+    epsilon: 1.0
+    sigma: 1.2
+  - id: 1
+    epsilon: 1.0
+    sigma: 1.2
