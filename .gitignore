@@ -65,3 +65,10 @@ cmake-build-debug/
 # Editor / language-server tooling (clangd)
 compile_commands.json
 .clangd
+
+# Slurm output files (regardless of their name) 
+*.out
+*.err
+
+# Profiling build folder (compiled with different flags)
+build-gprof/
