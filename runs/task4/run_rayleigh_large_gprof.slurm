@@ -26,6 +26,9 @@ ls -l "$BIN" "$INP"
 # Run (creates gmon.out in the current working directory)
 "$BIN" "$INP"
 rc=$?
+
+true
+
 echo "MolSim exit code: $rc"
 
 # Save profiling file with unique name
