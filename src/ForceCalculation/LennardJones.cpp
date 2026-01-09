@@ -79,7 +79,7 @@ void LennardJones::calculateF(Container &particles) {
 
 
 }
-
+/* Old version of LennarJones::Calc changed for serial optimization
 void LennardJones::calc(Particle &p1, Particle &p2, double epsilon, double sigma) {
   const auto diff = ArrayUtils::elementWisePairOp(p1.getX(), p2.getX(), std::minus<>());
   const double distance = std::max(ArrayUtils::L2Norm(diff), 1e-12);
@@ -92,3 +92,37 @@ void LennardJones::calc(Particle &p1, Particle &p2, double epsilon, double sigma
   p1.setF(ArrayUtils::elementWisePairOp(p1.getF(), newF, std::plus<>()));
   p2.setF(ArrayUtils::elementWisePairOp(p2.getF(), newF, std::minus<>()));
 }
+*/
+
+void LennardJones::calc(Particle &p1, Particle &p2, double epsilon, double sigma) {
+  // Cache particle state locally (reduce accessor calls)
+  const auto &x1 = p1.getX();
+  const auto &x2 = p2.getX();
+
+  auto f1 = p1.getF();
+  auto f2 = p2.getF();
+
+  const auto diff =
+      ArrayUtils::elementWisePairOp(x1, x2, std::minus<>());
+
+  const double distance =
+      std::max(ArrayUtils::L2Norm(diff), 1e-12);
+
+  const double invR = 1.0 / distance;
+  const double invR2 = invR * invR;
+
+  const double sr = sigma * invR;
+  const double sr2 = sr * sr;
+  const double sr6 = sr2 * sr2 * sr2;
+
+  const double scalar =
+      24.0 * epsilon * invR2 * sr6 * (2.0 * sr6 - 1.0);
+
+  const auto newF =
+      ArrayUtils::elementWiseScalarOp(scalar, diff, std::multiplies<>());
+
+  // Write forces back once
+  p1.setF(ArrayUtils::elementWisePairOp(f1, newF, std::plus<>()));
+  p2.setF(ArrayUtils::elementWisePairOp(f2, newF, std::minus<>()));
+}
+
