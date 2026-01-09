@@ -7,6 +7,7 @@ at **Technische Universität München**, Winter Semester **2025/2026**.
 ## Table of Contents
 - [Building the Project](#building-the-project)
 - [Running the Simulation](#running-the-simulation) 
+- [Benchmarking and Profiling](#benchmarking-and-profiling)
 - [YAML Configuration Format](#yaml-configuration-format) 
 - [Checkpointing](#checkpointing)
 - [Running Tests](#running-tests)
@@ -54,7 +55,6 @@ You can optionally specify:
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOG_LEVEL=INFO
 cmake --build build -- -j"$(nproc)"
-cmake --build build --target doc_doxygen
 ```
 
 ## Running the Simulation
@@ -80,6 +80,48 @@ will appear in the working directory.
 If logging is enabled (default), a `simulation.log` file is also generated
 in the working directory.
 
+## Benchmarking and Profiling 
+
+### Benchmarking 
+
+For performance benchmarking a specific set of flags has to be passed during configuration.
+
+```bash
+cmake -S . -B build-benchmark \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DLOG_LEVEL=OFF \
+  -DENABLE_VTK_OUTPUT=OFF
+
+cmake --build build-benchmark -- -j"$(nproc)"
+```
+
+Running the simulation produces a measurement of elapsed time and MUPS/s (Molecule Updates per Second). 
+The above cofiguration turns of all IO, Logging and VTK Output. For Benchmarking on CoolMUC there are a series of 
+SLURM batch scripts located at ´runs/task4´. 
+
+
+### Profiling
+
+For profiling a specific set of flags has to be passed during configuration.
+
+```bash
+cmake -S . -B build-benchmark \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DLOG_LEVEL=OFF \
+  -DENABLE_VTK_OUTPUT=OFF
+  -DCMAKE_CXX_FLAGS="-pg"
+
+cmake --build build-gprof -- -j"$(nproc)"
+```
+The above cofiguration turns of all IO, Logging and VTK Output. 
+The instrumented binary generates a gmon.out file after execution.
+The profiling report is generated with:
+
+```bash
+gprof build-gprof/MolSim gmon.out > gprof_output.txt
+```
+
+For profiling on CoolMUC there are a series of SLURM batch scripts located at ´runs/task4´.
 
 ## YAML Configuration Format
 
@@ -146,6 +188,8 @@ Checkpointing is used in Worksheet 4 to split the falling drop simulation into a
 ```
 
 ## Running Tests
+
+After having built the project, run the tests from the top-level directory via: 
 
 ```bash
 ctest --test-dir build --output-on-failure -j"$(nproc)"
