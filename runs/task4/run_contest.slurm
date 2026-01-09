@@ -27,7 +27,7 @@ ls -l $HOME/MolSim-WS25-GroupE/input/eingabeRayleighTaylorBigBenchmarking.yml
 echo "Running MolSim now..."
 
 bash -c "$HOME/MolSim-WS25-GroupE/build/MolSim \
-$HOME/MolSim-WS25-GroupE/input/eingabeRayleighTaylorBigBenchmarking.yml"
+$HOME/MolSim-WS25-GroupE/input/eingabeContest.yml"
 
 echo "MolSim finished with exit code $?"
 
