@@ -145,7 +145,6 @@ void LennardJones::calc(Particle &p1, Particle &p2, double epsilon, double sigma
   const double r2 = std::max(dx * dx + dy * dy + dz * dz, 1e-12);
 
   const double invR2 = 1.0 / r2;
-  const double invR = std::sqrt(invR2);
 
   const double sr2 = (sigma * sigma) * invR2;
   const double sr6 = sr2 * sr2 * sr2;
