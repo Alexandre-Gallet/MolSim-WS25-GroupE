@@ -3,8 +3,8 @@
 #include <array>
 
 #include "ForceCalculation/LennardJones.h"
-#include "ParticleContainer.h"
-#include "Particle.h"
+#include "Container/ParticleContainer.h"
+#include "Container/Particle.h"
 
 // --- Helper: vector norm ---
 double norm3D(const std::array<double,3>& v) {
@@ -121,4 +121,22 @@ TEST(LennardJonesBehaviourTest, AttractiveForLongDistances) {
     auto F12 = p1.getF();
 
     EXPECT_GT(dot3D(F12, r12), 0.0);
+}
+
+TEST(LennardJonesBehaviourTest, GravityAddsConstantForce) {
+    LennardJones lj;
+    lj.setEpsilon(0.0);
+    lj.setSigma(1.0);
+    lj.setGravity({0.0, -9.81, 0.0});
+
+    ParticleContainer container;
+    Particle p({0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, 2.0, 0);
+    container.addParticle(p);
+
+    lj.calculateF(container);
+
+    auto f = container.begin()->getF();
+    EXPECT_DOUBLE_EQ(f[0], 0.0);
+    EXPECT_DOUBLE_EQ(f[2], 0.0);
+    EXPECT_NEAR(f[1], -19.62, 1e-12); // m * g
 }

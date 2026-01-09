@@ -1,0 +1,39 @@
+simulation:
+  sim_type: molecule
+  t_start: 15.0
+  t_end: 40.0
+  delta_t: 0.0005
+  gravity: [0.0, -12.44, 0.0]
+  output_format: VTK
+  epsilon: 1.0
+  sigma: 1.2
+  checkpoint_file: output/checkpoint_30000.state  # adjust if write_frequency changes
+  restart_from_checkpoint: true
+
+
+output:
+  write_frequency: 500
+
+cuboids: []
+
+discs:
+  - center: [150.0, 150.0, 0.0]
+    radiusCells: 20
+    hDisc: 1.0
+    mass: 1.0
+    baseVelocityDisc: [0.0, 0.0, 0.0]
+    typeDisc: 1
+
+linkedCell:
+  - containerType: [Cell]
+    domainSize: [303.0, 180.0, 1.0]
+    rCutoff: 3
+    boundaryConditions: [Reflecting, Reflecting, Reflecting, Reflecting, Reflecting, Reflecting]
+
+types:
+  - id: 0
+    epsilon: 1.0
+    sigma: 1.2
+  - id: 1
+    epsilon: 1.0
+    sigma: 1.2

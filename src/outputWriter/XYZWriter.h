@@ -10,9 +10,9 @@
 #include <fstream>
 #include <list>
 
+#include "Container/Particle.h"
+#include "Container/ParticleContainer.h"
 #include "OutputWriter.h"
-#include "Particle.h"
-#include "ParticleContainer.h"
 
 namespace outputWriter {
 
@@ -22,7 +22,7 @@ class XYZWriter : public OutputWriter {
 
   ~XYZWriter() override;
 
-  void plotParticles(ParticleContainer &particles, const std::string &filename, int iteration) override;
+  void plotParticles(Container &particles, const std::string &filename, int iteration) override;
 };
 
 }  // namespace outputWriter

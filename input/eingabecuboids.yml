@@ -1,0 +1,34 @@
+simulation:
+  sim_type: molecule        # or: planet
+  t_start: 0.0
+  t_end: 5.0
+  delta_t: 0.0002
+  output_format: VTK        # or: XYZ
+
+output:
+  write_frequency: 10
+
+cuboids:
+  - origin: [0.0, 0.0, 0.0]
+    numPerDim: [40, 8, 1]
+    baseVelocity: [0.0, 0.0, 0.0]
+    h: 1.1225
+    mass: 1.0
+    type: 0
+    brownianMean: 0.1
+
+  - origin: [15.0, 15.0, 0.0]
+    numPerDim: [8, 8, 1]
+    baseVelocity: [0.0, -10.0, 0.0]
+    h: 1.1225
+    mass: 1.0
+    type: 0
+    brownianMean: 0.1
+
+discs:
+
+linkedCell:
+  - containerType: [Cell]
+    domainSize: [120.0, 50.0, 1.0]
+    rCutoff: 3.0
+    boundaryConditions: [Reflecting, Reflecting, Reflecting, Reflecting, Reflecting, Reflecting]
