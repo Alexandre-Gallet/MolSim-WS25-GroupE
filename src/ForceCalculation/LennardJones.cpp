@@ -94,6 +94,7 @@ void LennardJones::calc(Particle &p1, Particle &p2, double epsilon, double sigma
 }
 */
 
+/* Old version of LennardJones::Calc changed for serial optimization
 void LennardJones::calc(Particle &p1, Particle &p2, double epsilon, double sigma) {
   // Cache particle state locally (reduce accessor calls)
   const auto &x1 = p1.getX();
@@ -125,4 +126,45 @@ void LennardJones::calc(Particle &p1, Particle &p2, double epsilon, double sigma
   p1.setF(ArrayUtils::elementWisePairOp(f1, newF, std::plus<>()));
   p2.setF(ArrayUtils::elementWisePairOp(f2, newF, std::minus<>()));
 }
+*/
+
+void LennardJones::calc(Particle &p1, Particle &p2, double epsilon, double sigma) {
+  // Cache particle state
+  const auto &x1 = p1.getX();
+  const auto &x2 = p2.getX();
+
+  auto f1 = p1.getF();
+  auto f2 = p2.getF();
+
+  // Compute displacement components explicitly
+  const double dx = x1[0] - x2[0];
+  const double dy = x1[1] - x2[1];
+  const double dz = x1[2] - x2[2];
+
+  // r^2 with cutoff to avoid division by zero
+  const double r2 = std::max(dx * dx + dy * dy + dz * dz, 1e-12);
+
+  const double invR2 = 1.0 / r2;
+  const double invR = std::sqrt(invR2);
+
+  const double sr2 = (sigma * sigma) * invR2;
+  const double sr6 = sr2 * sr2 * sr2;
+
+  const double scalar =
+      24.0 * epsilon * invR2 * sr6 * (2.0 * sr6 - 1.0);
+
+  // Apply forces (Newton's 3rd law)
+  f1[0] += scalar * dx;
+  f1[1] += scalar * dy;
+  f1[2] += scalar * dz;
+
+  f2[0] -= scalar * dx;
+  f2[1] -= scalar * dy;
+  f2[2] -= scalar * dz;
+
+  // Write back once
+  p1.setF(f1);
+  p2.setF(f2);
+}
+
 
