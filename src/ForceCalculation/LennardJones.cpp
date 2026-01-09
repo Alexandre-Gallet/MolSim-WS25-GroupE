@@ -2,11 +2,9 @@
 
 #include <cmath>
 
-#include "../utils/ArrayUtils.h"
-
 #include "../Container/LinkedCellContainer.h"
-
 #include "../Container/ParticleContainer.h"
+#include "../utils/ArrayUtils.h"
 
 namespace {
 std::pair<double, double> mixParameters(const std::pair<double, double> &a, const std::pair<double, double> &b) {
@@ -69,15 +67,13 @@ void LennardJones::calculateF(Container &particles) {
 
   // Call templated forEachPair on the *concrete* container to avoid std::function overhead
   if (auto *lc = dynamic_cast<LinkedCellContainer *>(&particles)) {
-    lc->forEachPair(visitor);          // should bind to the templated overload (no std::function)
+    lc->forEachPair(visitor);  // should bind to the templated overload (no std::function)
   } else if (auto *pc = dynamic_cast<ParticleContainer *>(&particles)) {
-    pc->forEachPair(visitor);          // same idea
+    pc->forEachPair(visitor);  // same idea
   } else {
     // Fallback: keep correctness if a different container type is used
-    particles.forEachPair(visitor);    // will wrap into std::function (old behavior)
+    particles.forEachPair(visitor);  // will wrap into std::function (old behavior)
   }
-
-
 }
 /* Old version of LennarJones::Calc changed for serial optimization
 void LennardJones::calc(Particle &p1, Particle &p2, double epsilon, double sigma) {
@@ -149,8 +145,7 @@ void LennardJones::calc(Particle &p1, Particle &p2, double epsilon, double sigma
   const double sr2 = (sigma * sigma) * invR2;
   const double sr6 = sr2 * sr2 * sr2;
 
-  const double scalar =
-      24.0 * epsilon * invR2 * sr6 * (2.0 * sr6 - 1.0);
+  const double scalar = 24.0 * epsilon * invR2 * sr6 * (2.0 * sr6 - 1.0);
 
   // Apply forces (Newton's 3rd law)
   f1[0] += scalar * dx;
@@ -165,5 +160,3 @@ void LennardJones::calc(Particle &p1, Particle &p2, double epsilon, double sigma
   p1.setF(f1);
   p2.setF(f2);
 }
-
-
