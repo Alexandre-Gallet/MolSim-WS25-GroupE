@@ -18,12 +18,21 @@ LennardJones::LennardJones() = default;
 LennardJones::~LennardJones() = default;
 
 double LennardJones::calculateU(const Particle &p1, const Particle &p2) const {
-  const double distance = ArrayUtils::L2Norm(ArrayUtils::elementWisePairOp(p1.getX(), p2.getX(), std::minus<>()));
-  if (distance == 0.0) {
+  const auto &x1 = p1.getX();
+  const auto &x2 = p2.getX();
+
+  const double dx = x1[0] - x2[0];
+  const double dy = x1[1] - x2[1];
+  const double dz = x1[2] - x2[2];
+
+  const double r2 = dx * dx + dy * dy + dz * dz;
+  if (r2 == 0.0) {
     return 0.0;
   }
-  const double sr = sigma / distance;
-  const double sr6 = std::pow(sr, 6);
+  const double invR2 = 1.0 / r2;
+  const double sigma2 = sigma * sigma;
+  const double sr2 = sigma2 * invR2;
+  const double sr6 = sr2 * sr2 * sr2;
   return 4.0 * epsilon * (sr6 * sr6 - sr6);
 }
 void LennardJones::calculateF(Container &particles) {
@@ -50,19 +59,36 @@ void LennardJones::calculateF(Container &particles) {
     calc(p1, p2, mixed.first, mixed.second);
   });
   */
-  // Define the visitor once (so we don't rebuild lambdas inside the hot path)
-  auto visitor = [this](Particle &p1, Particle &p2) {
-    // (optional micro-fix: move lookup outside visitor if you can, but not necessary for Opt 1)
-    auto lookup = [this](int type) {
-      auto it = type_params_.find(type);
-      if (it != type_params_.end()) return it->second;
-      return std::make_pair(epsilon, sigma);
-    };
+  auto lookup = [this](int type) {
+    if (type >= 0 && type < static_cast<int>(type_params_dense_set_.size()) && type_params_dense_set_[type]) {
+      return type_params_dense_[type];
+    }
+    auto it = type_params_.find(type);
+    if (it != type_params_.end()) return it->second;
+    return std::make_pair(epsilon, sigma);
+  };
 
-    auto params1 = lookup(p1.getType());
-    auto params2 = lookup(p2.getType());
+  auto lookupPair = [this, &lookup](int type1, int type2) {
+    if (pair_params_dense_stride_ > 0 && type1 >= 0 && type2 >= 0 &&
+        type1 < pair_params_dense_stride_ && type2 < pair_params_dense_stride_) {
+      const int idx = type1 * pair_params_dense_stride_ + type2;
+      if (pair_params_dense_set_[idx]) {
+        return pair_params_dense_[idx];
+      }
+    }
+    const auto params1 = lookup(type1);
+    const auto params2 = lookup(type2);
     const auto mixed = mixParameters(params1, params2);
-    calc(p1, p2, mixed.first, mixed.second);
+    const double sigma2 = mixed.second * mixed.second;
+    const double sigma6 = sigma2 * sigma2 * sigma2;
+    const double epsilon24 = 24.0 * mixed.first;
+    return LennardJones::LJPairParams{epsilon24, sigma6};
+  };
+
+  // Define the visitor once (so we don't rebuild lambdas inside the hot path)
+  auto visitor = [this, &lookupPair](Particle &p1, Particle &p2) {
+    const auto mixed = lookupPair(p1.getType(), p2.getType());
+    calc(p1, p2, mixed.epsilon24, mixed.sigma6);
   };
 
   // Call templated forEachPair on the *concrete* container to avoid std::function overhead
@@ -76,7 +102,7 @@ void LennardJones::calculateF(Container &particles) {
   }
 }
 /* Old version of LennarJones::Calc changed for serial optimization
-void LennardJones::calc(Particle &p1, Particle &p2, double epsilon, double sigma) {
+void LennardJones::calc(Particle &p1, Particle &p2, double epsilon24, double sigma6) {
   const auto diff = ArrayUtils::elementWisePairOp(p1.getX(), p2.getX(), std::minus<>());
   const double distance = std::max(ArrayUtils::L2Norm(diff), 1e-12);
   const double invR2 = 1.0 / (distance * distance);
@@ -91,7 +117,7 @@ void LennardJones::calc(Particle &p1, Particle &p2, double epsilon, double sigma
 */
 
 /* Old version of LennardJones::Calc changed for serial optimization
-void LennardJones::calc(Particle &p1, Particle &p2, double epsilon, double sigma) {
+void LennardJones::calc(Particle &p1, Particle &p2, double epsilon24, double sigma6) {
   // Cache particle state locally (reduce accessor calls)
   const auto &x1 = p1.getX();
   const auto &x2 = p2.getX();
@@ -124,13 +150,10 @@ void LennardJones::calc(Particle &p1, Particle &p2, double epsilon, double sigma
 }
 */
 
-void LennardJones::calc(Particle &p1, Particle &p2, double epsilon, double sigma) {
+void LennardJones::calc(Particle &p1, Particle &p2, double epsilon24, double sigma6) {
   // Cache particle state
   const auto &x1 = p1.getX();
   const auto &x2 = p2.getX();
-
-  auto f1 = p1.getF();
-  auto f2 = p2.getF();
 
   // Compute displacement components explicitly
   const double dx = x1[0] - x2[0];
@@ -142,21 +165,16 @@ void LennardJones::calc(Particle &p1, Particle &p2, double epsilon, double sigma
 
   const double invR2 = 1.0 / r2;
 
-  const double sr2 = (sigma * sigma) * invR2;
-  const double sr6 = sr2 * sr2 * sr2;
+  const double invR6 = invR2 * invR2 * invR2;
+  const double sr6 = sigma6 * invR6;
 
-  const double scalar = 24.0 * epsilon * invR2 * sr6 * (2.0 * sr6 - 1.0);
+  const double scalar = epsilon24 * invR2 * sr6 * (2.0 * sr6 - 1.0);
 
   // Apply forces (Newton's 3rd law)
-  f1[0] += scalar * dx;
-  f1[1] += scalar * dy;
-  f1[2] += scalar * dz;
+  const double fx = scalar * dx;
+  const double fy = scalar * dy;
+  const double fz = scalar * dz;
 
-  f2[0] -= scalar * dx;
-  f2[1] -= scalar * dy;
-  f2[2] -= scalar * dz;
-
-  // Write back once
-  p1.setF(f1);
-  p2.setF(f2);
+  p1.addF(fx, fy, fz);
+  p2.addF(-fx, -fy, -fz);
 }
