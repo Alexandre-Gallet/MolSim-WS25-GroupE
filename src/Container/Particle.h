@@ -6,7 +6,10 @@
 #pragma once
 
 #include <array>
+#include <cstdint>
 #include <string>
+
+class LinkedCellContainer;
 
 /**
  * @brief Class representing a particle in the molecular dynamics simulation
@@ -42,8 +45,10 @@ class Particle {
    * @brief Type of the particle
    */
   int type;
+  uint32_t owned_index_ = 0;
 
  public:
+  friend class LinkedCellContainer;
   /**
    * @brief Construct a new Particle object with default type
    * @param type Type identifier for the particle
@@ -77,57 +82,66 @@ class Particle {
    * @brief Get the position of the particle
    * @return Reference to the position array
    */
-  const std::array<double, 3> &getX() const;
+  const std::array<double, 3> &getX() const { return x; }
 
   /**
    * @brief Set the position of the particle
    */
-  void setX(const std::array<double, 3> &);
+  void setX(const std::array<double, 3> &newX) { x = newX; }
 
   /**
    * @brief Get the velocity of the particle
    * @return Reference to the velocity array
    */
-  const std::array<double, 3> &getV() const;
+  const std::array<double, 3> &getV() const { return v; }
 
   /**
    * @brief Set the velocity of the particle
    */
-  void setV(const std::array<double, 3> &);
+  void setV(const std::array<double, 3> &newV) { v = newV; }
 
   /**
    * @brief Get the current force acting on the particle
    * @return Reference to the force array
    */
-  const std::array<double, 3> &getF() const;
+  const std::array<double, 3> &getF() const { return f; }
 
   /**
    * @brief Set the current force acting on the particle
    */
-  void setF(const std::array<double, 3> &);
+  void setF(const std::array<double, 3> &newF) { f = newF; }
+
+  /**
+   * @brief Add to the current force acting on the particle
+   */
+  void addF(double fx, double fy, double fz) {
+    f[0] += fx;
+    f[1] += fy;
+    f[2] += fz;
+  }
 
   /**
    * @brief Get the old force that was acting on the particle
    * @return Reference to the old force array
    */
-  const std::array<double, 3> &getOldF() const;
+  const std::array<double, 3> &getOldF() const { return old_f; }
 
   /**
    * @brief Set the old force that was acting on the particle
    */
-  void setOldF(const std::array<double, 3> &);
+  void setOldF(const std::array<double, 3> &oldF) { old_f = oldF; }
 
   /**
    * @brief Get the mass of the particle
    * @return Mass value
    */
-  double getM() const;
+  double getM() const { return m; }
 
   /**
    * @brief Get the type of the particle
    * @return Type identifier
    */
-  int getType() const;
+  int getType() const { return type; }
 
   /**
    * @brief Equality comparison operator

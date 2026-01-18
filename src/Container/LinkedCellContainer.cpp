@@ -1,10 +1,54 @@
-
 #include "LinkedCellContainer.h"
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <iostream>
-#include <unordered_set>
+#include <vector>
+
+namespace {
+struct ShiftTableEntry {
+  std::array<std::array<int, 3>, 26> shifts{};
+  int count = 0;
+};
+
+auto buildShiftTable() -> std::array<ShiftTableEntry, 64> {
+  std::array<ShiftTableEntry, 64> table{};
+  for (std::size_t key = 0; key < table.size(); ++key) {
+    int axis_shifts[3][3] = {};
+    int axis_counts[3] = {1, 1, 1};
+    for (int axis = 0; axis < 3; ++axis) {
+      const int mask = static_cast<int>((key >> (axis * 2)) & 0x3);
+      axis_shifts[axis][0] = 0;
+      if (mask & 0x1) {
+        axis_shifts[axis][axis_counts[axis]++] = +1;
+      }
+      if (mask & 0x2) {
+        axis_shifts[axis][axis_counts[axis]++] = -1;
+      }
+    }
+
+    auto &entry = table[key];
+    for (int ix = 0; ix < axis_counts[0]; ++ix) {
+      for (int iy = 0; iy < axis_counts[1]; ++iy) {
+        for (int iz = 0; iz < axis_counts[2]; ++iz) {
+          const int sx = axis_shifts[0][ix];
+          const int sy = axis_shifts[1][iy];
+          const int sz = axis_shifts[2][iz];
+          if (sx == 0 && sy == 0 && sz == 0) continue;
+          entry.shifts[entry.count++] = {sx, sy, sz};
+        }
+      }
+    }
+  }
+  return table;
+}
+
+const std::array<ShiftTableEntry, 64> &shiftTable() {
+  static const std::array<ShiftTableEntry, 64> table = buildShiftTable();
+  return table;
+}
+}  // namespace
 
 LinkedCellContainer::LinkedCellContainer() : LinkedCellContainer(1.0, {1.0, 1.0, 1.0}) {}
 
@@ -15,6 +59,9 @@ LinkedCellContainer::LinkedCellContainer(double r_cutoff, const std::array<doubl
   // so generated particles do not sit directly on the lower wall.
   if (std::abs(domain_size.at(2) - 1.0) < 1e-9) {
     domain_min.at(2) = -0.5 * domain_size.at(2);
+  }
+  for (int i = 0; i < 3; ++i) {
+    domain_max.at(i) = domain_min.at(i) + domain_size.at(i);
   }
   initDimensions();
   initCells();
@@ -54,6 +101,13 @@ void LinkedCellContainer::initCells() {
   for (auto &per_face : boundary_cells_by_face) {
     per_face.clear();
   }
+  for (auto &per_face : periodic_cell_indices_by_face) {
+    per_face.clear();
+  }
+  periodic_candidate_cell_indices.clear();
+
+  std::vector<char> periodic_candidate_marks(total_cells, 0);
+  const double layer = r_cutoff;
 
   for (std::size_t z = 0; z < padded_dims[2]; ++z) {
     for (std::size_t y = 0; y < padded_dims[1]; ++y) {
@@ -72,6 +126,7 @@ void LinkedCellContainer::initCells() {
           cell.type = CellType::Inner;
         }
 
+        const std::size_t linear_index = cells.size();
         cells.push_back(std::move(cell));
         auto *stored = &cells.back();
         if (stored->type == CellType::Halo) {
@@ -84,6 +139,33 @@ void LinkedCellContainer::initCells() {
           if (y == padded_dims[1] - 2) boundary_cells_by_face[static_cast<std::size_t>(Face::YMax)].push_back(stored);
           if (z == 1) boundary_cells_by_face[static_cast<std::size_t>(Face::ZMin)].push_back(stored);
           if (z == padded_dims[2] - 2) boundary_cells_by_face[static_cast<std::size_t>(Face::ZMax)].push_back(stored);
+
+          const double cell_min_x = domain_min.at(0) + static_cast<double>(x - 1) * cell_dim.at(0);
+          const double cell_max_x = cell_min_x + cell_dim.at(0);
+          const double cell_min_y = domain_min.at(1) + static_cast<double>(y - 1) * cell_dim.at(1);
+          const double cell_max_y = cell_min_y + cell_dim.at(1);
+          const double cell_min_z = domain_min.at(2) + static_cast<double>(z - 1) * cell_dim.at(2);
+          const double cell_max_z = cell_min_z + cell_dim.at(2);
+
+          const bool near_x_min = cell_min_x < domain_min.at(0) + layer;
+          const bool near_x_max = cell_max_x > domain_max.at(0) - layer;
+          const bool near_y_min = cell_min_y < domain_min.at(1) + layer;
+          const bool near_y_max = cell_max_y > domain_max.at(1) - layer;
+          const bool near_z_min = cell_min_z < domain_min.at(2) + layer;
+          const bool near_z_max = cell_max_z > domain_max.at(2) - layer;
+
+          if (near_x_min) periodic_cell_indices_by_face[static_cast<std::size_t>(Face::XMin)].push_back(linear_index);
+          if (near_x_max) periodic_cell_indices_by_face[static_cast<std::size_t>(Face::XMax)].push_back(linear_index);
+          if (near_y_min) periodic_cell_indices_by_face[static_cast<std::size_t>(Face::YMin)].push_back(linear_index);
+          if (near_y_max) periodic_cell_indices_by_face[static_cast<std::size_t>(Face::YMax)].push_back(linear_index);
+          if (near_z_min) periodic_cell_indices_by_face[static_cast<std::size_t>(Face::ZMin)].push_back(linear_index);
+          if (near_z_max) periodic_cell_indices_by_face[static_cast<std::size_t>(Face::ZMax)].push_back(linear_index);
+
+          if ((near_x_min || near_x_max || near_y_min || near_y_max || near_z_min || near_z_max) &&
+              !periodic_candidate_marks[linear_index]) {
+            periodic_candidate_marks[linear_index] = 1;
+            periodic_candidate_cell_indices.push_back(linear_index);
+          }
         }
       }
     }
@@ -91,22 +173,47 @@ void LinkedCellContainer::initCells() {
 }
 
 void LinkedCellContainer::deleteHaloCells() {
-  std::unordered_set<Particle *> halo_particles;
-  halo_particles.reserve(size());
+  if (owned_epoch.size() != owned_particles.size()) {
+    owned_epoch.resize(owned_particles.size(), 0);
+  }
+
+  if (++owned_epoch_counter == 0) {
+    std::fill(owned_epoch.begin(), owned_epoch.end(), 0);
+    owned_epoch_counter = 1;
+  }
+
   for (auto *cell : halo_cells) {
-    halo_particles.insert(cell->particles.begin(), cell->particles.end());
+    for (auto *particle : cell->particles) {
+      const std::size_t idx = particle->owned_index_;
+      if (idx < owned_particles.size() && owned_particles[idx].get() == particle) {
+        owned_epoch[idx] = owned_epoch_counter;
+      }
+    }
     cell->particles.clear();
   }
 
-  owned_particles.erase(
-      std::remove_if(owned_particles.begin(), owned_particles.end(),
-                     [&](const auto &ptr) -> bool { return halo_particles.find(ptr.get()) != halo_particles.end(); }),
-      owned_particles.end());
+  std::size_t write = 0;
+  for (std::size_t read = 0; read < owned_particles.size(); ++read) {
+    if (owned_epoch[read] == owned_epoch_counter) {
+      continue;
+    }
+    if (write != read) {
+      owned_particles[write] = std::move(owned_particles[read]);
+      owned_epoch[write] = owned_epoch[read];
+    }
+    owned_particles[write]->owned_index_ = static_cast<uint32_t>(write);
+    ++write;
+  }
+
+  owned_particles.resize(write);
+  owned_epoch.resize(write);
 }
 
 auto LinkedCellContainer::addParticle(Particle &particle) -> Particle & {
   owned_particles.push_back(std::make_unique<Particle>(particle));
   auto *stored = owned_particles.back().get();
+  stored->owned_index_ = static_cast<uint32_t>(owned_particles.size() - 1);
+  owned_epoch.push_back(0);
   placeParticle(stored);
   return *stored;
 }
@@ -115,6 +222,8 @@ auto LinkedCellContainer::emplaceParticle(const std::array<double, 3> &pos, cons
                                           double mass, int type) -> Particle & {
   owned_particles.push_back(std::make_unique<Particle>(pos, vel, mass, type));
   auto *stored = owned_particles.back().get();
+  stored->owned_index_ = static_cast<uint32_t>(owned_particles.size() - 1);
+  owned_epoch.push_back(0);
   placeParticle(stored);
   return *stored;
 }
@@ -128,26 +237,61 @@ auto LinkedCellContainer::size() const noexcept -> std::size_t { return owned_pa
 
 auto LinkedCellContainer::empty() const noexcept -> bool { return size() == 0; }
 
-auto LinkedCellContainer::reserve(std::size_t capacity) -> void { owned_particles.reserve(capacity); }
+auto LinkedCellContainer::reserve(std::size_t capacity) -> void {
+  owned_particles.reserve(capacity);
+  owned_epoch.reserve(capacity);
+}
 
 auto LinkedCellContainer::clear() noexcept -> void {
   owned_particles.clear();
+  owned_epoch.clear();
+  owned_epoch_counter = 0;
+  for (int axis = 0; axis < 3; ++axis) {
+    owned_x[axis].clear();
+    owned_v[axis].clear();
+  }
   for (auto &cell : cells) {
     cell.particles.clear();
   }
 }
 
-void LinkedCellContainer::rebuild() {
-  ghost_particles.clear();
+void LinkedCellContainer::clearDynamicState() {
+  ghost_pool.clear();
   for (auto &cell : cells) {
     cell.particles.clear();
   }
+}
 
-  wrapPeriodicParticles();
+void LinkedCellContainer::updateSoaCache() {
+  const std::size_t count = owned_particles.size();
+  for (int axis = 0; axis < 3; ++axis) {
+    owned_x[axis].resize(count);
+    owned_v[axis].resize(count);
+  }
 
+  for (std::size_t i = 0; i < count; ++i) {
+    const auto &pos = owned_particles[i]->getX();
+    const auto &vel = owned_particles[i]->getV();
+    for (int axis = 0; axis < 3; ++axis) {
+      owned_x[axis][i] = pos[axis];
+      owned_v[axis][i] = vel[axis];
+    }
+  }
+}
+
+void LinkedCellContainer::placeOwnedParticles() {
   for (auto &p : owned_particles) {
     placeParticle(p.get());
   }
+}
+
+void LinkedCellContainer::rebuild() {
+  clearDynamicState();
+
+  wrapPeriodicParticles();
+  updateSoaCache();
+
+  placeOwnedParticles();
 
   deleteHaloCells();
 
@@ -187,8 +331,15 @@ auto LinkedCellContainer::cbegin() const -> const_iterator { return begin(); }
 auto LinkedCellContainer::cend() const -> const_iterator { return end(); }
 
 void LinkedCellContainer::placeParticle(Particle *particle) {
-  const auto &pos = particle->getX();
+  const auto linear_index = linearIndexForPosition(particle->getX());
+  placeParticleAtIndex(particle, linear_index);
+}
 
+void LinkedCellContainer::placeParticleAtIndex(Particle *particle, std::size_t linear_index) {
+  cells[linear_index].particles.push_back(particle);
+}
+
+auto LinkedCellContainer::linearIndexForPosition(const std::array<double, 3> &pos) const -> std::size_t {
   std::array<std::size_t, 3> idx{};
   for (int i = 0; i < 3; ++i) {
     const double shifted = pos.at(i) - domain_min.at(i);
@@ -201,8 +352,7 @@ void LinkedCellContainer::placeParticle(Particle *particle) {
       idx.at(i) = std::min<std::size_t>(raw + 1, padded_dims.at(i) - 2);
     }
   }
-
-  cells[toLinearIndex(idx[0], idx[1], idx[2], padded_dims)].particles.push_back(particle);
+  return toLinearIndex(idx[0], idx[1], idx[2], padded_dims);
 }
 
 auto LinkedCellContainer::to3DIndex(std::size_t linear_index) const -> std::array<std::size_t, 3> {
@@ -246,20 +396,25 @@ void LinkedCellContainer::createGhostsForFace(Face face) {
   const auto face_index = static_cast<std::size_t>(face);
 
   std::vector<Particle *> candidates;
+  std::size_t candidate_count = 0;
+  for (auto *cell : boundary_cells_by_face.at(face_index)) {
+    candidate_count += cell->particles.size();
+  }
+  candidates.reserve(candidate_count);
 
   for (auto *cell : boundary_cells_by_face.at(face_index)) {
     candidates.insert(candidates.end(), cell->particles.begin(), cell->particles.end());
   }
 
   for (auto *particle : candidates) {
-    ghost_particles.push_back(std::make_unique<Particle>(*particle));
-    auto *ghost = ghost_particles.back().get();
+    ghost_pool.emplace_back(*particle);
+    auto *ghost = &ghost_pool.back();
 
     auto ghost_pos = ghost->getX();
     auto ghost_vel = ghost->getV();
 
     const double lower_bound = domain_min.at(axis);
-    const double upper_bound = lower_bound + domain_size.at(axis);
+    const double upper_bound = domain_max.at(axis);
 
     if (upper) {
       ghost_pos.at(axis) = upper_bound + (upper_bound - ghost_pos.at(axis));
@@ -270,24 +425,36 @@ void LinkedCellContainer::createGhostsForFace(Face face) {
 
     ghost->setX(ghost_pos);
     ghost->setV(ghost_vel);
-    placeParticle(ghost);
+    const auto linear_index = linearIndexForPosition(ghost_pos);
+    placeParticleAtIndex(ghost, linear_index);
   }
 }
 
 void LinkedCellContainer::createAllPeriodicGhosts() {
-  bool any_periodic = false;
+  std::array<std::size_t, 6> periodic_faces{};
+  std::size_t periodic_face_count = 0;
   for (std::size_t i = 0; i < boundary_conditions.size(); ++i) {
     if (boundary_conditions[i] == BoundaryCondition::Periodic) {
-      any_periodic = true;
-      break;
+      periodic_faces[periodic_face_count++] = i;
     }
   }
-  if (!any_periodic) return;
+  if (periodic_face_count == 0) return;
+
+  const std::vector<std::size_t> *candidate_cells = &periodic_candidate_cell_indices;
+  if (periodic_face_count == 1) {
+    candidate_cells = &periodic_cell_indices_by_face[periodic_faces[0]];
+  }
+  if (candidate_cells->empty()) return;
 
   std::vector<Particle *> candidates;
-  candidates.reserve(size());
-  for (auto *cell : boundary_cells) {
-    candidates.insert(candidates.end(), cell->particles.begin(), cell->particles.end());
+  std::size_t candidate_count = 0;
+  for (auto idx : *candidate_cells) {
+    candidate_count += cells[idx].particles.size();
+  }
+  candidates.reserve(candidate_count);
+  for (auto idx : *candidate_cells) {
+    auto &cell = cells[idx];
+    candidates.insert(candidates.end(), cell.particles.begin(), cell.particles.end());
   }
 
   // Thickness of the "boundary layer" that needs periodic images.
@@ -298,19 +465,14 @@ void LinkedCellContainer::createAllPeriodicGhosts() {
   for (auto *particle : candidates) {
     const auto pos = particle->getX();
 
-    // For each axis, gather possible shifts we should generate.
-    // Always include 0. Add +L or -L depending on which periodic boundary
-    // the particle is close to.
-    std::array<std::vector<double>, 3> shifts;
+    uint8_t key = 0;
+    double spans[3] = {domain_size.at(0), domain_size.at(1), domain_size.at(2)};
     for (int axis = 0; axis < 3; ++axis) {
-      shifts[axis].clear();
-      shifts[axis].push_back(0.0);
-
-      const double span = domain_size.at(axis);
+      const double span = spans[axis];
       if (span <= 0.0) continue;
 
       const double lower = domain_min.at(axis);
-      const double upper = lower + span;
+      const double upper = domain_max.at(axis);
 
       const auto min_face = static_cast<std::size_t>(axis * 2);
       const auto max_face = static_cast<std::size_t>(axis * 2 + 1);
@@ -318,37 +480,39 @@ void LinkedCellContainer::createAllPeriodicGhosts() {
       const bool per_min = boundary_conditions.at(min_face) == BoundaryCondition::Periodic;
       const bool per_max = boundary_conditions.at(max_face) == BoundaryCondition::Periodic;
 
-      // If particle is within 'layer' of the lower boundary, then the matching
-      // periodic image is shifted by +L (from the opposite side).
+      uint8_t mask = 0;
       if (per_min && pos.at(axis) < lower + layer) {
-        shifts[axis].push_back(+span);
+        mask |= 0x1;
+      }
+      if (per_max && pos.at(axis) >= upper - layer) {
+        mask |= 0x2;
       }
 
-      // If particle is within 'layer' of the upper boundary, then the matching
-      // periodic image is shifted by -L.
-      if (per_max && pos.at(axis) >= upper - layer) {
-        shifts[axis].push_back(-span);
-      }
+      key |= static_cast<uint8_t>(mask << (axis * 2));
     }
 
-    // Generate all non-zero combinations (up to 26 in 3D).
-    for (double sx : shifts[0]) {
-      for (double sy : shifts[1]) {
-        for (double sz : shifts[2]) {
-          if (sx == 0.0 && sy == 0.0 && sz == 0.0) continue;
+    if (key == 0) {
+      continue;
+    }
 
-          ghost_particles.push_back(std::make_unique<Particle>(*particle));
-          auto *ghost = ghost_particles.back().get();
+    const auto &entry = shiftTable()[key];
+    for (int i = 0; i < entry.count; ++i) {
+      const auto &shift = entry.shifts[i];
+      const double sx = static_cast<double>(shift[0]) * spans[0];
+      const double sy = static_cast<double>(shift[1]) * spans[1];
+      const double sz = static_cast<double>(shift[2]) * spans[2];
 
-          auto gpos = ghost->getX();
-          gpos[0] += sx;
-          gpos[1] += sy;
-          gpos[2] += sz;
-          ghost->setX(gpos);
+      ghost_pool.emplace_back(*particle);
+      auto *ghost = &ghost_pool.back();
 
-          placeParticle(ghost);
-        }
-      }
+      auto gpos = ghost->getX();
+      gpos[0] += sx;
+      gpos[1] += sy;
+      gpos[2] += sz;
+      ghost->setX(gpos);
+
+      const auto linear_index = linearIndexForPosition(gpos);
+      placeParticleAtIndex(ghost, linear_index);
     }
   }
 }
@@ -362,7 +526,7 @@ void LinkedCellContainer::wrapPeriodicParticles() {
       const auto min_face = static_cast<std::size_t>(axis * 2);
       const auto max_face = static_cast<std::size_t>(axis * 2 + 1);
       const double lower = domain_min.at(axis);
-      const double upper = lower + domain_size.at(axis);
+      const double upper = domain_max.at(axis);
       const double span = domain_size.at(axis);
       if (span <= 0.0) {
         continue;

@@ -16,9 +16,10 @@
 #pragma once
 #include <array>
 #include <cstdint>
+#include <deque>
 #include <functional>
 #include <memory>
-#include <unordered_set>
+#include <string>
 #include <vector>
 
 #include "Container.h"
@@ -133,7 +134,12 @@ class LinkedCellContainer : public Container {
  private:
   void initDimensions();
   void initCells();
+  void clearDynamicState();
+  void updateSoaCache();
+  void placeOwnedParticles();
   void placeParticle(Particle *particle);
+  void placeParticleAtIndex(Particle *particle, std::size_t linear_index);
+  [[nodiscard]] auto linearIndexForPosition(const std::array<double, 3> &pos) const -> std::size_t;
   void createGhostsForFace(Face face);
   void createAllPeriodicGhosts();  ///< Mirror boundary particles into opposite halo for all faces.
   void wrapPeriodicParticles();    ///< Wrap owned particles back into domain for periodic BC.
@@ -186,15 +192,22 @@ class LinkedCellContainer : public Container {
 
   storage_type cells;
   std::vector<std::unique_ptr<Particle>> owned_particles;  ///< Owned particle storage.
-  std::vector<std::unique_ptr<Particle>> ghost_particles;  ///< Ghost particle storage (not counted as owned).
+  std::deque<Particle> ghost_pool;  ///< Ghost particle storage (not counted as owned).
+  std::vector<uint32_t> owned_epoch;
+  uint32_t owned_epoch_counter = 0;
+  std::array<std::vector<double>, 3> owned_x;
+  std::array<std::vector<double>, 3> owned_v;
   double r_cutoff;
   std::array<double, 3> cell_dim{};
   std::array<double, 3> domain_size{};
   std::array<double, 3> domain_min{};  ///< Optional shift of the domain origin (used for thin z-domains).
+  std::array<double, 3> domain_max{};
   std::array<std::size_t, 3> cells_per_dim{};
   std::array<std::size_t, 3> padded_dims{};
   std::vector<LinkedCell *> boundary_cells;
   std::array<std::vector<LinkedCell *>, 6> boundary_cells_by_face;
+  std::array<std::vector<std::size_t>, 6> periodic_cell_indices_by_face;
+  std::vector<std::size_t> periodic_candidate_cell_indices;
   std::vector<LinkedCell *> halo_cells;
   std::array<BoundaryCondition, 6> boundary_conditions{BoundaryCondition::Outflow, BoundaryCondition::Outflow,
                                                        BoundaryCondition::Outflow, BoundaryCondition::Outflow,
