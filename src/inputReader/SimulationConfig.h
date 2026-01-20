@@ -36,6 +36,17 @@ struct ThermostatConfig {
   bool enable_thermostat = false;  // Check if a thermostat should be used, so that old simulations still function
 };
 
+/// Nano scale thermostat definition
+struct NSThermostatConfig {
+  double t_init;
+  double t_target;
+  double delta_t;
+  size_t n_thermostat;
+  size_t dimensions;
+  bool brownian_motion;
+  bool enable_thermostat = false;  // Check if a thermostat should be used, so that old simulations still function
+};
+
 /// Lennard-Jones parameters for a specific particle type.
 struct LJTypeParams {
   int type = 0;
@@ -91,4 +102,7 @@ struct SimulationConfig {
 
   // --- Thermostat
   ThermostatConfig thermostat;
+
+  // --- NS Thermostat
+  NSThermostatConfig ns_thermostat;
 };
