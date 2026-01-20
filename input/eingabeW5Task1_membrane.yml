@@ -1,0 +1,34 @@
+simulation:
+  sim_type: membrane
+  t_start: 0.0
+  t_end: 500.0
+  delta_t: 0.01
+  output_format: VTK
+  gravity: [0.0, 0.0, -0.001]
+
+output:
+  write_frequency: 200
+
+linkedCell:
+  - containerType: [Cell]
+    domainSize: [148.0, 148.0, 148.0]
+    rCutoff: 4.0
+    boundaryConditions: [Outflow, Outflow, Outflow, Outflow, Reflecting, Outflow]
+
+membrane:
+  origin: [15.0, 15.0, 1.5]
+  n: [50, 50, 1]
+  h: 2.2
+  mass: 1.0
+  baseVelocity: [0.0, 0.0, 0.0]
+  epsilon: 1.0
+  sigma: 1.0
+  k: 300.0
+  r0: 2.2
+  pull_force: 0.8
+  pull_until: 150.0
+  pull_indices:
+    - [17, 24]
+    - [17, 25]
+    - [18, 24]
+    - [18, 25]
