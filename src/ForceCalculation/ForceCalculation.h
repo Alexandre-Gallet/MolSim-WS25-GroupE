@@ -29,6 +29,7 @@ class ForceCalculation {
     // calculate the position updates using the methods in the ArrayUtils class
     // since the formulas are the same regardless of simulation, the method is included in the base class
     for (auto &p : particles) {
+      if (p.getType() == 1) continue;
       p.setX(ArrayUtils::elementWisePairOp(
           p.getX(),
           ArrayUtils::elementWisePairOp(
@@ -47,6 +48,7 @@ class ForceCalculation {
     // calculate the forces using the methods in the ArrayUtils class
     // since the formulas are the same regardless of simulation, the method is included in the base class
     for (auto &p : particles) {
+      if (p.getType() == 1) continue;
       p.setV(ArrayUtils::elementWisePairOp(
           p.getV(),
           ArrayUtils::elementWiseScalarOp(delta_t / (2 * p.getM()),

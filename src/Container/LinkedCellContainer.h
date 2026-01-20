@@ -192,7 +192,7 @@ class LinkedCellContainer : public Container {
 
   storage_type cells;
   std::vector<std::unique_ptr<Particle>> owned_particles;  ///< Owned particle storage.
-  std::deque<Particle> ghost_pool;  ///< Ghost particle storage (not counted as owned).
+  std::deque<Particle> ghost_pool;                         ///< Ghost particle storage (not counted as owned).
   std::vector<uint32_t> owned_epoch;
   uint32_t owned_epoch_counter = 0;
   std::array<std::vector<double>, 3> owned_x;

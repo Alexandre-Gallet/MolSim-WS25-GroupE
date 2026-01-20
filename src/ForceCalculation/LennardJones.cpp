@@ -38,6 +38,9 @@ double LennardJones::calculateU(const Particle &p1, const Particle &p2) const {
 void LennardJones::calculateF(Container &particles) {
   for (auto &p : particles) {
     // initialize to 0 so the simulation runs as expected
+    if (p.getType() == 1) {
+      p.setF({0., 0., 0.});
+    }
     p.setOldF(p.getF());
     auto gravityForce = ArrayUtils::elementWiseScalarOp(p.getM(), gravity_, std::multiplies<>());
     p.setF(gravityForce);
@@ -69,8 +72,8 @@ void LennardJones::calculateF(Container &particles) {
   };
 
   auto lookupPair = [this, &lookup](int type1, int type2) {
-    if (pair_params_dense_stride_ > 0 && type1 >= 0 && type2 >= 0 &&
-        type1 < pair_params_dense_stride_ && type2 < pair_params_dense_stride_) {
+    if (pair_params_dense_stride_ > 0 && type1 >= 0 && type2 >= 0 && type1 < pair_params_dense_stride_ &&
+        type2 < pair_params_dense_stride_) {
       const int idx = type1 * pair_params_dense_stride_ + type2;
       if (pair_params_dense_set_[idx]) {
         return pair_params_dense_[idx];
@@ -174,7 +177,6 @@ void LennardJones::calc(Particle &p1, Particle &p2, double epsilon24, double sig
   const double fx = scalar * dx;
   const double fy = scalar * dy;
   const double fz = scalar * dz;
-
   p1.addF(fx, fy, fz);
   p2.addF(-fx, -fy, -fz);
 }

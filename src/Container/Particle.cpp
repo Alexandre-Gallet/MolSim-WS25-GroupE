@@ -1,5 +1,5 @@
 /**
-* @file Particle.cpp
+ * @file Particle.cpp
  * @brief Implementation of the Particle class
  */
 
