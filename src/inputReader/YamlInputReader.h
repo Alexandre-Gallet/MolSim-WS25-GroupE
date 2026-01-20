@@ -65,6 +65,9 @@ class YamlInputReader {
   /// parse Thermostat section in YAML file
   void parseThermostatSection(const YAML::Node &Node, SimulationConfig &cfg) const;
 
+  /// parse Membrane section in YAML file
+  void parseMembraneSection(const YAML::Node &node, SimulationConfig &cfg) const;
+
   /// Helper to parse a 3-element vector of doubles from a YAML sequence.
   std::array<double, 3> parseVec3(const YAML::Node &n, const std::string &fieldName) const;
 
