@@ -7,12 +7,20 @@
 
 #include <array>
 #include <string>
+#include <vector>
 
 /**
  * @brief Class representing a particle in the molecular dynamics simulation
  */
 class Particle {
  private:
+ public:
+  struct Neighbor {
+    Particle *particle{nullptr};
+    double rest_length{0.0};
+  };
+ private:
+
   /**
    * @brief Position of the particle
    */
@@ -42,6 +50,11 @@ class Particle {
    * @brief Type of the particle
    */
   int type;
+
+  /**
+   * @brief Neighboring particles used for membrane simulations
+   */
+  std::vector<Neighbor> neighbors_;
 
  public:
   /**
@@ -141,6 +154,26 @@ class Particle {
    * @return String containing particle information
    */
   std::string toString() const;
+
+  /**
+   * @brief Add a neighbor reference with its rest length.
+   */
+  void addNeighbor(Particle *neighbor, double rest_length);
+
+  /**
+   * @brief Remove all stored neighbors.
+   */
+  void clearNeighbors();
+
+  /**
+   * @brief Accessor for neighbor list (mutable).
+   */
+  std::vector<Neighbor> &getNeighbors();
+
+  /**
+   * @brief Accessor for neighbor list (const).
+   */
+  const std::vector<Neighbor> &getNeighbors() const;
 };
 
 /**
