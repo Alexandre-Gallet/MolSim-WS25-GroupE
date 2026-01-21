@@ -25,11 +25,12 @@ void CuboidGenerator::generateCuboid(Container &container, const std::array<doub
 
         // 3 for the dimension
         auto brownian = maxwellBoltzmannDistributedVelocity(brownianMean, 3);
-
-        vel[0] += brownian[0];
-        vel[1] += brownian[1];
-        if (dimension == 3) {
-          vel[2] += brownian[2];
+        if (type != 1) {
+          vel[0] += brownian[0];
+          vel[1] += brownian[1];
+          if (dimension == 3) {
+            vel[2] += brownian[2];
+          }
         }
 
         container.emplaceParticle(pos, vel, mass, type);
