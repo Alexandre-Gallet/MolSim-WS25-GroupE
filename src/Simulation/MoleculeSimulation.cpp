@@ -18,6 +18,7 @@
 #include "Generator/ParticleGenerator.h"
 #include "inputReader/CheckpointReader.h"
 #include "outputWriter/WriterFactory.h"
+#include "utils/ParticleProfiling.h"
 
 MoleculeSimulation::MoleculeSimulation(const SimulationConfig &cfg, Container &particles)
     : cfg_(cfg), particles_(particles) {}
@@ -106,6 +107,11 @@ void MoleculeSimulation::runSimulation() {
     }
 
     iteration++;
+
+    // Write the particle profiling
+    if (iteration % 10000 == 0) {
+      ParticleProfiling::computeProfiling(particles_, cfg_.domainSize[0], cfg_.domainSize[1], cfg_.domainSize[2], 50);
+    }
 
     // Write output every cfg_.write_frequency
     if (iteration % cfg_.write_frequency == 0) {
