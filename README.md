@@ -72,6 +72,7 @@ Using some of the provided example files:
 ```bash
 ./MolSim ../input/eingabe.yml 
 ./MolSim ../input/eingabeRayleighTaylorSmall.yml
+./MolSim ../input/eingabeNanoScaleFlow.yml
 ```
 
 Simulation output files (VTK, XYZ, or both depending on `output_format` as defined in the .yml file)

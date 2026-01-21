@@ -38,12 +38,13 @@ double LennardJones::calculateU(const Particle &p1, const Particle &p2) const {
 void LennardJones::calculateF(Container &particles) {
   for (auto &p : particles) {
     // initialize to 0 so the simulation runs as expected
-    if (p.getType() == 1) {
+    p.setOldF(p.getF());
+    if (p.getType() != 1) {
+      auto gravityForce = ArrayUtils::elementWiseScalarOp(p.getM(), gravity_, std::multiplies<>());
+      p.setF(gravityForce);
+    } else {
       p.setF({0., 0., 0.});
     }
-    p.setOldF(p.getF());
-    auto gravityForce = ArrayUtils::elementWiseScalarOp(p.getM(), gravity_, std::multiplies<>());
-    p.setF(gravityForce);
   }
 
   /* Original code that got replaced for serial speedup

@@ -61,7 +61,9 @@ void MoleculeSimulation::runSimulation() {
   // Initialize thermostat for the nano scale flow simulation
   std::unique_ptr<NanoScaleThermostat> ns_thermo = nullptr;
   if (cfg_.ns_thermostat.enable_thermostat) {
-    thermostat = std::make_unique<Thermostat>(cfg_.ns_thermostat.t_init, cfg_.ns_thermostat.dimensions, cfg_.ns_thermostat.n_thermostat, cfg_.ns_thermostat.t_target, cfg_.ns_thermostat.delta_t, cfg_.ns_thermostat.brownian_motion);
+    thermostat = std::make_unique<Thermostat>(cfg_.ns_thermostat.t_init, cfg_.ns_thermostat.dimensions,
+                                              cfg_.ns_thermostat.n_thermostat, cfg_.ns_thermostat.t_target,
+                                              cfg_.ns_thermostat.delta_t, cfg_.ns_thermostat.brownian_motion);
   }
 
   // Lennard-Jones force setup
