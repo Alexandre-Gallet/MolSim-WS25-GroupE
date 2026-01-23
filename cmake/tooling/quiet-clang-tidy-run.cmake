@@ -1,6 +1,5 @@
-# Convert semicolon-separated list to space-separated
-string(REPLACE ";" " " FILES_SPACED "${ALL_CPP}")
-
+# loops over each file individually. This is the correct choice! It avoids the explosion in warnings and therefore keeps the signal to noise ratio
+# of clang-tidy output reasonable. This snippet actually calls the clang-tidy
 foreach(f ${ALL_CPP})
     execute_process(
             COMMAND ${CLANG_TIDY_EXE}
