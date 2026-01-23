@@ -16,11 +16,17 @@ list(REMOVE_ITEM MOLSIM_SRC
 # Crucially the core simulation logic is defined only once and is authoritative
 add_library(molsim_core ${MOLSIM_SRC})
 
+# needed so that the compiler can understand include paths in src and knows where to locate file
+target_include_directories(molsim_core
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 # include the vtk cmake module which links against molsim_core
 include(modules/vtk)
 
-# link spdlog and yaml-cpp against molsim_core library
-target_link_libraries(molsim_core PRIVATE spdlog::spdlog)
+# link spdlog and yaml-cpp against molsim_core library.
+target_link_libraries(molsim_core PUBLIC spdlog::spdlog)
 target_link_libraries(molsim_core PRIVATE yaml-cpp::yaml-cpp)
 
 # set LOG_LEVEL as globally accessible in molsim_core target
