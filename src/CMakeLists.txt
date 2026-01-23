@@ -1,6 +1,6 @@
 # include only those modules that we will link molsim_core against
-include(spdlog)
-include(yaml-cpp)
+include(modules/spdlog)
+include(modules/yaml-cpp)
 
 # Collect all simulation sources except main
 file(GLOB_RECURSE MOLSIM_SRC CONFIGURE_DEPENDS
@@ -15,6 +15,9 @@ list(REMOVE_ITEM MOLSIM_SRC
 # Core simulation library. This makes molsim_core a global target meaning other executables like the test executable can link against the global target
 # Crucially the core simulation logic is defined only once and is authoritative
 add_library(molsim_core ${MOLSIM_SRC})
+
+# include the vtk cmake module which links against molsim_core
+include(modules/vtk)
 
 # link spdlog and yaml-cpp against molsim_core library
 target_link_libraries(molsim_core PRIVATE spdlog::spdlog)

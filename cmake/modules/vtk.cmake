@@ -1,6 +1,3 @@
-option(ENABLE_VTK_OUTPUT "Enable VTK output" ON)
-#option(ENABLE_VTK_BINARY_OUTPUT "Enable binary VTK output" ON)
-
 if(ENABLE_VTK_OUTPUT)
     message(STATUS "VTK output enabled")
     # VTK Library, only add required components for less unnecessary includes
@@ -22,9 +19,9 @@ if(ENABLE_VTK_OUTPUT)
         include(${VTK_USE_FILE})
     endif ()
 
-    target_link_libraries(MolSim
-            PRIVATE
+    target_link_libraries(molsim_core
+            PUBLIC
             ${VTK_LIBRARIES}
     )
-    target_compile_definitions(MolSim PRIVATE ENABLE_VTK_OUTPUT)
+    target_compile_definitions(molsim_core PUBLIC ENABLE_VTK_OUTPUT)
 endif()

@@ -16,14 +16,7 @@ include(tooling/clang-tidy.cmake)
 
 add_subdirectory(src) # see the src/CMakeLists.txt
 
-
-# -----------------------------------
-# Load custom modules
-# -----------------------------------
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
-
-include(vtk)
-include(doxygen)
+include(modules/doxygen)
 
 # include CTest
 include(CTest)
