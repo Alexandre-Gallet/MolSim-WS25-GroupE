@@ -54,6 +54,22 @@ struct LJTypeParams {
   double sigma = 1.0;
 };
 
+/// Membrane-specific parameters
+struct MembraneConfig {
+  std::array<double, 3> origin{15.0, 15.0, 1.5};     // starting position of lower-left-front corner
+  std::array<int, 3> n{50, 50, 1};                   // particles per dimension
+  double h = 2.2;                                    // mesh width
+  double mass = 1.0;                                 // mass per particle
+  std::array<double, 3> baseVelocity{0.0, 0.0, 0.0};  // initial velocity
+  double epsilon = 1.0;                              // WCA epsilon
+  double sigma = 1.0;                                // WCA sigma
+  double k = 300.0;                                  // spring stiffness
+  double r0 = 2.2;                                   // rest length for direct neighbors
+  double pull_force = 0.8;                           // constant upward force
+  double pull_until = 150.0;                         // active time for upward pull
+  std::vector<std::array<int, 2>> pull_indices{{{17, 24}}, {{17, 25}}, {{18, 24}}, {{18, 25}}};
+};
+
 /**
  * @brief Bundles all simulation configuration options.
  */
@@ -105,4 +121,7 @@ struct SimulationConfig {
 
   // --- NS Thermostat
   NSThermostatConfig ns_thermostat;
+
+  // --- Membrane (Assignment 4)
+  MembraneConfig membrane;
 };

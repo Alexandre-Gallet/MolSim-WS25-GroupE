@@ -8,6 +8,7 @@
 #include <array>
 #include <cstdint>
 #include <string>
+#include <vector>
 
 class LinkedCellContainer;
 
@@ -16,6 +17,13 @@ class LinkedCellContainer;
  */
 class Particle {
  private:
+ public:
+  struct Neighbor {
+    Particle *particle{nullptr};
+    double rest_length{0.0};
+  };
+ private:
+
   /**
    * @brief Position of the particle
    */
@@ -46,6 +54,11 @@ class Particle {
    */
   int type;
   uint32_t owned_index_ = 0;
+
+  /**
+   * @brief Neighboring particles used for membrane simulations
+   */
+  std::vector<Neighbor> neighbors_;
 
  public:
   friend class LinkedCellContainer;
@@ -155,6 +168,26 @@ class Particle {
    * @return String containing particle information
    */
   std::string toString() const;
+
+  /**
+   * @brief Add a neighbor reference with its rest length.
+   */
+  void addNeighbor(Particle *neighbor, double rest_length);
+
+  /**
+   * @brief Remove all stored neighbors.
+   */
+  void clearNeighbors();
+
+  /**
+   * @brief Accessor for neighbor list (mutable).
+   */
+  std::vector<Neighbor> &getNeighbors();
+
+  /**
+   * @brief Accessor for neighbor list (const).
+   */
+  const std::vector<Neighbor> &getNeighbors() const;
 };
 
 /**

@@ -7,6 +7,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include <array>
+#include <limits>
 #include <sstream>
 #include <stdexcept>
 
@@ -72,6 +73,11 @@ SimulationConfig YamlInputReader::parse() const {
   // --- ns thermostat section ---
   if (root["ns_thermostat"]) {
     parseNSThermoSection(root["ns_thermostat"], cfg);
+  }
+
+  // --- membrane section (optional) ---
+  if (root["membrane"]) {
+    parseMembraneSection(root["membrane"], cfg);
   }
 
   return cfg;
@@ -291,6 +297,61 @@ void YamlInputReader::parseNSThermoSection(const YAML::Node &n, SimulationConfig
     cfg.ns_thermostat.delta_t = n["delta_t"].as<double>();
   } else {
     cfg.ns_thermostat.delta_t = std::numeric_limits<double>::infinity();
+  }
+}
+
+void YamlInputReader::parseMembraneSection(const YAML::Node &n, SimulationConfig &cfg) const {
+  if (!n || n.IsNull()) {
+    return;
+  }
+  if (!n.IsMap()) {
+    throw std::runtime_error("YAML error: 'membrane' must be a mapping");
+  }
+
+  if (n["origin"]) {
+    cfg.membrane.origin = parseVec3(n["origin"], "membrane.origin");
+  }
+  if (n["n"]) {
+    cfg.membrane.n = parseVec3Int(n["n"], "membrane.n");
+  }
+  if (n["h"]) {
+    cfg.membrane.h = n["h"].as<double>();
+  }
+  if (n["mass"]) {
+    cfg.membrane.mass = n["mass"].as<double>();
+  }
+  if (n["baseVelocity"]) {
+    cfg.membrane.baseVelocity = parseVec3(n["baseVelocity"], "membrane.baseVelocity");
+  }
+  if (n["epsilon"]) {
+    cfg.membrane.epsilon = n["epsilon"].as<double>();
+  }
+  if (n["sigma"]) {
+    cfg.membrane.sigma = n["sigma"].as<double>();
+  }
+  if (n["k"]) {
+    cfg.membrane.k = n["k"].as<double>();
+  }
+  if (n["r0"]) {
+    cfg.membrane.r0 = n["r0"].as<double>();
+  }
+  if (n["pull_force"]) {
+    cfg.membrane.pull_force = n["pull_force"].as<double>();
+  }
+  if (n["pull_until"]) {
+    cfg.membrane.pull_until = n["pull_until"].as<double>();
+  }
+  if (n["pull_indices"]) {
+    if (!n["pull_indices"].IsSequence()) {
+      throw std::runtime_error("YAML error: membrane.pull_indices must be a sequence of [i, j] pairs");
+    }
+    cfg.membrane.pull_indices.clear();
+    for (const auto &entry : n["pull_indices"]) {
+      if (!entry.IsSequence() || entry.size() != 2) {
+        throw std::runtime_error("YAML error: each membrane.pull_indices entry must have exactly 2 integers");
+      }
+      cfg.membrane.pull_indices.push_back({entry[0].as<int>(), entry[1].as<int>()});
+    }
   }
 }
 
