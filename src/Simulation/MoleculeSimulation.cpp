@@ -63,8 +63,8 @@ void MoleculeSimulation::runSimulation() {
   std::unique_ptr<NanoScaleThermostat> ns_thermo = nullptr;
   if (cfg_.ns_thermostat.enable_thermostat) {
     ns_thermo = std::make_unique<NanoScaleThermostat>(cfg_.ns_thermostat.t_init, cfg_.ns_thermostat.dimensions,
-                                              cfg_.ns_thermostat.n_thermostat, cfg_.ns_thermostat.t_target,
-                                              cfg_.ns_thermostat.delta_t, cfg_.ns_thermostat.brownian_motion);
+                                                      cfg_.ns_thermostat.n_thermostat, cfg_.ns_thermostat.t_target,
+                                                      cfg_.ns_thermostat.delta_t, cfg_.ns_thermostat.brownian_motion);
   }
 
   // Lennard-Jones force setup
