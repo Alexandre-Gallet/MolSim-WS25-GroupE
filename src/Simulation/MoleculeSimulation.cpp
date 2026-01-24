@@ -62,7 +62,7 @@ void MoleculeSimulation::runSimulation() {
   // Initialize thermostat for the nano scale flow simulation
   std::unique_ptr<NanoScaleThermostat> ns_thermo = nullptr;
   if (cfg_.ns_thermostat.enable_thermostat) {
-    thermostat = std::make_unique<Thermostat>(cfg_.ns_thermostat.t_init, cfg_.ns_thermostat.dimensions,
+    ns_thermo = std::make_unique<NanoScaleThermostat>(cfg_.ns_thermostat.t_init, cfg_.ns_thermostat.dimensions,
                                               cfg_.ns_thermostat.n_thermostat, cfg_.ns_thermostat.t_target,
                                               cfg_.ns_thermostat.delta_t, cfg_.ns_thermostat.brownian_motion);
   }
@@ -110,7 +110,8 @@ void MoleculeSimulation::runSimulation() {
 
     // Write the particle profiling
     if (iteration % 10000 == 0) {
-      ParticleProfiling::computeProfiling(particles_, cfg_.domainSize[0], cfg_.domainSize[1], cfg_.domainSize[2], 50);
+      ParticleProfiling::computeProfiling(particles_, cfg_.domainSize[0], cfg_.domainSize[1], cfg_.domainSize[2], 50,
+                                          iteration);
     }
 
     // Write output every cfg_.write_frequency
