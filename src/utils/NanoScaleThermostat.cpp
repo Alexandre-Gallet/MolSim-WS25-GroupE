@@ -40,8 +40,11 @@ void NanoScaleThermostat::apply(Container &particles, size_t step) {
     average_velocity = ArrayUtils::elementWisePairOp(average_velocity, p.getV(), std::plus<>());
     particle_count++;
   }
+  if (particle_count == 0) {
+    return;
+  }
   for (int i = 0; i < 3; i++) {
-    average_velocity[i] /= particle_count;
+    average_velocity.at(i) /= particle_count;
   }
 
   calculateKineticEnergy(particles);

@@ -1,13 +1,13 @@
 /**
- * @file Thermostat.h
- * @brief Class for controlling the temperature of the simulation
+ * @file NanoScaleThermostat.h
+ * @brief Class for controlling the temperature of the simulation for the nano scale simulation
  */
 #pragma once
 
 #include "Container/Container.h"
 
 /**
- * @class Thermostat
+ * @class NanoScaleThermostat
  * @brief Models a thermostat which manages the temperature of the particle system
  */
 class NanoScaleThermostat {
@@ -42,7 +42,7 @@ class NanoScaleThermostat {
   void calculateKineticEnergy(Container &particles);
   /**
    * @brief Calculates the current temperature of the system.
-   * @param particle_count Number of active particles.
+   * @param particle_count Number of active particles (excludes the walls).
    */
   void calculateTemperature(int particle_count);
   /**

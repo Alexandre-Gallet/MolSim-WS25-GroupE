@@ -128,50 +128,55 @@ For profiling on CoolMUC there are a series of SLURM batch scripts located at ´
 
 MolSim is configured entirely through a YAML file. The structure is divided into five main sections: **simulation**, **output**, **cuboids**, **discs**, **linkedCell**
 
-| Section    | Field              | Meaning                                                                              |
-|------------|--------------------|--------------------------------------------------------------------------------------|
-| simulation | sim_type           | Selects the simulation model (“molecule” or “planet”).                               |
-|            | t_start            | Start time of the simulation.                                                        |
-|            | t_end              | End time of the simulation.                                                          |
-|            | delta_t            | Time step size.                                                                      |
-|            | output_format      | Format used for particle output files.                                               |
-|            | gravity            | Gravity factor.                                                                      |
-|            | epsilon            | LJ epsilon parameter for the simulation.                                             |
-|            | sigma              | LJ sigma parameter for the simulation.                                               |
-|            |                    |                                                                                      |
-| output     | write_frequency    | Writes output every n-th iteration.                                                  |
-|            |                    |                                                                                      |
-| cuboids    | origin             | Position of the cuboid’s lower-left-front corner.                                    |
-|            | numPerDim          | Number of particles along each dimension.                                            |
-|            | baseVelocity       | Initial particle velocity.                                                           |
-|            | h                  | Particle spacing (mesh width).                                                       |
-|            | mass               | Mass of each particle.                                                               |
-|            | type               | Integer particle type identifier.                                                    |
-|            | brownianMean       | Mean of Brownian/random velocity distribution.                                       |
-|            |                    |                                                                                      |
-| discs      | center             | Center position of the disc.                                                         |
-|            | radiusCells        | Disc radius measured in grid cells.                                                  |
-|            | hDisc              | Mesh width for disc particles.                                                       |
-|            | mass               | Mass of each particle in the disc.                                                   |
-|            | baseVelocityDisc   | Initial velocity of disc particles.                                                  |
-|            | typeDisc           | Particle type identifier for disc particles.                                         |
-|            |                    |                                                                                      |
-| types      | id                 | Particle id.                                                                         |
-|            | epsilon            | Epsilon parameter for the L-J force calculation for the particles with the given id. |
-|            | sigma              | Sigma parameter for the L-J force calculation for the particles with the given id.   |
-|            |                    |                                                                                      |
-| linkedCell | containerType      | Container implementation (currently “Cell”).                                         |
-|            | domainSize         | Size of the simulation domain.                                                       |
-|            | rCutoff            | Lennard–Jones cutoff radius.                                                         |
-|            | boundaryConditions | Boundary types for ±x, ±y, ±z directions.                                            |
-|            |                    |                                                                                      |
-| thermostat | t_init             | Initial temperature of the system.                                                   |
-|            | dimensions         | The number of dimensions in the simulation.                                          |
-|            | n_thermostat       | Interval (in time steps) at which the thermostat is applied.                         |
-|            | t_target           | The desired temperature.                                                             |
-|            | delta_t            | Maximum temperature change per thermostat application.                               |
-|            | brownian_motion    | If true, initializes velocities using Maxwell-Boltzmann distribution.                |
-
+| Section       | Field              | Meaning                                                                              |
+|---------------|--------------------|--------------------------------------------------------------------------------------|
+| simulation    | sim_type           | Selects the simulation model (“molecule” or “planet”).                               |
+|               | t_start            | Start time of the simulation.                                                        |
+|               | t_end              | End time of the simulation.                                                          |
+|               | delta_t            | Time step size.                                                                      |
+|               | output_format      | Format used for particle output files.                                               |
+|               | gravity            | Gravity factor.                                                                      |
+|               | epsilon            | LJ epsilon parameter for the simulation.                                             |
+|               | sigma              | LJ sigma parameter for the simulation.                                               |
+|               |                    |                                                                                      |
+| output        | write_frequency    | Writes output every n-th iteration.                                                  |
+|               |                    |                                                                                      |
+| cuboids       | origin             | Position of the cuboid’s lower-left-front corner.                                    |
+|               | numPerDim          | Number of particles along each dimension.                                            |
+|               | baseVelocity       | Initial particle velocity.                                                           |
+|               | h                  | Particle spacing (mesh width).                                                       |
+|               | mass               | Mass of each particle.                                                               |
+|               | type               | Integer particle type identifier.                                                    |
+|               | brownianMean       | Mean of Brownian/random velocity distribution.                                       |
+|               |                    |                                                                                      |
+| discs         | center             | Center position of the disc.                                                         |
+|               | radiusCells        | Disc radius measured in grid cells.                                                  |
+|               | hDisc              | Mesh width for disc particles.                                                       |
+|               | mass               | Mass of each particle in the disc.                                                   |
+|               | baseVelocityDisc   | Initial velocity of disc particles.                                                  |
+|               | typeDisc           | Particle type identifier for disc particles.                                         |
+|               |                    |                                                                                      |
+| types         | id                 | Particle id.                                                                         |
+|               | epsilon            | Epsilon parameter for the L-J force calculation for the particles with the given id. |
+|               | sigma              | Sigma parameter for the L-J force calculation for the particles with the given id.   |
+|               |                    |                                                                                      |
+| linkedCell    | containerType      | Container implementation (currently “Cell”).                                         |
+|               | domainSize         | Size of the simulation domain.                                                       |
+|               | rCutoff            | Lennard–Jones cutoff radius.                                                         |
+|               | boundaryConditions | Boundary types for ±x, ±y, ±z directions.                                            |
+|               |                    |                                                                                      |
+| thermostat    | t_init             | Initial temperature of the system.                                                   |
+|               | dimensions         | The number of dimensions in the simulation.                                          |
+|               | n_thermostat       | Interval (in time steps) at which the thermostat is applied.                         |
+|               | t_target           | The desired temperature.                                                             |
+|               | delta_t            | Maximum temperature change per thermostat application.                               |
+|               | brownian_motion    | If true, initializes velocities using Maxwell-Boltzmann distribution.                |
+| ns_thermostat | t_init             | Initial temperature of the system.                                                   |
+|               | dimensions         | The number of dimensions in the simulation.                                          |
+|               | n_thermostat       | Interval (in time steps) at which the thermostat is applied.                         |
+|               | t_target           | The desired temperature.                                                             |
+|               | delta_t            | Maximum temperature change per thermostat application.                               |
+|               | brownian_motion    | If true, initializes velocities using Maxwell-Boltzmann distribution.                |
 
 Examples of a working yaml configuration files can be found at `input/eingabe.yml` and `input/eingabedisc.yml` 
 
