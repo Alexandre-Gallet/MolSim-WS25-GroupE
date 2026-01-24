@@ -10,8 +10,8 @@
 #include <filesystem>
 
 #include "Container/ContainerType.h"
-#include "Generator/MembraneGenerator.h"
 #include "ForceCalculation/ForceCalculation.h"
+#include "Generator/MembraneGenerator.h"
 #include "outputWriter/WriterFactory.h"
 
 MembraneSimulation::MembraneSimulation(const SimulationConfig &cfg, Container &particles)

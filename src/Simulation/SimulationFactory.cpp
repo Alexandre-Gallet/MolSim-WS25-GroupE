@@ -6,8 +6,8 @@
 
 #include <memory>
 
-#include "MoleculeSimulation.h"
 #include "MembraneSimulation.h"
+#include "MoleculeSimulation.h"
 #include "PlanetSimulation.h"
 
 namespace SimulationFactory {

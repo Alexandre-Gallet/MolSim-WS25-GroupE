@@ -7,7 +7,7 @@ simulation:
   output_format: VTK
 
 output:
-  write_frequency: 10
+  write_frequency: 1000
 
 cuboids:
   - origin: [ 0.6, 2.0, 0.0 ]
@@ -15,7 +15,7 @@ cuboids:
     baseVelocity: [ 0.0, 0.0, 0.0 ]
     h: 1.2
     mass: 1.0
-    type: 1
+    type: 0
 
   - origin: [ 0.6, 19.0, 0.0 ]
     numPerDim: [ 50, 14, 1 ]
@@ -27,7 +27,7 @@ cuboids:
 discs:
 
 types:
-  - id: 1
+  - id: 0
     epsilon: 1.0
     sigma: 1.0
   - id: 2

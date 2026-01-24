@@ -22,8 +22,8 @@ class Particle {
     Particle *particle{nullptr};
     double rest_length{0.0};
   };
- private:
 
+ private:
   /**
    * @brief Position of the particle
    */

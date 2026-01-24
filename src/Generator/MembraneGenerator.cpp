@@ -69,7 +69,7 @@ Particle *MembraneGenerator::particleAt(const std::vector<Particle *> &grid, con
 }
 
 std::size_t MembraneGenerator::linearIndex(int i, int j, int k, const std::array<int, 3> &dims) {
-  return static_cast<std::size_t>(i) + static_cast<std::size_t>(dims[0]) *
-                                          (static_cast<std::size_t>(j) + static_cast<std::size_t>(dims[1]) *
-                                                                           static_cast<std::size_t>(k));
+  return static_cast<std::size_t>(i) +
+         static_cast<std::size_t>(dims[0]) *
+             (static_cast<std::size_t>(j) + static_cast<std::size_t>(dims[1]) * static_cast<std::size_t>(k));
 }
