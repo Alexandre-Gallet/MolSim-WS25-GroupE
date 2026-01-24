@@ -4,7 +4,8 @@
 #include <filesystem>
 #include <fstream>
 
-void ParticleProfiling::computeProfiling(const Container &particles, double x_axis, double y_axis, double z_axis, int n_bins) {
+void ParticleProfiling::computeProfiling(const Container &particles, double x_axis, double y_axis, double z_axis,
+                                         int n_bins, int iteration) {
   double bin_width = x_axis / n_bins;
   std::vector<double> velocity(n_bins, 0.0);
   std::vector<int> particles_per_bin(n_bins, 0);
@@ -18,8 +19,9 @@ void ParticleProfiling::computeProfiling(const Container &particles, double x_ax
   std::string folder = "profiling";
   std::filesystem::create_directories(folder);
 
-  std::string file_name = folder + "/particle_profiling.csv";
+  std::string file_name = folder + "/particle_profiling_" + std::to_string(iteration) + ".csv";
   std::ofstream csv_file(file_name);
+  csv_file << "Bin,Average_velocity,Density\n";
   for (int i = 0; i < n_bins; i++) {
     double average_vel = 0.0;
     if (particles_per_bin[i] > 0) {

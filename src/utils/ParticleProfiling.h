@@ -7,7 +7,7 @@
 #include "Container/Container.h"
 
 class ParticleProfiling {
-public:
-  static void computeProfiling(const Container &particles, double x_axis, double y_axis, double z_axis, int n_bins);
+ public:
+  static void computeProfiling(const Container &particles, double x_axis, double y_axis, double z_axis, int n_bins,
+                               int iteration);
 };
-
