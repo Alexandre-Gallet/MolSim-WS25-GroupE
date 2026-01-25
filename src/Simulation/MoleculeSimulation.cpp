@@ -108,10 +108,12 @@ void MoleculeSimulation::runSimulation() {
 
     iteration++;
 
-    // Write the particle profiling
-    if (iteration % 10000 == 0) {
-      ParticleProfiling::computeProfiling(particles_, cfg_.domainSize[0], cfg_.domainSize[1], cfg_.domainSize[2], 50,
-                                          iteration);
+    // Write the particle profiling only for the nano scale simulation
+    if (ns_thermo) {
+      if (iteration % 10000 == 0) {
+        ParticleProfiling::computeProfiling(particles_, cfg_.domainSize[0], cfg_.domainSize[1], cfg_.domainSize[2], 20,
+                                            iteration);
+      }
     }
 
     // Write output every cfg_.write_frequency

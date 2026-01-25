@@ -1,0 +1,47 @@
+simulation:
+  sim_type: molecule
+  t_start: 0.0
+  t_end: 100.0
+  delta_t: 0.0005
+  gravity: [0.0, -12.44, 0.0]
+  output_format: VTK
+
+output:
+  write_frequency: 1000
+
+cuboids:
+  - origin: [ 0.6, 0.6, 0.6 ]
+    numPerDim: [ 50, 20, 50 ]
+    baseVelocity: [ 0.0, 0.0, 0.0 ]
+    h: 1.2
+    mass: 1.0
+    type: 0
+
+  - origin: [ 0.6, 24.6, 0.6 ]
+    numPerDim: [ 50, 20, 50 ]
+    baseVelocity: [ 0.0, 0.0, 0.0 ]
+    h: 1.2
+    mass: 2.0
+    type: 2
+
+discs:
+
+types:
+  - id: 0
+    epsilon: 1.0
+    sigma: 1.2
+  - id: 2
+    epsilon: 1.0
+    sigma: 1.1
+
+linkedCell:
+  - containerType: [Cell]
+    domainSize: [60.0, 60.0, 60.0]
+    rCutoff: 3.6
+    boundaryConditions: [Periodic, Periodic, Periodic, Periodic, Periodic, Periodic]
+
+thermostat:
+  t_init: 40
+  n_thermostat: 1000
+  dimensions: 3
+  brownian_motion: false

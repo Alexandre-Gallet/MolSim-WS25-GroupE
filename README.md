@@ -114,7 +114,7 @@ cmake -S . -B build-benchmark \
 
 cmake --build build-gprof -- -j"$(nproc)"
 ```
-The above cofiguration turns of all IO, Logging and VTK Output. 
+The above configuration turns off all IO, Logging and VTK Output. 
 The instrumented binary generates a gmon.out file after execution.
 The profiling report is generated with:
 
@@ -177,6 +177,19 @@ MolSim is configured entirely through a YAML file. The structure is divided into
 |               | t_target           | The desired temperature.                                                                                            |
 |               | delta_t            | Maximum temperature change per thermostat application.                                                              |
 |               | brownian_motion    | If true, initializes velocities using Maxwell-Boltzmann distribution.                                               |
+|               |                    |                                                                                                                     |
+| membrane      | origin             | Coordinates of the lower-left corner.                                                                               |
+|               | n                  | Number of particles along each dimension.                                                                           |
+|               | h                  | Particle spacing (mesh width).                                                                                      |
+|               | mass               | Mass of each particle in the membrane.                                                                              |
+|               | baseVelocity       | Initial velocity of the particles.                                                                                  |
+|               | epsilon            | LJ epsilon parameter for the simulation.                                                                            |
+|               | sigma              | LJ sigma parameter for the simulation.                                                                              |
+|               | k                  | Stiffness constant.                                                                                                 |
+|               | r0                 | Average bond length of a molecule pair.                                                                             |
+|               | pull_force         | Force that pulls particles at the given indices up on the z-axis.                                                   |
+|               | pull_until         | Time until the pull_force is effective.                                                                             |
+|               | pull_indices       | Indices of the particles being pulled by the pull_force                                                             |
 
 Examples of a working yaml configuration files can be found at `input/eingabe.yml` and `input/eingabedisc.yml` 
 
