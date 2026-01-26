@@ -5,7 +5,7 @@ set(SPDLOG_FMT_EXTERNAL OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
         spdlog
-        URL https://github.com/gabime/spdlog/archive/refs/tags/v1.14.1.zip
+        URL ${SPDLOG_URL}
 )
 
 FetchContent_MakeAvailable(spdlog)

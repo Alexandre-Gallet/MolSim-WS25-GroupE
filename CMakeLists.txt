@@ -13,16 +13,18 @@ list(APPEND CMAKE_MODULE_PATH
         "${CMAKE_SOURCE_DIR}/cmake/modules"
 )
 
+# include all cmake files needed
+include(cmake/VersionControl.cmake)
 include(ProjectOptions)
 include(CompilerWarnings)
 
 # Tooling
 include(cmake/tooling/clang-format.cmake)
 include(cmake/tooling/clang-tidy.cmake)
-
-add_subdirectory(src) # see the src/CMakeLists.txt
-
 include(cmake/tooling/doxygen.cmake)
+
+# see the src/CMakeLists.txt
+add_subdirectory(src)
 
 # include CTest
 include(CTest)

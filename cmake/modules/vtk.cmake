@@ -13,7 +13,7 @@ if(ENABLE_VTK_OUTPUT)
         message(FATAL_ERROR "VTK not found")
     endif ()
 
-    if(VTK_VERSION VERSION_GREATER_EQUAL 8.9)
+    if(VTK_VERSION VERSION_GREATER_EQUAL ${VTK_MIN_VERSION})
          include_directories(${VTK_INCLUDE_DIRS})
     else()
         include(${VTK_USE_FILE})
