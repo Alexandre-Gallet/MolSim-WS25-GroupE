@@ -1,20 +1,21 @@
-  /*
-   Tests for ParticleContainer and its basic functionality.
+/*
+ Tests for ParticleContainer and its basic functionality.
 
-  This file contains unit tests that verify creation, insertion, iteration,
-  pair iteration and clearing of the ParticleContainer used in the MolSim project.
-  Each test states its intention briefly, as required in the worksheet.
- */
+This file contains unit tests that verify creation, insertion, iteration,
+pair iteration and clearing of the ParticleContainer used in the MolSim project.
+Each test states its intention briefly, as required in the worksheet.
+*/
+
+#include "ParticleContainerTest.h"
 
 #include <array>
 #include <cassert>
 #include <cmath>
 #include <iostream>
 
-#include "../../src/Container/ParticleContainer.h"
 #include "../../src/Container/Particle.h"
+#include "../../src/Container/ParticleContainer.h"
 #include "gtest/gtest.h"
-#include "ParticleContainerTest.h"
 
 namespace {
 /*
@@ -26,17 +27,15 @@ constexpr double tolerance = 1e-12;
  Convenience zero vector for particle creation.
  */
 const std::array<double, 3> ZERO{0.0, 0.0, 0.0};
-}
+}  // namespace
 
-
- // Newly created container must be empty.
+// Newly created container must be empty.
 
 TEST(ParticleContainerTest, NewlyConstructedIsEmpty) {
   ParticleContainer c;
   EXPECT_TRUE(c.empty());
   EXPECT_EQ(c.size(), 0u);
 }
-
 
 // Adding one particle should increase the size to 1 and make it non-empty.
 
@@ -47,7 +46,7 @@ TEST(ParticleContainerTest, AddParticleIncreasesSize) {
   EXPECT_FALSE(c.empty());
 }
 
- // Range-based iteration should visit all inserted particles (const and non-const).
+// Range-based iteration should visit all inserted particles (const and non-const).
 
 TEST(ParticleContainerTest, IterationVisitsAllParticles) {
   ParticleContainer c;
@@ -73,7 +72,7 @@ TEST(ParticleContainerTest, IterationVisitsAllParticles) {
   EXPECT_EQ(count, 3u);
 }
 
- //Reserving capacity must not change the logical size of the container.
+// Reserving capacity must not change the logical size of the container.
 TEST(ParticleContainerTest, ReserveDoesNotChangeSize) {
   ParticleContainer c;
   EXPECT_EQ(c.size(), 0u);
@@ -83,7 +82,7 @@ TEST(ParticleContainerTest, ReserveDoesNotChangeSize) {
   EXPECT_EQ(c.size(), 1u);
 }
 
- //Adding a particle by const reference should still increase the size.
+// Adding a particle by const reference should still increase the size.
 
 TEST(ParticleContainerTest, AddParticleByConstRefIncreasesSize) {
   ParticleContainer c;
@@ -94,7 +93,7 @@ TEST(ParticleContainerTest, AddParticleByConstRefIncreasesSize) {
   (void)ref;
 }
 
- // Adding a particle by rvalue should also increase the size.
+// Adding a particle by rvalue should also increase the size.
 
 TEST(ParticleContainerTest, AddParticleByRvalueIncreasesSize) {
   ParticleContainer c;
@@ -104,8 +103,7 @@ TEST(ParticleContainerTest, AddParticleByRvalueIncreasesSize) {
   (void)ref;
 }
 
-
- // Empty containers should provide begin()==end() and no iteration.
+// Empty containers should provide begin()==end() and no iteration.
 TEST(ParticleContainerTest, EmptyContainerHasNoIteration) {
   ParticleContainer c;
   EXPECT_EQ(c.begin(), c.end());
@@ -139,9 +137,7 @@ TEST(ParticleContainerTest, ClearEmptiesContainer) {
 }
 
 // Fixture setup should create exactly two particles.
-TEST_F(ParticleContainerFixture, SizeIsTwoAfterSetup) {
-  EXPECT_EQ(pc.size(), 2u);
-}
+TEST_F(ParticleContainerFixture, SizeIsTwoAfterSetup) { EXPECT_EQ(pc.size(), 2u); }
 
 // Adding one more particle on top of fixture data should yield three.
 TEST_F(ParticleContainerFixture, SizeAfterAddIsThree) {
@@ -202,7 +198,7 @@ TEST(ParticleContainerTest, ForEachPairVisitsAllUniquePairs) {
     EXPECT_NE(&a, &b);
     ++calls;
   });
-  EXPECT_EQ(calls, 6); // 4 * 3 / 2
+  EXPECT_EQ(calls, 6);  // 4 * 3 / 2
 }
 
 /*
@@ -222,5 +218,5 @@ TEST(ParticleContainerTest, ConstForEachPairAlsoWorks) {
     EXPECT_NE(&a, &b);
     ++calls;
   });
-  EXPECT_EQ(calls, 3); // 3 * 2 / 2
+  EXPECT_EQ(calls, 3);  // 3 * 2 / 2
 }

@@ -3,18 +3,19 @@
 //
 
 #include "DiscGeneratorTest.h"
+
 #include <array>
 #include <cmath>
-#include "gtest/gtest.h"
 
+#include "Container/Particle.h"
+#include "Container/ParticleContainer.h"
 #include "Generator/DiscGenerator.h"
 #include "Generator/ParticleGenerator.h"
-#include "Container/ParticleContainer.h"
-#include "Container/Particle.h"
+#include "gtest/gtest.h"
 namespace {
-constexpr double tolerance = 1e-12; // tolerance for floating point comparisons
+constexpr double tolerance = 1e-12;  // tolerance for floating point comparisons
 const std::array<double, 3> ZERO{0.0, 0.0, 0.0};
-}
+}  // namespace
 
 // Test 1: radiusCells = 0 should generate exactly one particle
 //         located exactly at the center.
@@ -28,8 +29,7 @@ TEST(DiscGeneratorTest, RadiusZeroProducesSingleParticleAtCenter) {
   const std::array<double, 3> baseVelocity{0.0, 0.0, 0.0};
   const int type = 1;
 
-  DiscGenerator::generateDisc(container, center, radiusCells, h, mass,
-                              baseVelocity, type);
+  DiscGenerator::generateDisc(container, center, radiusCells, h, mass, baseVelocity, type);
 
   // Expect exactly one particle
   ASSERT_EQ(container.size(), 1u);
@@ -66,19 +66,18 @@ TEST(DiscGeneratorBasicTest, RadiusOneHasFiveExpectedLatticePoints) {
   const std::array<double, 3> baseVelocity{0.0, 0.0, 0.0};
   const int type = 2;
 
-  DiscGenerator::generateDisc(container, center, radiusCells, h, mass,
-                              baseVelocity, type);
+  DiscGenerator::generateDisc(container, center, radiusCells, h, mass, baseVelocity, type);
 
   // Expect exactly 5 particles for radius 1
   ASSERT_EQ(container.size(), 5u);
 
   // Expected absolute positions
   const std::array<std::array<double, 3>, 5> expectedPositions = {{
-    {center[0] + 0.0, center[1] + 0.0, center[2]},  // center
-    {center[0] + 1.0, center[1] + 0.0, center[2]},  // right
-    {center[0] - 1.0, center[1] + 0.0, center[2]},  // left
-    {center[0] + 0.0, center[1] + 1.0, center[2]},  // up
-    {center[0] + 0.0, center[1] - 1.0, center[2]},  // down
+      {center[0] + 0.0, center[1] + 0.0, center[2]},  // center
+      {center[0] + 1.0, center[1] + 0.0, center[2]},  // right
+      {center[0] - 1.0, center[1] + 0.0, center[2]},  // left
+      {center[0] + 0.0, center[1] + 1.0, center[2]},  // up
+      {center[0] + 0.0, center[1] - 1.0, center[2]},  // down
   }};
 
   // Check whether every expected point exists
@@ -87,16 +86,14 @@ TEST(DiscGeneratorBasicTest, RadiusOneHasFiveExpectedLatticePoints) {
 
     for (auto &p : container) {
       const auto &x = p.getX();
-      if (std::fabs(x[0] - expected[0]) < tolerance &&
-          std::fabs(x[1] - expected[1]) < tolerance &&
+      if (std::fabs(x[0] - expected[0]) < tolerance && std::fabs(x[1] - expected[1]) < tolerance &&
           std::fabs(x[2] - expected[2]) < tolerance) {
         found = true;
         break;
       }
     }
 
-    EXPECT_TRUE(found) << "Expected position ("
-                       << expected[0] << ", " << expected[1] << ", " << expected[2]
+    EXPECT_TRUE(found) << "Expected position (" << expected[0] << ", " << expected[1] << ", " << expected[2]
                        << ") was not found in the generated disc.";
   }
 }
@@ -123,8 +120,7 @@ TEST(DiscGeneratorBasicTest, ExistingParticlesArePreservedByGenerateDisc) {
   const std::array<double, 3> baseVelocity{0.0, 0.0, 0.0};
   const int type = 1;
 
-  DiscGenerator::generateDisc(container, center, radiusCells, h, mass,
-                              baseVelocity, type);
+  DiscGenerator::generateDisc(container, center, radiusCells, h, mass, baseVelocity, type);
 
   // Container should now contain more particles
   ASSERT_GT(container.size(), initialSize);
@@ -137,20 +133,16 @@ TEST(DiscGeneratorBasicTest, ExistingParticlesArePreservedByGenerateDisc) {
       const auto &x = p.getX();
       const auto &v = p.getV();
 
-      if (std::fabs(x[0] - markerPos[0]) < tolerance &&
-          std::fabs(x[1] - markerPos[1]) < tolerance &&
-          std::fabs(x[2] - markerPos[2]) < tolerance &&
-          std::fabs(v[0] - markerVel[0]) < tolerance &&
-          std::fabs(v[1] - markerVel[1]) < tolerance &&
-          std::fabs(v[2] - markerVel[2]) < tolerance) {
+      if (std::fabs(x[0] - markerPos[0]) < tolerance && std::fabs(x[1] - markerPos[1]) < tolerance &&
+          std::fabs(x[2] - markerPos[2]) < tolerance && std::fabs(v[0] - markerVel[0]) < tolerance &&
+          std::fabs(v[1] - markerVel[1]) < tolerance && std::fabs(v[2] - markerVel[2]) < tolerance) {
         foundMarker = true;
         break;
       }
     }
   }
 
-  EXPECT_TRUE(foundMarker)
-      << "The existing marker particle was removed or modified by generateDisc().";
+  EXPECT_TRUE(foundMarker) << "The existing marker particle was removed or modified by generateDisc().";
 }
 
 // Test 4: All generated particles must lie inside the physical
@@ -165,11 +157,10 @@ TEST(DiscGeneratorBasicTest, AllParticlesInsideAndOnGrid) {
   const std::array<double, 3> baseVelocity{0.0, 0.0, 0.0};
   const int type = 2;
 
-  DiscGenerator::generateDisc(container, center, radiusCells, h, mass,
-                              baseVelocity, type);
+  DiscGenerator::generateDisc(container, center, radiusCells, h, mass, baseVelocity, type);
 
-  const double R = h * radiusCells;   // physical radius
-  const double R2 = R * R;            // squared radius
+  const double R = h * radiusCells;  // physical radius
+  const double R2 = R * R;           // squared radius
 
   for (const auto &p : container) {
     const auto &x = p.getX();
@@ -178,7 +169,7 @@ TEST(DiscGeneratorBasicTest, AllParticlesInsideAndOnGrid) {
     double dy = x[1] - center[1];
 
     // Particle must lie inside (or on) the disc
-    EXPECT_LE(dx*dx + dy*dy, R2 + tolerance);
+    EXPECT_LE(dx * dx + dy * dy, R2 + tolerance);
 
     // Must be aligned on the h-grid
     EXPECT_NEAR(std::round(dx / h), dx / h, 1e-9);

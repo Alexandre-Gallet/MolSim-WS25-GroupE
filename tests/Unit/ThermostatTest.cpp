@@ -1,6 +1,7 @@
 
-#include <cmath>
 #include <gtest/gtest.h>
+
+#include <cmath>
 
 #include "Container/Container.h"
 #include "Container/Particle.h"
@@ -8,10 +9,10 @@
 #include "utils/Thermostat.h"
 
 class ThermostatTest : public ::testing::Test {
-protected:
-  void setupContainer(Container& container, double velocity) {
-    Particle p1({0,0,0}, {velocity, 0, 0}, 1.0);
-    Particle p2({1,1,1}, {0, velocity, 0}, 1.0);
+ protected:
+  void setupContainer(Container &container, double velocity) {
+    Particle p1({0, 0, 0}, {velocity, 0, 0}, 1.0);
+    Particle p2({1, 1, 1}, {0, velocity, 0}, 1.0);
     container.addParticle(p1);
     container.addParticle(p2);
   }
@@ -20,7 +21,7 @@ protected:
 TEST_F(ThermostatTest, TestHoldsTemperature) {
   ParticleContainer container;
   setupContainer(container, 1.0);
-  double t_target = 1.0/3.0;
+  double t_target = 1.0 / 3.0;
   Thermostat thermostat(t_target, 3, 1, t_target, 0.1, false);
   thermostat.apply(container, 1);
 
@@ -45,12 +46,12 @@ TEST_F(ThermostatTest, TestCoolingTemperature) {
 
 TEST_F(ThermostatTest, TestHeatingTemperature) {
   ParticleContainer container;
-  container.addParticle(Particle({0,0,0}, {1.0, 0.0, 0.0}, 1.0, 0));
-  container.addParticle(Particle({1,1,1}, {0.0, 1.0, 0.0}, 1.0, 1));
+  container.addParticle(Particle({0, 0, 0}, {1.0, 0.0, 0.0}, 1.0, 0));
+  container.addParticle(Particle({1, 1, 1}, {0.0, 1.0, 0.0}, 1.0, 1));
 
   double t_init = 1.0 / 3.0;
   double t_target = 1.0;
-  double delta_t = 0.1; // Test gradual heating
+  double delta_t = 0.1;  // Test gradual heating
 
   Thermostat thermostat(t_init, 3, 1, t_target, delta_t, false);
   thermostat.apply(container, 1);

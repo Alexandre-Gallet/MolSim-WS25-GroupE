@@ -1,15 +1,15 @@
 
 
+#include "../../src/Generator/ParticleGenerator.h"
+
 #include <gtest/gtest.h>
 
 #include <cmath>
 #include <sstream>
 
 #include "../../src/Container/ParticleContainer.h"
-#include "../../src/Generator/ParticleGenerator.h"
 #include "Generator/CuboidGenerator.h"
 #include "Simulation/Simulation.h"
-
 
 /*
 #include "GParticleGenerator.h"
@@ -37,45 +37,43 @@
  */
 
 TEST(ParticleGeneratorBehaviourTest, GeneratesCorrectNumberAndNonZeroVelocity) {
-    /// Container to hold the generated particles.
-    ParticleContainer container;
+  /// Container to hold the generated particles.
+  ParticleContainer container;
 
-    /// Create generator instance.
+  /// Create generator instance.
 
-    /// Define cuboid parameters.
-    const std::array<double, 3> origin{0.0, 0.0, 0.0};  ///< Lower-left corner
-    const std::array<int, 3> dims{3, 2, 1};             ///< Number of particles per dimension
-    const std::array<double, 3> domain_size = {180., 90., 1}; ///< Size of the domain
-    const double h = 1.0;                               ///< Spacing between particles
-    const double mass = 1.0;                            ///< Mass of each particle
-    const std::array<double, 3> initVel{0.0, 0.0, 0.0}; ///< Initial base velocity
-    const double mbMeanVelocity = 0.1;                  ///< Mean velocity for Brownian motion
+  /// Define cuboid parameters.
+  const std::array<double, 3> origin{0.0, 0.0, 0.0};         ///< Lower-left corner
+  const std::array<int, 3> dims{3, 2, 1};                    ///< Number of particles per dimension
+  const std::array<double, 3> domain_size = {180., 90., 1};  ///< Size of the domain
+  const double h = 1.0;                                      ///< Spacing between particles
+  const double mass = 1.0;                                   ///< Mass of each particle
+  const std::array<double, 3> initVel{0.0, 0.0, 0.0};        ///< Initial base velocity
+  const double mbMeanVelocity = 0.1;                         ///< Mean velocity for Brownian motion
 
-    /// Generate the cuboid of particles with Maxwell-Boltzmann noise.
-    CuboidGenerator::generateCuboid(container, origin, dims, domain_size, h, mass, initVel, mbMeanVelocity);
+  /// Generate the cuboid of particles with Maxwell-Boltzmann noise.
+  CuboidGenerator::generateCuboid(container, origin, dims, domain_size, h, mass, initVel, mbMeanVelocity);
 
-    /// Verify that the total number of particles equals 3×2×1 = 6.
-    EXPECT_EQ(container.size(), 6) << "ParticleGenerator did not produce the expected number of particles.";
+  /// Verify that the total number of particles equals 3×2×1 = 6.
+  EXPECT_EQ(container.size(), 6) << "ParticleGenerator did not produce the expected number of particles.";
 
-    /// Check that at least one particle received a non-zero velocity.
-    bool foundNonZeroVel = false;
-    for (auto &p : container) {
-        auto v = p.getV();
-        if (v[0] != 0.0 || v[1] != 0.0 || v[2] != 0.0) {
-            foundNonZeroVel = true;
-            break;
-        }
+  /// Check that at least one particle received a non-zero velocity.
+  bool foundNonZeroVel = false;
+  for (auto &p : container) {
+    auto v = p.getV();
+    if (v[0] != 0.0 || v[1] != 0.0 || v[2] != 0.0) {
+      foundNonZeroVel = true;
+      break;
     }
+  }
 
-    EXPECT_TRUE(foundNonZeroVel)
-        << "All particle velocities are zero — Maxwell-Boltzmann distribution may not have been applied.";
+  EXPECT_TRUE(foundNonZeroVel)
+      << "All particle velocities are zero — Maxwell-Boltzmann distribution may not have been applied.";
 }
-
-
 
 TEST(ParticleGeneratorBehaviourTest, GeneratesCorrectGridPositions) {
   ParticleContainer c;
-  CuboidGenerator::generateCuboid(c, {0,0,0}, {3,3,1}, {180., 90., 1.}, 1.0, 1.0, {0,0,0}, 0.1);
+  CuboidGenerator::generateCuboid(c, {0, 0, 0}, {3, 3, 1}, {180., 90., 1.}, 1.0, 1.0, {0, 0, 0}, 0.1);
 
   for (auto &p : c) {
     auto x = p.getX();
@@ -84,8 +82,7 @@ TEST(ParticleGeneratorBehaviourTest, GeneratesCorrectGridPositions) {
   }
 }
 
-
-//Check that cuboid generator does not change initial velocities when brownian motion mean velocitiy is 0
+// Check that cuboid generator does not change initial velocities when brownian motion mean velocitiy is 0
 TEST(ParticleGeneratorBehaviourTest, NoBrownianKeepsVelocityConstant) {
   ParticleContainer container;
 
@@ -105,19 +102,3 @@ TEST(ParticleGeneratorBehaviourTest, NoBrownianKeepsVelocityConstant) {
     EXPECT_DOUBLE_EQ(p.getV()[2], v0[2]);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
