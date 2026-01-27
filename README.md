@@ -43,7 +43,7 @@ sudo dnf install vtk-devel cmake gcc-c++ make
 ### 3. Configure and build the project
 
 ```bash
-cmake -S . -B build
+cmake -S . -B build 
 cmake --build build -- -j"$(nproc)"
 ```
 
