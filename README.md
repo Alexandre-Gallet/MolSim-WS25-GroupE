@@ -59,7 +59,7 @@ In the configuration phase you can optionally specify
 
 ## Running the Simulation
 
-After configuring and building, run the simulation from the top-level directory with:
+After configuring and building, run the simulation from the top-level directory with: 
 
 ```bash
 ./build/src/MolSim path/to/config.yml
@@ -74,11 +74,12 @@ Using some of the provided input files:
 ./build/src/MolSim ./input/eingabeRayleighTaylorSmall.yml
 ```
 
-The working directory determines where the output folder and simulation logs, if enabled, are written.
+Output location: MolSim creates an output/ directory in the current working directory (the directory you run the executable from).
+If logging is enabled, a simulation.log is also written there.
 
 ## Running Tests
 
-The tests can be run with the test executable from the top-level directory:
+Run the tests from the top-level directory with:
 
 ```bash
 ./build/tests/MolSimTests
@@ -87,7 +88,7 @@ The tests can be run with the test executable from the top-level directory:
 
 ## Clang-Tidy and Clang-Format
 
-Checking the format, fixing the format and calling clang-tidy can be done via the custom targets:
+Format checking and fixing is run from the top-level directory with custom targets:
 
 ```bash
 cmake --build build --target clang_format_check
@@ -101,13 +102,13 @@ STL headers, improving the signal-to-noise ratio of diagnostics.
 
 ## Doxygen Documentation
 
-Doxygen can be generated using the custom doxygen target:
+Generate Doxygen from the top-level directory with: 
 
 ```bash
 cmake --build build --target doc_doxygen
 ```
 
-and can be opened with:
+Open them with: 
 
 ```bash
 xdg-open build/docs/html/index.html
@@ -116,97 +117,91 @@ xdg-open build/docs/html/index.html
 
 ## Benchmarking and Profiling 
 
-### Benchmarking 
-
-For performance benchmarking a specific set of flags has to be passed during configuration:
-
+This project provides dedicated executables so that benchmarking/profiling does not depend on ad-hoc 
+compiler flags or runtime switches. Build normally with Release (the default value). 
+The benchmarking and profiling executables are compiled with `SPDLOG_ACTIVE_LEVEL=OFF`, 
+independent of the global `LOG_LEVEL`. We always recommend clean building: 
 ```bash
-cmake -S . -B build-benchmark \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DLOG_LEVEL=OFF \
-  -DENABLE_VTK_OUTPUT=OFF
-
-cmake --build build-benchmark -- -j"$(nproc)"
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build -- -j"$(nproc)"
 ```
 
-Running the simulation produces a measurement of elapsed time and MUPS/s (Molecule Updates per Second). 
-The above configuration turns off all IO, Logging and VTK Output. For Benchmarking on CoolMUC there are a series of 
-SLURM batch scripts located at `runs/task4`. 
+**Important:** Set `simulation.output_format: NONE` in the YAML configuration file.
 
+For benchmarking on CoolMUC, SLURM batch scripts are located at runs/task4.
+
+### Benchmarking 
+
+Benchmarking is run from the top-level directory with the dedicated `MolSimBenchmark`:
+
+```bash
+./build/src/MolSimBenchmark ./path/to/config.yml
+```
 
 ### Profiling
 
-For profiling a specific set of flags has to be passed during configuration:
-
+Profiling is run from the top-level directory with the dedicated `MolSimGprof`:
 ```bash
-cmake -S . -B build-benchmark \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DLOG_LEVEL=OFF \
-  -DENABLE_VTK_OUTPUT=OFF
-  -DCMAKE_CXX_FLAGS="-pg"
-
-cmake --build build-gprof -- -j"$(nproc)"
-```
-The above configuration turns of all IO, Logging and VTK Output. 
-The instrumented binary generates a gmon.out file after execution.
-The profiling report is generated with:
-
-```bash
-gprof build-gprof/MolSim gmon.out > gprof_output.txt
+./build/src/MolSimGprof path/to/config.yml
 ```
 
-For profiling on CoolMUC there are a series of SLURM batch scripts located at ´runs/task4´.
+This produces gmon.out in the top-level directory. Generate a report via:
+```bash
+gprof ./build/src/MolSimGprof gmon.out > gprof_output.txt
+```
 
+For profiling on CoolMUC, SLURM batch scripts are located at runs/task4.
 ## YAML Configuration Format
 
-MolSim is configured entirely through a YAML file. The structure is divided into five main sections: **simulation**, **output**, **cuboids**, **discs**, **linkedCell**
+MolSim is configured entirely through a YAML file.
+The configuration is organized into the following sections:
 
-| Section    | Field              | Meaning                                                                              |
-|------------|--------------------|--------------------------------------------------------------------------------------|
-| simulation | sim_type           | Selects the simulation model (“molecule” or “planet”).                               |
-|            | t_start            | Start time of the simulation.                                                        |
-|            | t_end              | End time of the simulation.                                                          |
-|            | delta_t            | Time step size.                                                                      |
-|            | output_format      | Format used for particle output files.                                               |
-|            | gravity            | Gravity factor.                                                                      |
-|            | epsilon            | LJ epsilon parameter for the simulation.                                             |
-|            | sigma              | LJ sigma parameter for the simulation.                                               |
-|            |                    |                                                                                      |
-| output     | write_frequency    | Writes output every n-th iteration.                                                  |
-|            |                    |                                                                                      |
-| cuboids    | origin             | Position of the cuboid’s lower-left-front corner.                                    |
-|            | numPerDim          | Number of particles along each dimension.                                            |
-|            | baseVelocity       | Initial particle velocity.                                                           |
-|            | h                  | Particle spacing (mesh width).                                                       |
-|            | mass               | Mass of each particle.                                                               |
-|            | type               | Integer particle type identifier.                                                    |
-|            | brownianMean       | Mean of Brownian/random velocity distribution.                                       |
-|            |                    |                                                                                      |
-| discs      | center             | Center position of the disc.                                                         |
-|            | radiusCells        | Disc radius measured in grid cells.                                                  |
-|            | hDisc              | Mesh width for disc particles.                                                       |
-|            | mass               | Mass of each particle in the disc.                                                   |
-|            | baseVelocityDisc   | Initial velocity of disc particles.                                                  |
-|            | typeDisc           | Particle type identifier for disc particles.                                         |
-|            |                    |                                                                                      |
-| types      | id                 | Particle id.                                                                         |
+| Section    | Field              | Meaning                                                                      |
+|------------|--------------------|------------------------------------------------------------------------------|
+| simulation | sim_type           | Selects the simulation model (“molecule” or “planet”).                       |
+|            | t_start            | Start time of the simulation.                                                |
+|            | t_end              | End time of the simulation.                                                  |
+|            | delta_t            | Time step size.                                                              |
+|            | output_format      | Output format: `XYZ`, `VTK`, `CHECKPOINT`, or `NONE`                                             |
+|            | gravity            | Gravity factor.                                                              |
+|            | epsilon            | LJ epsilon parameter for the simulation.                                     |
+|            | sigma              | LJ sigma parameter for the simulation.                                       |
+|            |                    |                                                                              |
+| output     | write_frequency    | Writes output every n-th iteration.                                          |
+|            |                    |                                                                              |
+| cuboids    | origin             | Position of the cuboid’s lower-left-front corner.                            |
+|            | numPerDim          | Number of particles along each dimension.                                    |
+|            | baseVelocity       | Initial particle velocity.                                                   |
+|            | h                  | Particle spacing (mesh width).                                               |
+|            | mass               | Mass of each particle.                                                       |
+|            | type               | Integer particle type identifier.                                            |
+|            | brownianMean       | Mean of Brownian/random velocity distribution.                               |
+|            |                    |                                                                              |
+| discs      | center             | Center position of the disc.                                                 |
+|            | radiusCells        | Disc radius measured in grid cells.                                          |
+|            | hDisc              | Mesh width for disc particles.                                               |
+|            | mass               | Mass of each particle in the disc.                                           |
+|            | baseVelocityDisc   | Initial velocity of disc particles.                                          |
+|            | typeDisc           | Particle type identifier for disc particles.                                 |
+|            |                    |                                                                              |
+| types      | id                 | Particle id.                                                                 |
 |            | epsilon            | Epsilon parameter for the L-J force calculation for the particles with the given id. |
-|            | sigma              | Sigma parameter for the L-J force calculation for the particles with the given id.   |
-|            |                    |                                                                                      |
-| linkedCell | containerType      | Container implementation (currently “Cell”).                                         |
-|            | domainSize         | Size of the simulation domain.                                                       |
-|            | rCutoff            | Lennard–Jones cutoff radius.                                                         |
-|            | boundaryConditions | Boundary types for ±x, ±y, ±z directions.                                            |
-|            |                    |                                                                                      |
-| thermostat | t_init             | Initial temperature of the system.                                                   |
-|            | dimensions         | The number of dimensions in the simulation.                                          |
-|            | n_thermostat       | Interval (in time steps) at which the thermostat is applied.                         |
-|            | t_target           | The desired temperature.                                                             |
-|            | delta_t            | Maximum temperature change per thermostat application.                               |
-|            | brownian_motion    | If true, initializes velocities using Maxwell-Boltzmann distribution.                |
+|            | sigma              | Sigma parameter for the L-J force calculation for the particles with the given id. |
+|            |                    |                                                                              |
+| linkedCell | containerType      | Container implementation (currently “Cell”).                                 |
+|            | domainSize         | Size of the simulation domain.                                               |
+|            | rCutoff            | Lennard–Jones cutoff radius.                                                 |
+|            | boundaryConditions | Boundary types for ±x, ±y, ±z directions.                                    |
+|            |                    |                                                                              |
+| thermostat | t_init             | Initial temperature of the system.                                           |
+|            | dimensions         | The number of dimensions in the simulation.                                  |
+|            | n_thermostat       | Interval (in time steps) at which the thermostat is applied.                 |
+|            | t_target           | The desired temperature.                                                     |
+|            | delta_t            | Maximum temperature change per thermostat application.                       |
+|            | brownian_motion    | If true, initializes velocities using Maxwell-Boltzmann distribution.        |
 
 
-Examples of a working yaml configuration files can be found at `input/eingabe.yml` and `input/eingabedisc.yml`.
+Examples of a working YAML configuration files can be found at `input/`
 
 ##  Checkpointing
 Checkpointing is used to split the falling drop simulation into an equilibration phase and a subsequent production run that restarts from a saved simulation state.
@@ -215,7 +210,7 @@ The checkpoint filename depends on the total number of steps and `output.write_f
 Total steps = `(t_end - t_start) / delta_t`. Example: `t_end=15`, `delta_t=0.0005` ⇒ 30,000 steps. 
 With `write_frequency=1000` the final file is `checkpoint_30000.state`; 
 with `write_frequency=500` it would be `checkpoint_60000.state`. 
-Checkpoints are written in `build/output`.
+Checkpoints are written in `./output/`.
 <br />
 
 The drop run resumes from the checkpoint created by the equilibration run. 
