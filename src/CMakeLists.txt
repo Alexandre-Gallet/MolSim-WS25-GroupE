@@ -2,6 +2,9 @@
 include(modules/spdlog)
 include(modules/yaml-cpp)
 
+# add the vtk interface, which needs to be linked manually
+include(modules/vtk)
+
 # Collect all simulation sources except main
 file(GLOB_RECURSE MOLSIM_SRC CONFIGURE_DEPENDS
         *.cpp
@@ -25,19 +28,17 @@ target_include_directories(molsim_core
 # link spdlog and yaml-cpp against molsim_core library.
 target_link_libraries(molsim_core PUBLIC spdlog::spdlog)
 target_link_libraries(molsim_core PRIVATE yaml-cpp::yaml-cpp)
+target_link_libraries(molsim_core PUBLIC molsim_vtk)
 
 # set LOG_LEVEL as globally accessible in molsim_core target. We use INTERFACE to avoid the override warnings.
 target_compile_definitions(molsim_core INTERFACE SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_${LOG_LEVEL})
-
-# add the vtk interface, which needs to be linked manually
-include(modules/vtk)
 
 # Production executable linked against molsim_core which contains all the logic
 add_executable(MolSim MolSim.cpp)
 
 # link molsim_core, compiler warnings and vtk dependency to MolSim target
 target_link_libraries(MolSim
-        PRIVATE molsim_core molsim_vtk project_warnings
+        PRIVATE molsim_core project_warnings
 )
 
 # A separate executable for benchmarking

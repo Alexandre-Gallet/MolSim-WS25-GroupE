@@ -1,12 +1,4 @@
-/*
- * VTKWriter.h
- *
- *  Created on: 01.03.2010
- *      Author: eckhardw
- */
-
 #pragma once
-#ifdef ENABLE_VTK_OUTPUT
 
 #include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
@@ -25,7 +17,7 @@ namespace outputWriter {
  * particles using the official VTK library.
  */
 class VTKWriter : public OutputWriter {
- public:
+public:
   VTKWriter() = default;
   ~VTKWriter() override = default;
 
@@ -39,8 +31,9 @@ class VTKWriter : public OutputWriter {
    * @param filename Output filename
    * @param iteration Current iteration number
    */
-  void plotParticles(Container &particles, const std::string &filename, int iteration) override;
+  void plotParticles(Container &particles,
+                     const std::string &filename,
+                     int iteration) override;
 };
 
 }  // namespace outputWriter
-#endif
