@@ -138,17 +138,18 @@ Benchmarking is run from the top-level directory with the dedicated `MolSimBench
 ./build/src/MolSimBenchmark ./path/to/config.yml
 ```
 
-### Profiling
+### Automated gprof Profiling
+An automation script is provided to run profiling reproducibly and
+store results with full metadata (timestamp, git commit, host, input).
+From the top-level directory:
 
-Profiling is run from the top-level directory with the dedicated `MolSimGprof`:
 ```bash
-./build/src/MolSimGprof path/to/config.yml
+./scripts/run_gprof.sh path/to/config.yml
 ```
 
-This produces gmon.out in the top-level directory. Generate a report via:
-```bash
-gprof ./build/src/MolSimGprof gmon.out > gprof_output.txt
-```
+This generates a gprof report in .txt format in `gprof_txt_output`. The report
+filename encodes execution time, git commit hash (or `nogit`), hostname and 
+input file name.
 
 For profiling on CoolMUC, SLURM batch scripts are located at runs/task4.
 ## YAML Configuration Format

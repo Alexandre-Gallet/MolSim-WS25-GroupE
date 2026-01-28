@@ -76,11 +76,19 @@ compile_commands.json
 # Profiling build folder (compiled with different flags)
 build-gprof/
 
-# gprof profiling output
-gmon.*.out
-gprof_*.txt
-gprof*.txt
+# Profiling build folder (compiled with different flags from an old code base)
+build-gprof/
+
+# Raw gprof output (these are binaries, always ignore)
 gmon.out
+gmon.*.out
+
+# Ignore gprof text output by default
+gprof*.txt
+
+# Allow curated gprof reports (tracked)
+!gprof_txt_output/
+!gprof_txt_output/**
 
 # doxygen save on write file (most likely editior generated)
 Doxyfile.bak

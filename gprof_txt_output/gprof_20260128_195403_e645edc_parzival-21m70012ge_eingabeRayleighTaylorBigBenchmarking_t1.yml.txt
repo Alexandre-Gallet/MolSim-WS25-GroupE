@@ -1,0 +1,226 @@
+=== MolSim gprof report ===
+Timestamp     : 20260128_195403
+Git commit    : e645edc
+Host          : parzival-21m70012ge
+Input file    : input/eingabeRayleighTaylorBigBenchmarking_t1.yml
+Input SHA1    : 81eed4cd315a1f04e3742fcddaea95c1437809fd
+
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  Ts/call  Ts/call  name    
+ 42.54      6.47     6.47                             LennardJones::calc(Particle&, Particle&, double, double)
+ 25.90     10.41     3.94                             LennardJones::calculateF(Container&)
+ 12.03     12.24     1.83                             Particle::setF(std::array<double, 3ul> const&)
+  6.90     13.29     1.05                             Particle::getF() const
+  4.47     13.97     0.68                             Particle::getX() const
+  4.47     14.65     0.68                             Particle::getType() const
+  1.25     14.84     0.19                             LinkedCellContainer::placeParticle(Particle*)
+  0.66     14.94     0.10                             void std::vector<double, std::allocator<double> >::_M_realloc_append<double>(double&&)
+  0.46     15.01     0.07                             LinkedCellContainer::createAllPeriodicGhosts()
+  0.33     15.06     0.05                             Particle::Particle(Particle const&)
+  0.26     15.10     0.04                             Particle::setX(std::array<double, 3ul> const&)
+  0.20     15.13     0.03                             Particle::setV(std::array<double, 3ul> const&)
+  0.13     15.15     0.02                             MoleculeSimulation::runSimulation()
+  0.13     15.17     0.02                             LinkedCellContainer::wrapPeriodicParticles()
+  0.13     15.19     0.02                             _init
+  0.07     15.20     0.01                             LinkedCellContainer::deleteHaloCells()
+  0.07     15.21     0.01                             LinkedCellContainer::rebuild()
+  0.00     15.21     0.00        2     0.00     0.00  SimulationConfig::~SimulationConfig()
+  0.00     15.21     0.00        2     0.00     0.00  frame_dummy
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+Copyright (C) 2012-2025 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 4 byte(s) for 0.07% of 15.21 seconds
+
+index % time    self  children    called     name
+                                                 <spontaneous>
+[1]     42.5    6.47    0.00                 LennardJones::calc(Particle&, Particle&, double, double) [1]
+-----------------------------------------------
+                                                 <spontaneous>
+[2]     25.9    3.94    0.00                 LennardJones::calculateF(Container&) [2]
+-----------------------------------------------
+                                                 <spontaneous>
+[3]     12.0    1.83    0.00                 Particle::setF(std::array<double, 3ul> const&) [3]
+-----------------------------------------------
+                                                 <spontaneous>
+[4]      6.9    1.05    0.00                 Particle::getF() const [4]
+-----------------------------------------------
+                                                 <spontaneous>
+[5]      4.5    0.68    0.00                 Particle::getX() const [5]
+-----------------------------------------------
+                                                 <spontaneous>
+[6]      4.5    0.68    0.00                 Particle::getType() const [6]
+-----------------------------------------------
+                                                 <spontaneous>
+[7]      1.2    0.19    0.00                 LinkedCellContainer::placeParticle(Particle*) [7]
+-----------------------------------------------
+                                                 <spontaneous>
+[8]      0.7    0.10    0.00                 void std::vector<double, std::allocator<double> >::_M_realloc_append<double>(double&&) [8]
+-----------------------------------------------
+                                                 <spontaneous>
+[9]      0.5    0.07    0.00                 LinkedCellContainer::createAllPeriodicGhosts() [9]
+-----------------------------------------------
+                                                 <spontaneous>
+[10]     0.3    0.05    0.00                 Particle::Particle(Particle const&) [10]
+-----------------------------------------------
+                                                 <spontaneous>
+[11]     0.3    0.04    0.00                 Particle::setX(std::array<double, 3ul> const&) [11]
+-----------------------------------------------
+                                                 <spontaneous>
+[12]     0.2    0.03    0.00                 Particle::setV(std::array<double, 3ul> const&) [12]
+-----------------------------------------------
+                                                 <spontaneous>
+[13]     0.1    0.02    0.00                 MoleculeSimulation::runSimulation() [13]
+-----------------------------------------------
+                                                 <spontaneous>
+[14]     0.1    0.02    0.00                 LinkedCellContainer::wrapPeriodicParticles() [14]
+-----------------------------------------------
+                                                 <spontaneous>
+[15]     0.1    0.02    0.00                 _init [15]
+-----------------------------------------------
+                                                 <spontaneous>
+[16]     0.1    0.01    0.00                 LinkedCellContainer::deleteHaloCells() [16]
+-----------------------------------------------
+                                                 <spontaneous>
+[17]     0.1    0.01    0.00                 LinkedCellContainer::rebuild() [17]
+-----------------------------------------------
+                0.00    0.00       2/2           main [23]
+[18]     0.0    0.00    0.00       2         frame_dummy [18]
+-----------------------------------------------
+                0.00    0.00       2/2           main [23]
+[25]     0.0    0.00    0.00       2         SimulationConfig::~SimulationConfig() [25]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function is in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+Copyright (C) 2012-2025 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Index by function name
+
+   [2] LennardJones::calculateF(Container&) [9] LinkedCellContainer::createAllPeriodicGhosts() [5] Particle::getX() const
+   [1] LennardJones::calc(Particle&, Particle&, double, double) [17] LinkedCellContainer::rebuild() [6] Particle::getType() const
+  [25] SimulationConfig::~SimulationConfig() [3] Particle::setF(std::array<double, 3ul> const&) [8] void std::vector<double, std::allocator<double> >::_M_realloc_append<double>(double&&)
+  [13] MoleculeSimulation::runSimulation() [12] Particle::setV(std::array<double, 3ul> const&) [15] _init
+   [7] LinkedCellContainer::placeParticle(Particle*) [11] Particle::setX(std::array<double, 3ul> const&) [18] frame_dummy
+  [16] LinkedCellContainer::deleteHaloCells() [10] Particle::Particle(Particle const&)
+  [14] LinkedCellContainer::wrapPeriodicParticles() [4] Particle::getF() const
