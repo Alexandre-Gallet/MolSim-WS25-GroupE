@@ -131,8 +131,6 @@ void MoleculeSimulation::plotParticles(Container &particles, int iteration, Outp
     return;
   }
 
-  SPDLOG_INFO("OutputFormat enum value = {}", static_cast<int>(format));
-
   std::filesystem::create_directories("output");
 
   // Output file name from Outputformat
