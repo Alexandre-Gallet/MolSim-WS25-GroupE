@@ -5,7 +5,6 @@
  *      Author: eckhardw
  */
 
-
 #include "VTKWriter.h"
 
 #include <vtkCellArray.h>

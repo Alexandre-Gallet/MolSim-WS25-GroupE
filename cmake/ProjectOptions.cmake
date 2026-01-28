@@ -16,6 +16,4 @@ if(NOT CMAKE_BUILD_TYPE)
             FORCE)
 endif()
 
-# vtk options for output writer
-option(ENABLE_VTK_OUTPUT "Enable VTK output" ON)
-#option(ENABLE_VTK_BINARY_OUTPUT "Enable binary VTK output" ON)
+

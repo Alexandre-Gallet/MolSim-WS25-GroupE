@@ -1,6 +1,6 @@
 #pragma once
-#include <string>
 #include <stdexcept>
+#include <string>
 /**
  * Class to differentiate between the different output types
  */
@@ -24,8 +24,6 @@ inline OutputFormat parse_output(const std::string &output_format) {
     return OutputFormat::NONE;
   }
   // throw error if there is no match
-  throw std::runtime_error(
-      "Invalid output_format '" + output_format +
-      "'. Valid values are: XYZ, VTK, CHECKPOINT, NONE."
-  );
+  throw std::runtime_error("Invalid output_format '" + output_format +
+                           "'. Valid values are: XYZ, VTK, CHECKPOINT, NONE.");
 }

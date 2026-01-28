@@ -1,11 +1,10 @@
 #include "WriterFactory.h"
 
+#include "VTKWriter.h"  // <-- always included
 #include "outputWriter/CheckpointWriter.h"
 #include "outputWriter/XYZWriter.h"
-#include "VTKWriter.h"   // <-- always included
 
-std::unique_ptr<outputWriter::OutputWriter>
-WriterFactory::createWriter(OutputFormat format) {
+std::unique_ptr<outputWriter::OutputWriter> WriterFactory::createWriter(OutputFormat format) {
   switch (format) {
     case OutputFormat::XYZ:
       return std::make_unique<outputWriter::XYZWriter>();

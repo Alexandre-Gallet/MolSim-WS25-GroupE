@@ -18,7 +18,6 @@
 #include "inputReader/CheckpointReader.h"
 #include "outputWriter/WriterFactory.h"
 
-
 MoleculeSimulation::MoleculeSimulation(const SimulationConfig &cfg, Container &particles)
     : cfg_(cfg), particles_(particles) {}
 
@@ -127,7 +126,6 @@ void MoleculeSimulation::runSimulation() {
 }
 
 void MoleculeSimulation::plotParticles(Container &particles, int iteration, OutputFormat format) {
-
   // double check that benchmarking/profiling never uses plotParticles
   if (format == OutputFormat::NONE) {
     return;
