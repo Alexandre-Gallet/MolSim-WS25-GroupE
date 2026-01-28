@@ -117,26 +117,44 @@ xdg-open build/docs/html/index.html
 
 ## Benchmarking and Profiling 
 
-This project provides dedicated executables so that benchmarking/profiling does not depend on ad-hoc 
-compiler flags or runtime switches. Build normally with Release (the default value). 
+This project provides dedicated executables and automation scripts so that
+benchmarking and profiling do **not** depend on ad-hoc compiler flags or
+runtime switches.
+
+Build normally with Release (the default value). 
 The benchmarking and profiling executables are compiled with `SPDLOG_ACTIVE_LEVEL=OFF`, 
 independent of the global `LOG_LEVEL`. We always recommend clean building: 
+
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -- -j"$(nproc)"
 ```
 
-**Important:** Set `simulation.output_format: NONE` in the YAML configuration file.
+**Important:** For both benchmarking and profiling set
+`simulation.output_format: NONE` in the YAML configuration file 
+to avoid I/O affecting measurements.
 
-For benchmarking on CoolMUC, SLURM batch scripts are located at runs/task4.
+For benchmarking and profiling on CoolMUC, SLURM batch scripts are located at `runs/task4`.
 
 ### Benchmarking 
 
-Benchmarking is run from the top-level directory with the dedicated `MolSimBenchmark`:
+Benchmarking is run from the top-level directory with the dedicated `MolSimBenchmark` executable:
 
 ```bash
 ./build/src/MolSimBenchmark ./path/to/config.yml
 ```
+
+The executable prints the total runtime to standard output. To avoid the top-level 
+directory being cluttered and collect results from multiple runs, an automation script
+is provided:
+
+```bash
+./scripts/run_benchmarking.sh path/to/config.yml
+```
+
+This script stores benchmarking results together with metadata (timestamp,
+git commit, hostname, input file) in a machine-readable CSV file in `benchmark_csv_output/`
+as well as in a human-readable txt file in `benchmark_txt_output/`.
 
 ### Automated gprof Profiling
 An automation script is provided to run profiling reproducibly and
@@ -147,11 +165,10 @@ From the top-level directory:
 ./scripts/run_gprof.sh path/to/config.yml
 ```
 
-This generates a gprof report in .txt format in `gprof_txt_output`. The report
+This generates a gprof report in `.txt` format in `gprof_txt_output/`. The report's
 filename encodes execution time, git commit hash (or `nogit`), hostname and 
 input file name.
 
-For profiling on CoolMUC, SLURM batch scripts are located at runs/task4.
 ## YAML Configuration Format
 
 MolSim is configured entirely through a YAML file.
