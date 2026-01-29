@@ -1,6 +1,7 @@
 # include only those modules that we will link molsim_core against
 include(modules/spdlog)
 include(modules/yaml-cpp)
+include(modules/openmp)
 
 # add the vtk interface, which needs to be linked manually
 include(modules/vtk)
@@ -25,10 +26,15 @@ target_include_directories(molsim_core
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-# link spdlog and yaml-cpp against molsim_core library.
+# link spdlog, yaml-cpp and vtk against molsim_core library.
 target_link_libraries(molsim_core PUBLIC spdlog::spdlog)
 target_link_libraries(molsim_core PUBLIC yaml-cpp::yaml-cpp)
 target_link_libraries(molsim_core PUBLIC molsim_vtk)
+
+# conditionally link openMP
+if (OpenMP_CXX_FOUND)
+    target_link_libraries(molsim_core PUBLIC OpenMP::OpenMP_CXX)
+endif()
 
 # set LOG_LEVEL as globally accessible in molsim_core target. We use INTERFACE to avoid the override warnings.
 target_compile_definitions(molsim_core INTERFACE SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_${LOG_LEVEL})

@@ -24,6 +24,7 @@
 #include "inputReader/YamlInputReader.h"
 #include "utils/logging.hpp"
 
+
 /**
  * @brief Main entry point of the molecular dynamics simulation.
  *
