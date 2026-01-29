@@ -150,7 +150,7 @@ directory being cluttered and collect results from multiple runs, an automation 
 is provided:
 
 ```bash
-./scripts/run_benchmarking.sh path/to/config.yml
+./scripts/run_benchmark.sh path/to/config.yml
 ```
 
 This script stores benchmarking results together with metadata (timestamp,
