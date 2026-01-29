@@ -90,6 +90,7 @@ TEST(MembraneForceTest, AppliesGravityAndPull) {
 // Stretched spring along x-axis should yield equal and opposite Hooke forces.
 TEST(MembraneForceTest, SpringForceIsSymmetric) {
   ParticleContainer container;
+  container.reserve(2);
   auto &p1 = container.emplaceParticle(std::array<double, 3>{0.0, 0.0, 0.0}, std::array<double, 3>{0.0, 0.0, 0.0}, 1.0, 0);
   auto &p2 = container.emplaceParticle(std::array<double, 3>{2.0, 0.0, 0.0}, std::array<double, 3>{0.0, 0.0, 0.0}, 1.0, 0);
 
@@ -97,6 +98,9 @@ TEST(MembraneForceTest, SpringForceIsSymmetric) {
   p2.clearNeighbors();
   p1.addNeighbor(&p2, 1.0);
   p2.addNeighbor(&p1, 1.0);
+
+  ASSERT_EQ(p1.getNeighbors().size(), 1u);
+  ASSERT_EQ(p2.getNeighbors().size(), 1u);
 
   MembraneForce force(/*epsilon*/ 0.0, /*sigma*/ 1.0, /*k*/ 10.0, /*r0*/ 1.0, /*pull_force*/ 0.0, /*pull_until*/ 0.0,
                       std::array<double, 3>{0.0, 0.0, 0.0});
@@ -113,6 +117,7 @@ TEST(MembraneForceTest, SpringForceIsSymmetric) {
 // Repulsive LJ component should push particles apart when they are inside the cutoff.
 TEST(MembraneForceTest, RepulsiveWithinCutoff) {
   ParticleContainer container;
+  container.reserve(2);
   auto &p1 = container.emplaceParticle(std::array<double, 3>{0.0, 0.0, 0.0}, std::array<double, 3>{0.0, 0.0, 0.0}, 1.0, 0);
   auto &p2 = container.emplaceParticle(std::array<double, 3>{1.0, 0.0, 0.0}, std::array<double, 3>{0.0, 0.0, 0.0}, 1.0, 0);
 
