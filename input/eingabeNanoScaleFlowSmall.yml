@@ -1,0 +1,54 @@
+simulation:
+  sim_type: molecule
+  t_start: 0.0
+  t_end: 5.0 # set to 100th of a fraction of the actual simulation runtime for testing, local profiling
+  delta_t: 0.0005
+  gravity: [0.0, -0.8, 0.0]
+  output_format: NONE
+
+output:
+  write_frequency: 500
+
+cuboids:
+  - origin: [ 1.0, 0.5, 0.5 ]
+    numPerDim: [ 2, 30, 12 ]
+    baseVelocity: [ 0.0, 0.0, 0.0 ]
+    h: 1.0
+    mass: 1.0
+    type: 1
+
+  - origin: [ 27.2, 0.5, 0.5 ]
+    numPerDim: [ 2, 30, 12 ]
+    baseVelocity: [ 0.0, 0.0, 0.0 ]
+    h: 1.0
+    mass: 1.0
+    type: 1
+
+  - origin: [ 3.2, 0.6, 0.6 ]
+    numPerDim: [20, 25, 10 ]
+    baseVelocity: [ 0.0, 0.0, 0.0 ]
+    h: 1.2
+    mass: 1.0
+    type: 2
+
+discs:
+
+types:
+  - id: 1
+    epsilon: 2.0
+    sigma: 1.1
+  - id: 2
+    epsilon: 1.0
+    sigma: 1.0
+
+linkedCell:
+  - containerType: [Cell]
+    domainSize: [30.0, 30.0, 12.0]
+    rCutoff: 2.75
+    boundaryConditions: [Outflow, Outflow, Periodic, Periodic, Periodic, Periodic]
+
+ns_thermostat:
+  t_init: 40
+  n_thermostat: 10
+  dimensions: 3
+  brownian_motion: false
