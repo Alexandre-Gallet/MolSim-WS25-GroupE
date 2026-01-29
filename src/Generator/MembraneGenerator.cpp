@@ -5,6 +5,8 @@
 
 #include <cmath>
 
+// Builds a regular 3D grid of particles for the membrane and wires symmetric neighbor pointers so the spring force
+// calculation can traverse precomputed edges (axis-aligned and diagonals within each layer).
 std::vector<Particle *> MembraneGenerator::generate(Container &container, const MembraneConfig &cfg) {
   const int nx = cfg.n[0];
   const int ny = cfg.n[1];
@@ -13,8 +15,10 @@ std::vector<Particle *> MembraneGenerator::generate(Container &container, const 
   const std::size_t total = static_cast<std::size_t>(nx) * static_cast<std::size_t>(ny) * static_cast<std::size_t>(nz);
   std::vector<Particle *> grid(total, nullptr);
 
+  // Avoid reallocations while we place all particles.
   container.reserve(container.size() + total);
 
+  // Lay out a regular grid of particles, storing back-pointers in a flat array for later neighbor wiring.
   for (int k = 0; k < nz; ++k) {
     for (int j = 0; j < ny; ++j) {
       for (int i = 0; i < nx; ++i) {
@@ -29,6 +33,7 @@ std::vector<Particle *> MembraneGenerator::generate(Container &container, const 
   }
 
   const double diag_rest = std::sqrt(2.0) * cfg.r0;
+  // Helper that connects two lattice nodes symmetrically with their intended rest length.
   auto addNeighborPair = [&](int i0, int j0, int k0, int i1, int j1, int k1, double rest) {
     auto *a = particleAt(grid, cfg.n, i0, j0, k0);
     auto *b = particleAt(grid, cfg.n, i1, j1, k1);
@@ -41,6 +46,7 @@ std::vector<Particle *> MembraneGenerator::generate(Container &container, const 
   for (int k = 0; k < nz; ++k) {
     for (int j = 0; j < ny; ++j) {
       for (int i = 0; i < nx; ++i) {
+        // Four in-plane connections: +x, +y, and two diagonals in the layer.
         if (i + 1 < nx) {
           addNeighborPair(i, j, k, i + 1, j, k, cfg.r0);
         }
