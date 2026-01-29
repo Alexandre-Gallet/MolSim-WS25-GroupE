@@ -9,9 +9,7 @@ std::unique_ptr<outputWriter::OutputWriter> WriterFactory::createWriter(OutputFo
     case OutputFormat::XYZ:
       return std::make_unique<outputWriter::XYZWriter>();
 
-
     case OutputFormat::VTK:
-
       return std::make_unique<outputWriter::VTKWriter>();
 
     case OutputFormat::Checkpoint:
