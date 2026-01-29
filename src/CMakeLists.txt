@@ -27,7 +27,7 @@ target_include_directories(molsim_core
 
 # link spdlog and yaml-cpp against molsim_core library.
 target_link_libraries(molsim_core PUBLIC spdlog::spdlog)
-target_link_libraries(molsim_core PRIVATE yaml-cpp::yaml-cpp)
+target_link_libraries(molsim_core PUBLIC yaml-cpp::yaml-cpp)
 target_link_libraries(molsim_core PUBLIC molsim_vtk)
 
 # set LOG_LEVEL as globally accessible in molsim_core target. We use INTERFACE to avoid the override warnings.
