@@ -83,7 +83,7 @@ jobs:
 
       # Step 8: Configure CMake (needed to generate build system)
       - name: Configure project
-        run: cmake -S . -B build
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 
       # Step 9: Build with generated buildsystem using all available cores
       - name: Build project

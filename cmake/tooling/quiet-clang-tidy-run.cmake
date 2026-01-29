@@ -9,9 +9,13 @@ foreach(f ${ALL_CPP})
             --system-headers=false
             --extra-arg=-Wno-everything
             ${f}
+            RESULT_VARIABLE TIDY_RESULT
             OUTPUT_STRIP_TRAILING_WHITESPACE
-            ERROR_QUIET
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             COMMAND_ECHO STDOUT
     )
 endforeach()
+
+if(NOT TIDY_RESULT EQUAL 0)
+    message(FATAL_ERROR "clang-tidy failed on ${f}")
+endif()
