@@ -4,6 +4,8 @@ simulation:
   t_end: 0.5
   delta_t: 0.0002
   output_format: VTK        # or: XYZ
+  parallel:
+    method: pair_static
 
 output:
   write_frequency: 10

@@ -22,7 +22,7 @@ echo "Current directory: $(pwd)"
 echo "Binary:"
 ls -l $HOME/MolSim-WS25-GroupE/build/MolSim
 echo "Input file:"
-ls -l $HOME/MolSim-WS25-GroupE/input/eingabeRayleighTaylorBigBenchmarking.yml
+ls -l $HOME/MolSim-WS25-GroupE/input/contest1.yml
 
 echo "Running MolSim now..."
 

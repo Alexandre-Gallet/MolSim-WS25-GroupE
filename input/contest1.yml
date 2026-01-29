@@ -7,7 +7,7 @@ simulation:
   output_format: NONE
 
 output:
-  write_frequency: 1000000000   # to avoid IO in benchmarking
+  write_frequency: 10
 
 cuboids:
   - origin: [ 0.6, 2.0, 0.0 ]

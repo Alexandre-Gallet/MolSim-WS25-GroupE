@@ -181,7 +181,8 @@ The configuration is organized into the following sections:
 |               | t_start            | Start time of the simulation.                                                                                       |
 |               | t_end              | End time of the simulation.                                                                                         |
 |               | delta_t            | Time step size.                                                                                                     |
-|               | output_format      | Output format: `XYZ`, `VTK`, `CHECKPOINT`, or `NONE`                                                                                                                        |
+ |               | parallel           | Mode of parallelization: `None`, `PairStatic`, `CellDynamic`                                                        |
+|               | output_format      | Output format: `XYZ`, `VTK`, `CHECKPOINT`, or `NONE`                                                                |
 |               | gravity            | Gravity factor.                                                                                                     |
 |               | epsilon            | LJ epsilon parameter for the simulation.                                                                            |
 |               | sigma              | LJ sigma parameter for the simulation.                                                                              |
