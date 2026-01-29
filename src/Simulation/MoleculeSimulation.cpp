@@ -116,8 +116,10 @@ void MoleculeSimulation::runSimulation() {
       }
     }
 
-    // Write output every cfg_.write_frequency
-    if (iteration % cfg_.write_frequency == 0) {
+    // Write output every on every modulo write_frequency == 0 and if OutputFormat
+    // is not set to None to avoid the entire loop during benchmarking and not have to resort to setting
+    // write_frequency >> 100 billion
+    if (cfg_.output_format != OutputFormat::NONE && iteration % cfg_.write_frequency == 0) {
       if (cfg_.containerType == ContainerType::Cell) {
         static_cast<LinkedCellContainer *>(&particles_)->deleteHaloCells();
       }
@@ -131,6 +133,7 @@ void MoleculeSimulation::runSimulation() {
   }
 
   // Ensure a final checkpoint is written when requested, even if the loop did not land on write_frequency.
+  // Won't affect benchmarking if outputFormat None is chose
   if (cfg_.output_format == OutputFormat::Checkpoint && iteration % cfg_.write_frequency != 0) {
     if (cfg_.containerType == ContainerType::Cell) {
       static_cast<LinkedCellContainer *>(&particles_)->deleteHaloCells();
@@ -143,6 +146,11 @@ void MoleculeSimulation::runSimulation() {
 }
 
 void MoleculeSimulation::plotParticles(Container &particles, int iteration, OutputFormat format) {
+  // double check that benchmarking/profiling never uses plotParticles
+  if (format == OutputFormat::NONE) {
+    return;
+  }
+
   std::filesystem::create_directories("output");
 
   // Output file name from Outputformat

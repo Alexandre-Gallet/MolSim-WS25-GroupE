@@ -5,16 +5,17 @@ Implementation of a molecular dynamics (MD) simulator developed during the lab c
 at **Technische Universität München**, Winter Semester **2025/2026**.
 
 ## Table of Contents
-- [Building the Project](#building-the-project)
+- [Configuration and Building](#configuration-and-building)
 - [Running the Simulation](#running-the-simulation) 
-- [Benchmarking and Profiling](#benchmarking-and-profiling)
-- [YAML Configuration Format](#yaml-configuration-format) 
-- [Checkpointing](#checkpointing)
 - [Running Tests](#running-tests)
 - [Doxygen Documentation](#doxygen-documentation)
 - [Clang-Tidy and Clang-Format](#clang-tidy-and-clang-format)
+- [Benchmarking and Profiling](#benchmarking-and-profiling)
+- [YAML Configuration Format](#yaml-configuration-format) 
+- [Checkpointing](#checkpointing)
 
-## Building the Project
+
+## Configuration and Building
 
 ### 1. Clone the repository
 ```bash
@@ -41,92 +42,138 @@ sudo dnf install vtk-devel cmake gcc-c++ make
 
 ### 3. Configure and build the project
 
-You can optionally specify:
-
-- `-DCMAKE_BUILD_TYPE`  
-  - Default: `Release` (`-O3`, `-DNDEBUG`)  
-  - Other valid values: `Debug`, `RelWithDebInfo`, `MinSizeRel`
-
-- `-DLOG_LEVEL`  
-  - Default: `INFO`  
-  - Other options: `TRACE`, `DEBUG`, `WARN`, `ERROR`, `CRITICAL`, `OFF`  
-  - Defines which logging statements are compiled into the binary.
-
 ```bash
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOG_LEVEL=INFO
+cmake -S . -B build 
 cmake --build build -- -j"$(nproc)"
 ```
 
+In the configuration phase you can optionally specify
+
+- `-DCMAKE_BUILD_TYPE`
+  - Default: `Release` (using `-O3`, `-DNDEBUG` flags)
+  - Other valid values: `Debug`, `RelWithDebInfo`, `MinSizeRel`
+
+- `-DLOG_LEVEL`
+  - Default: `INFO`
+  - Other options: `TRACE`, `DEBUG`, `WARN`, `ERROR`, `CRITICAL`, `OFF`
+
 ## Running the Simulation
 
-After building, run the simulation from within the `build` directory:
+After configuring and building, run the simulation from the top-level directory with: 
 
 ```bash
-./MolSim path/to/config.yml 
+./build/src/MolSim path/to/config.yml
 ```
 
 ### Example
 
-Using some of the provided example files:
+Using some of the provided input files:
 
 ```bash
-./MolSim ../input/eingabe.yml 
-./MolSim ../input/eingabeRayleighTaylorSmall.yml
-./MolSim ../input/eingabeNanoScaleFlow.yml
+./build/src/MolSim ./input/eingabe.yml
+./build/src/MolSim ./input/eingabeRayleighTaylorSmall.yml
+./build/src/MolSim ./input/eingabeNanoScaleFlow.yml
 ```
 
-Simulation output files (VTK, XYZ, or both depending on `output_format` as defined in the .yml file)
-will appear in the working directory.
+Output location: MolSim creates an output/ directory in the current working directory (the directory you run the executable from).
+If logging is enabled, a simulation.log is also written there.
 
-If logging is enabled (default), a `simulation.log` file is also generated
-in the working directory.
+## Running Tests
+
+Run the tests from the top-level directory with:
+
+```bash
+./build/tests/MolSimTests
+```
+
+
+## Clang-Tidy and Clang-Format
+
+Format checking and fixing is run from the top-level directory with custom targets:
+
+```bash
+cmake --build build --target clang_format_check
+cmake --build build --target clang_format_fix
+cmake --build build --target run_clang_tidy
+```
+
+These commands respect the configuration files `.clang-tidy` and `.clang-format`.
+clang-tidy is executed per translation unit to avoid excessive noise from system and
+STL headers, improving the signal-to-noise ratio of diagnostics.
+
+## Doxygen Documentation
+
+Generate Doxygen from the top-level directory with: 
+
+```bash
+cmake --build build --target doc_doxygen
+```
+
+Open them with: 
+
+```bash
+xdg-open build/docs/html/index.html
+```
+
 
 ## Benchmarking and Profiling 
 
+This project provides dedicated executables and automation scripts so that
+benchmarking and profiling do **not** depend on ad-hoc compiler flags or
+runtime switches.
+
+Build normally with Release (the default value). 
+The benchmarking and profiling executables are compiled with `SPDLOG_ACTIVE_LEVEL=OFF`, 
+independent of the global `LOG_LEVEL`. We always recommend clean building: 
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build -- -j"$(nproc)"
+```
+
+**Important:** For both benchmarking and profiling set
+`simulation.output_format: NONE` in the YAML configuration file 
+to avoid I/O affecting measurements.
+
+For benchmarking and profiling on CoolMUC, SLURM batch scripts are located at `runs/task4`.
+
 ### Benchmarking 
 
-For performance benchmarking a specific set of flags has to be passed during configuration.
+Benchmarking is run from the top-level directory with the dedicated `MolSimBenchmark` executable:
 
 ```bash
-cmake -S . -B build-benchmark \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DLOG_LEVEL=OFF \
-  -DENABLE_VTK_OUTPUT=OFF
-
-cmake --build build-benchmark -- -j"$(nproc)"
+./build/src/MolSimBenchmark ./path/to/config.yml
 ```
 
-Running the simulation produces a measurement of elapsed time and MUPS/s (Molecule Updates per Second). 
-The above configuration turns of all IO, Logging and VTK Output. For Benchmarking on CoolMUC there are a series of 
-SLURM batch scripts located at ´runs/task4´. 
-
-
-### Profiling
-
-For profiling a specific set of flags has to be passed during configuration.
+The executable prints the total runtime to standard output. To avoid the top-level 
+directory being cluttered and collect results from multiple runs, an automation script
+is provided:
 
 ```bash
-cmake -S . -B build-benchmark \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DLOG_LEVEL=OFF \
-  -DENABLE_VTK_OUTPUT=OFF
-  -DCMAKE_CXX_FLAGS="-pg"
-
-cmake --build build-gprof -- -j"$(nproc)"
+./scripts/run_benchmarking.sh path/to/config.yml
 ```
-The above configuration turns off all IO, Logging and VTK Output. 
-The instrumented binary generates a gmon.out file after execution.
-The profiling report is generated with:
+
+This script stores benchmarking results together with metadata (timestamp,
+git commit, hostname, input file) in a machine-readable CSV file in `benchmark_csv_output/`
+as well as in a human-readable txt file in `benchmark_txt_output/`.
+
+### Automated gprof Profiling
+An automation script is provided to run profiling reproducibly and
+store results with full metadata (timestamp, git commit, host, input).
+From the top-level directory:
 
 ```bash
-gprof build-gprof/MolSim gmon.out > gprof_output.txt
+./scripts/run_gprof.sh path/to/config.yml
 ```
 
-For profiling on CoolMUC there are a series of SLURM batch scripts located at ´runs/task4´.
+This generates a gprof report in `.txt` format in `gprof_txt_output/`. The report's
+filename encodes execution time, git commit hash (or `nogit`), hostname and 
+input file name.
 
 ## YAML Configuration Format
 
-MolSim is configured entirely through a YAML file. The structure is divided into five main sections: **simulation**, **output**, **cuboids**, **discs**, **linkedCell**
+MolSim is configured entirely through a YAML file.
+The configuration is organized into the following sections:
 
 | Section       | Field              | Meaning                                                                                                             |
 |---------------|--------------------|---------------------------------------------------------------------------------------------------------------------|
@@ -134,7 +181,7 @@ MolSim is configured entirely through a YAML file. The structure is divided into
 |               | t_start            | Start time of the simulation.                                                                                       |
 |               | t_end              | End time of the simulation.                                                                                         |
 |               | delta_t            | Time step size.                                                                                                     |
-|               | output_format      | Format used for particle output files.                                                                              |
+|               | output_format      | Output format: `XYZ`, `VTK`, `CHECKPOINT`, or `NONE`                                                                                                                        |
 |               | gravity            | Gravity factor.                                                                                                     |
 |               | epsilon            | LJ epsilon parameter for the simulation.                                                                            |
 |               | sigma              | LJ sigma parameter for the simulation.                                                                              |
@@ -191,53 +238,27 @@ MolSim is configured entirely through a YAML file. The structure is divided into
 |               | pull_until         | Time until the pull_force is effective.                                                                             |
 |               | pull_indices       | Indices of the particles being pulled by the pull_force                                                             |
 
-Examples of a working yaml configuration files can be found at `input/eingabe.yml` and `input/eingabedisc.yml` 
+Examples of a working YAML configuration files can be found at `input/`
 
 ##  Checkpointing
-Checkpointing is used in Worksheet 4 to split the falling drop simulation into an equilibration phase and a subsequent production run that restarts from a saved simulation state.
+Checkpointing is used to split the falling drop simulation into an equilibration phase and a subsequent production run that restarts from a saved simulation state.
 
-- The checkpoint filename depends on the total number of steps and `output.write_frequency`. Total steps = `(t_end - t_start) / delta_t`. Example: `t_end=15`, `delta_t=0.0005` ⇒ 30,000 steps. With `write_frequency=1000` the final file is `checkpoint_30000.state`; with `write_frequency=500` it would be `checkpoint_60000.state`. Checkpoints are written under `build/output/`.
-- The drop run resumes from the checkpoint created by the equilibration run. Set `simulation.checkpoint_file` to that `.state` file and `restart_from_checkpoint: true`. Only the initial phase space is restored; timing/output parameters (`t_start`, `t_end`, `delta_t`, `write_frequency`) come from the new YAML.
-- Run from the `build` directory, passing the YAML as input (you do not “run” the YAML itself):
-  - Equilibration: `./MolSim ../input/eingabeW4Task3_equilibrate.yml`
-  - Drop: `./MolSim ../input/eingabeW4Task3_drop.yml`
+The checkpoint filename depends on the total number of steps and `output.write_frequency`. 
+Total steps = `(t_end - t_start) / delta_t`. Example: `t_end=15`, `delta_t=0.0005` ⇒ 30,000 steps. 
+With `write_frequency=1000` the final file is `checkpoint_30000.state`; 
+with `write_frequency=500` it would be `checkpoint_60000.state`. 
+Checkpoints are written in `./output/`.
+<br />
+
+The drop run resumes from the checkpoint created by the equilibration run. 
+Set `simulation.checkpoint_file` to that `.state` file and `restart_from_checkpoint: true`. 
+Only the initial phase space is restored; 
+timing/output parameters (`t_start`, `t_end`, `delta_t`, `write_frequency`) 
+come from the new YAML. <br />
+
+Use the checkpointing mechanics by running from the top-level directory. 
+An example of this would work using the provided input files is given by: 
 ```bash
-./MolSim ../input/eingabeW4Task3_equilibrate.yml
-./MolSim ../input/eingabeW4Task3_drop.yml
+./build/src/MolSim ../input/eingabeW4Task3_equilibrate.yml
+./build/src/MolSim ../input/eingabeW4Task3_drop.yml
 ```
-
-## Running Tests
-
-After having built the project, run the tests from the top-level directory via: 
-
-```bash
-ctest --test-dir build --output-on-failure -j"$(nproc)"
-```
-
-## Doxygen Documentation
-
-After having built the project, generate the documentation via:
-
-```bash
-cmake --build build --target doc_doxygen
-```
-
-open it from the `build` directory with:
-
-```bash
-xdg-open docs/html/index.html
-```
-
-## Clang-Tidy and Clang-Format
-
-To run static analysis and formatting checks manually use a clean build of the project:
-
-```bash
-rm -rf build/
-mkdir -p build
-cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-cmake --build build --target run_clang_tidy
-cmake --build build --target clang_format_check
-```
-
-These commands respect the configuration files `.clang-tidy` and `.clang-format`.

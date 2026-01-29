@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <array>
 #include <algorithm>
+#include <array>
 #include <set>
 #include <utility>
 #include <vector>
@@ -11,7 +11,7 @@
 
 namespace {
 // Store pairs with deterministic ordering to simplify lookups.
-std::pair<const Particle*, const Particle*> makeOrderedPair(Particle &a, Particle &b) {
+std::pair<const Particle *, const Particle *> makeOrderedPair(Particle &a, Particle &b) {
   if (&a > &b) {
     return {&b, &a};
   }
@@ -29,13 +29,11 @@ TEST(LinkedCellContainerTest, ForEachPairVisitsCurrentAndNeighborCellsOnly) {
   // Far in +y direction (index difference 2): should not be paired with others.
   auto &far = container.emplaceParticle({1.1, 3.6, 0.2}, {0, 0, 0}, 1.0);  // (2,4,1)
 
-  std::set<std::pair<const Particle*, const Particle*>> visited_pairs;
-  container.forEachPair([&](Particle &p, Particle &q) {
-    visited_pairs.insert(makeOrderedPair(p, q));
-  });
+  std::set<std::pair<const Particle *, const Particle *>> visited_pairs;
+  container.forEachPair([&](Particle &p, Particle &q) { visited_pairs.insert(makeOrderedPair(p, q)); });
 
-  std::set<std::pair<const Particle*, const Particle*>> expected{
-      makeOrderedPair(a, b), makeOrderedPair(a, c), makeOrderedPair(b, c)};
+  std::set<std::pair<const Particle *, const Particle *>> expected{makeOrderedPair(a, b), makeOrderedPair(a, c),
+                                                                   makeOrderedPair(b, c)};
 
   EXPECT_EQ(visited_pairs, expected);
   EXPECT_EQ(visited_pairs.count(makeOrderedPair(a, far)), 0u);
@@ -51,8 +49,8 @@ TEST(LinkedCellContainerTest, ForEachPairDoesNotDuplicatePairs) {
   auto &c = container.emplaceParticle({2.2, 1.1, 0.2}, {0, 0, 0}, 1.0);
   auto &d = container.emplaceParticle({2.3, 1.8, 0.2}, {0, 0, 0}, 1.0);  // neighbor cell (3,3,1)
 
-  std::vector<std::pair<const Particle*, const Particle*>> all_pairs;
-  std::set<std::pair<const Particle*, const Particle*>> unique_pairs;
+  std::vector<std::pair<const Particle *, const Particle *>> all_pairs;
+  std::set<std::pair<const Particle *, const Particle *>> unique_pairs;
 
   container.forEachPair([&](Particle &p, Particle &q) {
     auto ordered = makeOrderedPair(p, q);
@@ -67,16 +65,16 @@ TEST(LinkedCellContainerTest, BoundaryAndHaloIterationVisitCorrectParticles) {
   // Domain 3x3x3 -> padded 5x5x5; inner cell index (2,2,2), boundary when index is 1 or 3.
   LinkedCellContainer container(1.0, {3.0, 3.0, 3.0});
 
-  auto &inner = container.emplaceParticle({1.5, 1.5, 1.5}, {0, 0, 0}, 1.0);  // (2,2,2) inner
+  auto &inner = container.emplaceParticle({1.5, 1.5, 1.5}, {0, 0, 0}, 1.0);     // (2,2,2) inner
   auto &boundary = container.emplaceParticle({0.2, 1.5, 1.5}, {0, 0, 0}, 1.0);  // (1,2,2) boundary
-  auto &halo = container.emplaceParticle({-0.1, 1.5, 1.5}, {0, 0, 0}, 1.0);      // (0,2,2) halo
+  auto &halo = container.emplaceParticle({-0.1, 1.5, 1.5}, {0, 0, 0}, 1.0);     // (0,2,2) halo
 
-  std::vector<const Particle*> boundary_seen;
+  std::vector<const Particle *> boundary_seen;
   container.forEachBoundaryParticle([&](Particle *p) { boundary_seen.push_back(p); });
   EXPECT_EQ(boundary_seen.size(), 1u);
   EXPECT_EQ(boundary_seen.front(), &boundary);
 
-  std::vector<const Particle*> halo_seen;
+  std::vector<const Particle *> halo_seen;
   container.forEachHaloParticle([&](Particle *p) { halo_seen.push_back(p); });
   EXPECT_EQ(halo_seen.size(), 1u);
   EXPECT_EQ(halo_seen.front(), &halo);
@@ -123,8 +121,7 @@ TEST(LinkedCellContainerTest, ReflectingFaceCreatesGhostAndFlushesOnNextRebuild)
   bc[static_cast<std::size_t>(Face::XMin)] = BoundaryCondition::Reflecting;
   container.setBoundaryConditions(bc);
 
-  auto &original =
-      container.emplaceParticle({0.2, 1.5, 1.5}, {1.0, -0.5, 0.25}, 1.0);  // boundary on XMin
+  auto &original = container.emplaceParticle({0.2, 1.5, 1.5}, {1.0, -0.5, 0.25}, 1.0);  // boundary on XMin
 
   container.rebuild();
 

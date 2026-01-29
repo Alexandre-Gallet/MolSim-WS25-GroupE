@@ -17,10 +17,9 @@ TEST(DiscGeneratorBehaviourTest, DiscProducesNeighborsWithinCutoff) {
   const std::array<double, 3> baseVelocity{0.0, 0.0, 0.0};
   const int type = 1;
 
-  DiscGenerator::generateDisc(container, center, radiusCells, h, mass,
-                              baseVelocity, type);
+  DiscGenerator::generateDisc(container, center, radiusCells, h, mass, baseVelocity, type);
 
-  ASSERT_GT(container.size(), 1u); // must contain multiple particles
+  ASSERT_GT(container.size(), 1u);  // must contain multiple particles
 
   const double cutoff = 1.5;
   const double cutoff2 = cutoff * cutoff;
@@ -34,17 +33,17 @@ TEST(DiscGeneratorBehaviourTest, DiscProducesNeighborsWithinCutoff) {
     ++it2;
 
     for (; it2 != container.end(); ++it2, ++j) {
-      Particle& p1 = *it1;
-      Particle& p2 = *it2;
+      Particle &p1 = *it1;
+      Particle &p2 = *it2;
 
-      const auto& xA = p1.getX();
-      const auto& xB = p2.getX();
+      const auto &xA = p1.getX();
+      const auto &xB = p2.getX();
 
       double dx = xA[0] - xB[0];
       double dy = xA[1] - xB[1];
       double dz = xA[2] - xB[2];
 
-      double r2 = dx*dx + dy*dy + dz*dz;
+      double r2 = dx * dx + dy * dy + dz * dz;
 
       if (r2 < cutoff2) {
         ++neighborInteractions;

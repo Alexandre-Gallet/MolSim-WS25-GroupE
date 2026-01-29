@@ -81,26 +81,8 @@ int main(int argc, char *argv[]) {
   const std::chrono::duration<double> elapsed = end_time - start_time;
   const double runtime_seconds = elapsed.count();
 
-  // Compute the intended number of integration steps from the configuration.
-  // We floor to next smallest integer because (t_end - t_start) / delta_t may be
-  // slightly below/above an integer due to floating-point representation.
-  // Note that the division itself may still be affected by floating-point representation error.
-
-  const auto iterations = static_cast<std::size_t>(std::floor((cfg.t_end - cfg.t_start) / cfg.delta_t));
-
-  // Number of physical particles only.
-  // Ghost particles used for boundary handling are excluded, as they do not
-  // represent independent molecules, but temporary copies that are not
-  // time-integrated.
-  const std::size_t num_particles = particles.size();
-
-  // Molecule updates per second: (particles × iterations) / runtime
-  const double molecule_updates_per_second =
-      (static_cast<double>(num_particles) * static_cast<double>(iterations)) / runtime_seconds;
-
   // Print results to command line. Independent of logging flag passed during compilation
   std::cout << "Runtime [s]: " << runtime_seconds << '\n';
-  std::cout << "Molecule updates per second: " << molecule_updates_per_second << '\n';
   std::cout << std::flush;
 
   return EXIT_SUCCESS;

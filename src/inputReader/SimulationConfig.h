@@ -80,11 +80,8 @@ struct SimulationConfig {
   double t_end = 1000.0;
   double delta_t = 0.014;
 
-#ifdef ENABLE_VTK_OUTPUT
-  OutputFormat output_format = OutputFormat::VTK;
-#else
+  // remove all compile flag hacking
   OutputFormat output_format = OutputFormat::XYZ;
-#endif
 
   int write_frequency = 10;
 

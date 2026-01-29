@@ -95,7 +95,8 @@ jobs:
 
       # Step 7: Configure CMake (needed for compile_commands.json for clang-tidy)
       - name: Configure project
-        run: cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
 
       # Step 8: Run clang-tidy on push but never fail
       - name: Run clang-tidy (push)

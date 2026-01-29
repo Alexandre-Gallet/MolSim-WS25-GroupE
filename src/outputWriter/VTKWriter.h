@@ -1,12 +1,4 @@
-/*
- * VTKWriter.h
- *
- *  Created on: 01.03.2010
- *      Author: eckhardw
- */
-
 #pragma once
-#ifdef ENABLE_VTK_OUTPUT
 
 #include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
@@ -43,4 +35,3 @@ class VTKWriter : public OutputWriter {
 };
 
 }  // namespace outputWriter
-#endif

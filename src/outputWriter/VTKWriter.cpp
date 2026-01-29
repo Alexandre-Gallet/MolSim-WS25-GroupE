@@ -4,7 +4,6 @@
  *  Created on: 01.03.2010
  *      Author: eckhardw
  */
-#ifdef ENABLE_VTK_OUTPUT
 
 #include "VTKWriter.h"
 
@@ -90,4 +89,3 @@ void VTKWriter::plotParticles(Container &particles, const std::string &filename,
   writer->Write();
 }
 }  // namespace outputWriter
-#endif

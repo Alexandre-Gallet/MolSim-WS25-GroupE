@@ -9,8 +9,7 @@ auto createContainer(SimulationConfig &cfg) -> std::unique_ptr<Container> {
     case ContainerType::Cell:
       return std::make_unique<LinkedCellContainer>(cfg.rCutoff, cfg.domainSize);
     case ContainerType::Particle:
-      return std::make_unique<ParticleContainer>();
-    default:  // won't be reached
+    default:
       return std::make_unique<ParticleContainer>();
   }
 }

@@ -1,0 +1,17 @@
+=== MolSim Benchmark Report ===
+Timestamp     : 20260128_231850
+Git commit    : 33810d6
+Host          : parzival-21m70012ge
+Input file    : ./input/eingabeRayleighTaylorBigBenchmarking.yml
+Input SHA1    : 3150ef4f3c1f3eda7dbbc9f2c42938511b7d6097
+Runtime [s]   : 32.3505
+
+--- Raw Output ---
+[2026-01-28 23:18:50.473681] [info] Setting up molecule simulation from YAML configuration...
+[2026-01-28 23:18:50.473717] [info] Generating particles from 2 cuboid(s)...
+[2026-01-28 23:18:50.475063] [info] Generated 10000 particles from cuboids.
+[2026-01-28 23:18:50.475071] [info] Generating particles from 0 disc(s)...
+[2026-01-28 23:18:50.478699] [info] Starting molecule simulation: t_start=0, t_end=0.5, delta_t=0.0005, output every 1000000000 steps.
+[2026-01-28 23:19:22.824096] [info] Molecule simulation completed after 1000 iterations (final t = 0.5).
+Runtime [s]: 32.3505
+Molecule updates per second: 309115
