@@ -1,19 +1,32 @@
 #pragma once
 
-// OpenMPCompat.h
-// A wrapper so the rest of the code doesn't use #ifdef _OPENMP.
-//
-// Behavior:
-// - If compiled without OpenMP support, everything falls back to serial defaults.
-// - If compiled with OpenMP support (-fopenmp), functions call omp_* functionality.
-
+/**
+ * @file OpenMPCompat.h
+ * @brief Small OpenMP compatibility wrapper.
+ *
+ * This header provides a tiny API to query OpenMP state (enabled/threads/id)
+ * without scattering preprocessor checks across the codebase.
+ *
+ * - If compiled with OpenMP support, it includes <omp.h> and forwards to the runtime.
+ * - If not, it provides serial fallbacks (1 thread, thread id 0).
+ *
+ * Usage:
+ *   if (ompcompat::enabled()) { ... }
+ *   int n = ompcompat::maxThreads();
+ *   int tid = ompcompat::threadId();
+ */
 #ifdef _OPENMP
   #include <omp.h>
 #endif
 
 namespace omp_compat {
 
-// True if the binary was compiled with OpenMP enabled.
+/**
+ * @brief Returns true if this translation unit was compiled with OpenMP enabled.
+ *
+ * This checks the compiler-defined macro `_OPENMP` which is set when the
+ * OpenMP compile flags are active (e.g. via linking `OpenMP::OpenMP_CXX` in CMake).
+ */
 inline constexpr bool enabled() noexcept {
 #ifdef _OPENMP
   return true;
@@ -22,7 +35,11 @@ inline constexpr bool enabled() noexcept {
 #endif
 }
 
-// Thread id in the *current* parallel region. Serial fallback: 0.
+/**
+ * @brief Returns the calling thread's OpenMP thread id inside a parallel region.
+ *
+ * @return Thread id in [0, numThreads-1]. Returns 0 when OpenMP is disabled.
+ */
 inline int threadId() noexcept {
 #ifdef _OPENMP
   return omp_get_thread_num();
@@ -31,7 +48,12 @@ inline int threadId() noexcept {
 #endif
 }
 
-// Number of threads in the *current* parallel region. Serial fallback: 1.
+/**
+ * @brief Returns the number of threads in the current OpenMP parallel region.
+ *
+ * Outside a parallel region, OpenMP typically returns 1.
+ * Returns 1 when OpenMP is disabled.
+ */
 inline int numThreads() noexcept {
 #ifdef _OPENMP
   return omp_get_num_threads();
@@ -40,8 +62,14 @@ inline int numThreads() noexcept {
 #endif
 }
 
-// Max threads available to OpenMP runtime (depends on OMP_NUM_THREADS this needs to be set exported in slurm scripts explictely)
-//. Serial fallback: 1.
+/**
+ * @brief Returns the maximum number of OpenMP threads the runtime may use.
+ *
+ * Note: The actual number of threads in a specific parallel region may differ
+ * (e.g. due to runtime limits, `OMP_NUM_THREADS`, Slurm cpus-per-task, etc.).
+ *
+ * @return Max thread count (>= 1). Returns 1 when OpenMP is disabled.
+ */
 inline int maxThreads() noexcept {
 #ifdef _OPENMP
   return omp_get_max_threads();
@@ -50,7 +78,13 @@ inline int maxThreads() noexcept {
 #endif
 }
 
-// True if called from inside a parallel region. Serial fallback: false.
+
+/**
+ * @brief Returns TRUE if inside a  parallel region.
+ *
+ * Outside a parallel region, OpenMP typically returns FALSE
+ * Returns FALSE when OpenMP is disabled.
+ */
 inline bool inParallel() noexcept {
 #ifdef _OPENMP
   return omp_in_parallel() != 0;
