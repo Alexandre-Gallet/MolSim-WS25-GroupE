@@ -48,22 +48,6 @@ void LennardJones::calculateF(Container &particles) {
     }
   }
 
-  /* Original code that got replaced for serial speedup
-  // Use pair iterator to calculates forces between each pair of particles
-  particles.forEachPair([this](Particle &p1, Particle &p2) {
-    auto lookup = [this](int type) {
-      auto it = type_params_.find(type);
-      if (it != type_params_.end()) {
-        return it->second;
-      }
-      return std::make_pair(epsilon, sigma);
-    };
-    auto params1 = lookup(p1.getType());
-    auto params2 = lookup(p2.getType());
-    const auto mixed = mixParameters(params1, params2);
-    calc(p1, p2, mixed.first, mixed.second);
-  });
-  */
   auto lookup = [this](int type) {
     if (type >= 0 && type < static_cast<int>(type_params_dense_set_.size()) && type_params_dense_set_[type]) {
       return type_params_dense_[type];
@@ -130,12 +114,19 @@ void LennardJones::calculateF(Container &particles) {
 
         const std::size_t base = static_cast<std::size_t>(tid) * n;
 
-        fx[base + i] += dfx;
-        fy[base + i] += dfy;
-        fz[base + i] += dfz;
-        fx[base + j] -= dfx;
-        fy[base + j] -= dfy;
-        fz[base + j] -= dfz;
+        const bool p1_owned = !p1.isGhost();
+        const bool p2_owned = !p2.isGhost();
+
+        if (p1_owned) {
+          fx[base + i] += dfx;
+          fy[base + i] += dfy;
+          fz[base + i] += dfz;
+        }
+        if (p2_owned) {
+          fx[base + j] -= dfx;
+          fy[base + j] -= dfy;
+          fz[base + j] -= dfz;
+        }
       };
 
       lc->forEachPairParallelStatic(visitor);
@@ -171,9 +162,63 @@ void LennardJones::calculateF(Container &particles) {
     return;
   }
 
-  // Strategy B not implemented yet -> fall back to serial
-  if (parallel_method_ == ParallelMethod::CellDynamic) {
-    // later
+  if (parallel_method_ == ParallelMethod::CellDynamic && OpenMPCompat::enabled()) {
+    if (auto *lc = dynamic_cast<LinkedCellContainer *>(&particles)) {
+      const std::size_t n = particles.size();
+      const int T = std::max(1, OpenMPCompat::maxThreads());
+
+      std::vector<double> fx(static_cast<std::size_t>(T) * n, 0.0);
+      std::vector<double> fy(static_cast<std::size_t>(T) * n, 0.0);
+      std::vector<double> fz(static_cast<std::size_t>(T) * n, 0.0);
+
+      auto visitorDyn = [this, &lookupPair, n, T, &fx, &fy, &fz](Particle &p1, Particle &p2, int tid) {
+        if (tid < 0 || tid >= T) tid = 0;
+
+        // Skip wall particles in pair interactions (keep your rule consistent).
+        if (p1.getType() == 1 || p2.getType() == 1) return;
+
+        const std::size_t i = static_cast<std::size_t>(p1.getOwnedIndex());
+        const std::size_t j = static_cast<std::size_t>(p2.getOwnedIndex());
+        if (i >= n || j >= n) return;
+
+        const auto mixed = lookupPair(p1.getType(), p2.getType());
+
+        double dfx, dfy, dfz;
+        computeForceComponents(p1, p2, mixed.epsilon24, mixed.sigma6, dfx, dfy, dfz);
+
+        const std::size_t base = static_cast<std::size_t>(tid) * n;
+        fx[base + i] += dfx;
+        fy[base + i] += dfy;
+        fz[base + i] += dfz;
+        fx[base + j] -= dfx;
+        fy[base + j] -= dfy;
+        fz[base + j] -= dfz;
+      };
+
+      lc->forEachPairCellDynamic(visitorDyn);
+
+      // Reduction: only add to non-wall particles (your fix)
+      for (auto &p : particles) {
+        if (p.getType() == 1) continue;
+        const std::size_t idx = static_cast<std::size_t>(p.getOwnedIndex());
+        if (idx >= n) continue;
+
+        double sx = 0.0, sy = 0.0, sz = 0.0;
+        for (int t = 0; t < T; ++t) {
+          const std::size_t base = static_cast<std::size_t>(t) * n;
+          sx += fx[base + idx];
+          sy += fy[base + idx];
+          sz += fz[base + idx];
+        }
+        p.addF(sx, sy, sz);
+      }
+
+      return;
+    }
+
+    // fallback if not linked-cell
+    particles.forEachPair(visitor);
+    return;
   }
 
   // Default: existing serial traversal (your curre<nt code)

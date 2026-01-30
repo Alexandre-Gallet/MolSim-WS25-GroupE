@@ -137,6 +137,109 @@ class LinkedCellContainer : public Container {
   template <typename Func>
   void forEachHaloParticle(Func visitor);
 
+  /**
+   * @brief Visits all unique particle pairs using linked-cell traversal,
+   *        distributing work dynamically over cells (OpenMP schedule(dynamic)).
+   *
+   * The visitor must have signature:
+   *   void visitor(Particle& p1, Particle& p2, int tid)
+   *
+   * Pairs are visited exactly once (no double counting) using a half-neighborhood stencil.
+   */
+  template <typename Func>
+  void forEachPairCellDynamic(Func &&visitor) {
+    // Half-neighborhood stencil (13 neighbors) for unique pair enumeration in 3D.
+    // Self-pairs (within same cell) are handled separately.
+    static constexpr int shifts[13][3] = {
+        {0, 0, 1},  {0, 1, -1}, {0, 1, 0}, {0, 1, 1},  {1, -1, -1}, {1, -1, 0}, {1, -1, 1},
+        {1, 0, -1}, {1, 0, 0},  {1, 0, 1}, {1, 1, -1}, {1, 1, 0},   {1, 1, 1},
+    };
+
+    const std::size_t total = cells.size();
+
+    // Serial fallback if OpenMP isn't enabled/linked.
+    if (!OpenMPCompat::enabled()) {
+      for (std::size_t base = 0; base < total; ++base) {
+        if (cells[base].type == CellType::Halo) continue;
+        const int tid = 0;
+
+        // Self pairs
+        auto &a = cells[base].particles;
+        for (std::size_t i = 0; i < a.size(); ++i) {
+          for (std::size_t j = i + 1; j < a.size(); ++j) {
+            visitor(*a[i], *a[j], tid);
+          }
+        }
+
+        // Neighbor pairs
+        const auto c = to3DIndex(base);
+        for (const auto &s : shifts) {
+          const int nx = static_cast<int>(c[0]) + s[0];
+          const int ny = static_cast<int>(c[1]) + s[1];
+          const int nz = static_cast<int>(c[2]) + s[2];
+
+          // padded grid guarantees halo exists; but keep it safe
+          if (nx < 0 || ny < 0 || nz < 0) continue;
+          if (nx >= static_cast<int>(padded_dims[0]) || ny >= static_cast<int>(padded_dims[1]) ||
+              nz >= static_cast<int>(padded_dims[2]))
+            continue;
+
+          const std::size_t nb = toLinearIndex(static_cast<std::size_t>(nx), static_cast<std::size_t>(ny),
+                                               static_cast<std::size_t>(nz), padded_dims);
+
+          auto &b = cells[nb].particles;
+          for (auto *pa : a) {
+            for (auto *pb : b) {
+              visitor(*pa, *pb, tid);
+            }
+          }
+        }
+      }
+      return;
+    }
+
+#ifdef _OPENMP
+#pragma omp parallel for schedule(dynamic)
+#endif
+    for (std::ptrdiff_t base_s = 0; base_s < static_cast<std::ptrdiff_t>(total); ++base_s) {
+      const std::size_t base = static_cast<std::size_t>(base_s);
+      if (cells[base].type == CellType::Halo) continue;
+
+      const int tid = OpenMPCompat::threadId();
+
+      // Self pairs
+      auto &a = cells[base].particles;
+      for (std::size_t i = 0; i < a.size(); ++i) {
+        for (std::size_t j = i + 1; j < a.size(); ++j) {
+          visitor(*a[i], *a[j], tid);
+        }
+      }
+
+      // Neighbor pairs
+      const auto c = to3DIndex(base);
+      for (const auto &s : shifts) {
+        const int nx = static_cast<int>(c[0]) + s[0];
+        const int ny = static_cast<int>(c[1]) + s[1];
+        const int nz = static_cast<int>(c[2]) + s[2];
+
+        if (nx < 0 || ny < 0 || nz < 0) continue;
+        if (nx >= static_cast<int>(padded_dims[0]) || ny >= static_cast<int>(padded_dims[1]) ||
+            nz >= static_cast<int>(padded_dims[2]))
+          continue;
+
+        const std::size_t nb = toLinearIndex(static_cast<std::size_t>(nx), static_cast<std::size_t>(ny),
+                                             static_cast<std::size_t>(nz), padded_dims);
+
+        auto &b = cells[nb].particles;
+        for (auto *pa : a) {
+          for (auto *pb : b) {
+            visitor(*pa, *pb, tid);
+          }
+        }
+      }
+    }
+  }
+
  private:
   void initDimensions();
   void initCells();
