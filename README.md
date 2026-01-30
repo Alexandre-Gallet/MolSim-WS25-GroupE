@@ -135,7 +135,7 @@ cmake --build build -- -j"$(nproc)"
 `simulation.output_format: NONE` in the YAML configuration file 
 to avoid I/O affecting measurements.
 
-For benchmarking and profiling on CoolMUC, SLURM batch scripts are located at `runs/task4`.
+For benchmarking and profiling on CoolMUC, SLURM batch scripts are located at `runs`.
 
 ### Benchmarking 
 
