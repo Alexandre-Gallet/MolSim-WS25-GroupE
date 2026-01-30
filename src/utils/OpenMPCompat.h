@@ -19,7 +19,7 @@
   #include <omp.h>
 #endif
 
-namespace omp_compat {
+namespace OpenMPCompat {
 
 /**
  * @brief Returns true if this translation unit was compiled with OpenMP enabled.
