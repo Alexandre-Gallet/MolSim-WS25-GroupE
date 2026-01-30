@@ -51,14 +51,12 @@ TEST(ParallelForcesTest, PairStaticMatchesSerialForcesLinkedCell) {
     GTEST_SKIP() << "OpenMP enabled but maxThreads < 2; skipping true parallel-path test.";
   }
 
-
   // Small domain and cutoff -> a few cells, easy neighbor traversal
   LinkedCellContainer lc(/*r_cutoff=*/3.0, /*domain_size=*/{10.0, 10.0, 10.0});
 
   // Boundary conditions irrelevant here, but keep stable
-  lc.setBoundaryConditions({BoundaryCondition::None, BoundaryCondition::None,
-                            BoundaryCondition::None, BoundaryCondition::None,
-                            BoundaryCondition::None, BoundaryCondition::None});
+  lc.setBoundaryConditions({BoundaryCondition::None, BoundaryCondition::None, BoundaryCondition::None,
+                            BoundaryCondition::None, BoundaryCondition::None, BoundaryCondition::None});
 
   // Place a few particles well inside domain
   lc.emplaceParticle({2.0, 2.0, 2.0}, {0.0, 0.0, 0.0}, 1.0, /*type=*/0);
@@ -68,7 +66,6 @@ TEST(ParallelForcesTest, PairStaticMatchesSerialForcesLinkedCell) {
   // Add a "wall" particle (type==1). It should remain force-free.
   lc.emplaceParticle({5.0, 5.0, 5.0}, {0.0, 0.0, 0.0}, 1.0, /*type=*/1);
 
-
   // Ensure cells are populated consistently
   lc.rebuild();
 
@@ -77,7 +74,6 @@ TEST(ParallelForcesTest, PairStaticMatchesSerialForcesLinkedCell) {
     if (p.getType() == 1) wall_idx = static_cast<std::size_t>(p.getOwnedIndex());
   }
   ASSERT_NE(wall_idx, static_cast<std::size_t>(-1)) << "Wall particle not found";
-
 
   LennardJones lj;
   lj.setGravity({0.0, 0.0, 0.0});

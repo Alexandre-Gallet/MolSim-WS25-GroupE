@@ -157,14 +157,12 @@ class Particle {
   int getType() const { return type; }
 
   /**
- * @brief Index of the owned particle inside its container storage.
- *
- * Used for thread-local force accumulation during parallel force computation.
- * For LinkedCellContainer this is guaranteed to be in [0, size()) for owned particles.
- */
+   * @brief Index of the owned particle inside its container storage.
+   *
+   * Used for thread-local force accumulation during parallel force computation.
+   * For LinkedCellContainer this is guaranteed to be in [0, size()) for owned particles.
+   */
   [[nodiscard]] uint32_t getOwnedIndex() const { return owned_index_; }
-
-
 
   /**
    * @brief Equality comparison operator

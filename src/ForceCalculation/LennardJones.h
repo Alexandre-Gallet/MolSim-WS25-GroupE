@@ -109,9 +109,8 @@ class LennardJones : public ForceCalculation {
    */
   static void calc(Particle &p1, Particle &p2, double epsilon24, double sigma6);
 
-  static inline void computeForceComponents(const Particle &p1, const Particle &p2,
-                                         double epsilon24, double sigma6,
-                                         double &fx, double &fy, double &fz) {
+  static inline void computeForceComponents(const Particle &p1, const Particle &p2, double epsilon24, double sigma6,
+                                            double &fx, double &fy, double &fz) {
     const auto &x1 = p1.getX();
     const auto &x2 = p2.getX();
 
@@ -131,6 +130,4 @@ class LennardJones : public ForceCalculation {
     fy = scalar * dy;
     fz = scalar * dz;
   }
-
-
 };

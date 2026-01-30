@@ -71,12 +71,14 @@ struct MembraneConfig {
 };
 
 // enum for parallelization
-enum class ParallelMethod {None, PairStatic, CellDynamic};
+enum class ParallelMethod { None, PairStatic, CellDynamic };
 
 /**
  * @brief Bundles parallelization configuration options.
  */
-struct ParallelConfig { ParallelMethod method = ParallelMethod::None; };
+struct ParallelConfig {
+  ParallelMethod method = ParallelMethod::None;
+};
 
 /**
  * @brief Bundles all simulation configuration options.

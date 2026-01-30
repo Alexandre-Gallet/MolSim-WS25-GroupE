@@ -75,7 +75,6 @@ void MoleculeSimulation::runSimulation() {
   lj.setGravity(cfg_.gravity);
   lj.setParallelMethod(cfg_.parallel.method);
 
-
   // Initial force evaluation
   lj.calculateF(particles_);
   SPDLOG_DEBUG("Initial Lennard-Jones forces computed (epsilon={}, sigma={}).", cfg_.lj_epsilon, cfg_.lj_sigma);

@@ -22,11 +22,10 @@
 #include <string>
 #include <vector>
 
-
-#include "utils/OpenMPCompat.h"
 #include "Container.h"
 #include "Particle.h"
 #include "spdlog/spdlog.h"
+#include "utils/OpenMPCompat.h"
 
 enum class Face : uint8_t { XMin = 0, XMax = 1, YMin = 2, YMax = 3, ZMin = 4, ZMax = 5 };
 enum class BoundaryCondition : uint8_t { None, Outflow, Reflecting, Periodic };
@@ -124,7 +123,6 @@ class LinkedCellContainer : public Container {
   /// Iterate over all unordered pairs in parallel (static scheduling over cells).
   template <typename Func>
   void forEachPairParallelStatic(Func visitor);
-
 
   /**
    * @brief Iterate over all boundary particles (inside domain, adjacent to halos).
@@ -278,7 +276,6 @@ inline void LinkedCellContainer::forEachPair(Func visitor) {
   }
 }
 
-
 template <typename Func>
 inline void LinkedCellContainer::forEachPairParallelStatic(Func visitor) {
   // Half-stencil covering all 13 forward neighbors to avoid duplicate pair visits.
@@ -343,8 +340,6 @@ inline void LinkedCellContainer::forEachPairParallelStatic(Func visitor) {
     }
   }
 }
-
-
 
 template <typename Func>
 inline void LinkedCellContainer::forEachBoundaryParticle(Func visitor) {

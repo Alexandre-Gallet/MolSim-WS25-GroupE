@@ -99,8 +99,7 @@ void LennardJones::calculateF(Container &particles) {
     calc(p1, p2, mixed.epsilon24, mixed.sigma6);
   };
 
-
-    // -----------------------------
+  // -----------------------------
   // Choose traversal strategy
   // -----------------------------
   if (parallel_method_ == ParallelMethod::PairStatic && OpenMPCompat::enabled()) {
@@ -131,11 +130,13 @@ void LennardJones::calculateF(Container &particles) {
 
         const std::size_t base = static_cast<std::size_t>(tid) * n;
 
-        fx[base + i] += dfx; fy[base + i] += dfy; fz[base + i] += dfz;
-        fx[base + j] -= dfx; fy[base + j] -= dfy; fz[base + j] -= dfz;
+        fx[base + i] += dfx;
+        fy[base + i] += dfy;
+        fz[base + i] += dfz;
+        fx[base + j] -= dfx;
+        fy[base + j] -= dfy;
+        fz[base + j] -= dfz;
       };
-
-
 
       lc->forEachPairParallelStatic(visitor);
 
@@ -157,17 +158,16 @@ void LennardJones::calculateF(Container &particles) {
         p.addF(sx, sy, sz);
       }
 
-
       return;  // done
     }
 
     // Fallback (non-linked-cell container): keep correctness
     // (No efficient neighbor traversal available here.)
     particles.forEachPair([this, &lookupPair](Particle &p1, Particle &p2) {
-  if (p1.getType() == 1 || p2.getType() == 1) return;
-  const auto mixed = lookupPair(p1.getType(), p2.getType());
-  calc(p1, p2, mixed.epsilon24, mixed.sigma6);
-});
+      if (p1.getType() == 1 || p2.getType() == 1) return;
+      const auto mixed = lookupPair(p1.getType(), p2.getType());
+      calc(p1, p2, mixed.epsilon24, mixed.sigma6);
+    });
     return;
   }
 
@@ -184,7 +184,6 @@ void LennardJones::calculateF(Container &particles) {
   } else {
     particles.forEachPair(visitor);
   }
-
 }
 
 void LennardJones::calc(Particle &p1, Particle &p2, double epsilon24, double sigma6) {

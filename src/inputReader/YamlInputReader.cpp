@@ -7,8 +7,8 @@
 #include <yaml-cpp/yaml.h>
 
 #include <algorithm>
-#include <cctype>
 #include <array>
+#include <cctype>
 #include <limits>
 #include <sstream>
 #include <stdexcept>
@@ -137,7 +137,7 @@ void YamlInputReader::parseSimulationSection(const YAML::Node &n, SimulationConf
 // parsing of the parallel input in yaml with some checks and error messages
 
 void YamlInputReader::parseParallelSection(const YAML::Node &n, SimulationConfig &cfg) const {
-  cfg.parallel.method = ParallelMethod::None; // default
+  cfg.parallel.method = ParallelMethod::None;  // default
 
   if (!n || n.IsNull()) return;
   if (!n.IsMap()) throw std::runtime_error("YAML error: 'parallel' must be a mapping");
@@ -146,12 +146,17 @@ void YamlInputReader::parseParallelSection(const YAML::Node &n, SimulationConfig
   if (!n["method"].IsScalar()) throw std::runtime_error("YAML error: parallel.method must be a string");
 
   std::string s = n["method"].as<std::string>();
-  std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c){ return char(std::tolower(c)); });
+  std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return char(std::tolower(c)); });
 
-  if (s == "none") cfg.parallel.method = ParallelMethod::None;
-  else if (s == "pair_static" || s == "pairstatic") cfg.parallel.method = ParallelMethod::PairStatic;
-  else if (s == "cell_dynamic" || s == "celldynamic") cfg.parallel.method = ParallelMethod::CellDynamic;
-  else throw std::runtime_error("YAML error: parallel.method must be one of: none | pair_static | cell_dynamic (got '" + s + "')");
+  if (s == "none")
+    cfg.parallel.method = ParallelMethod::None;
+  else if (s == "pair_static" || s == "pairstatic")
+    cfg.parallel.method = ParallelMethod::PairStatic;
+  else if (s == "cell_dynamic" || s == "celldynamic")
+    cfg.parallel.method = ParallelMethod::CellDynamic;
+  else
+    throw std::runtime_error("YAML error: parallel.method must be one of: none | pair_static | cell_dynamic (got '" +
+                             s + "')");
 }
 
 // Parsing of output Section

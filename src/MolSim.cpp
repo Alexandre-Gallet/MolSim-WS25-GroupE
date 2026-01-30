@@ -24,7 +24,6 @@
 #include "inputReader/YamlInputReader.h"
 #include "utils/logging.hpp"
 
-
 /**
  * @brief Main entry point of the molecular dynamics simulation.
  *
@@ -61,7 +60,6 @@ int main(int argc, char *argv[]) {
   }
 
   SPDLOG_INFO("Parallel method = {}", static_cast<int>(cfg.parallel.method));
-
 
   auto container = ContainerFactory::createContainer(cfg);
   auto &particles = *container;
@@ -103,11 +101,13 @@ int main(int argc, char *argv[]) {
 
 - TODO: slides, which we should do using the online powerpoint version so we can all work on them in parallel
 
-- TODO(Task 3): Full-length 3D Rayleigh–Taylor simulation. (Which one is the the correct input file) This is the one that we might have to run with smaller end_time due to timing constraints
+- TODO(Task 3): Full-length 3D Rayleigh–Taylor simulation. (Which one is the the correct input file) This is the one
+that we might have to run with smaller end_time due to timing constraints
 
 - TODO(output files): Which input files are the ones that need to be run for your visualizations.
 
-- TODO(Profiling): Some recent optimizations to the innerloops were done without profiling. This is important so you can argue evidence based approach
+- TODO(Profiling): Some recent optimizations to the innerloops were done without profiling. This is important so you can
+argue evidence based approach
 
 - TODO(Meeting Friday Morning): I have a room in the TUM bib from 08:00 to 10:00
 */

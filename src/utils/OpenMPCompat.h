@@ -16,7 +16,7 @@
  *   int tid = ompcompat::threadId();
  */
 #ifdef _OPENMP
-  #include <omp.h>
+#include <omp.h>
 #endif
 
 namespace OpenMPCompat {
@@ -78,7 +78,6 @@ inline int maxThreads() noexcept {
 #endif
 }
 
-
 /**
  * @brief Returns TRUE if inside a  parallel region.
  *
@@ -93,4 +92,4 @@ inline bool inParallel() noexcept {
 #endif
 }
 
-}  // namespace omp_compat
+}  // namespace OpenMPCompat
