@@ -54,6 +54,7 @@ class Particle {
    */
   int type;
   uint32_t owned_index_ = 0;
+  bool is_ghost_ = false;
 
   /**
    * @brief Neighboring particles used for membrane simulations
@@ -163,6 +164,8 @@ class Particle {
    * For LinkedCellContainer this is guaranteed to be in [0, size()) for owned particles.
    */
   [[nodiscard]] uint32_t getOwnedIndex() const { return owned_index_; }
+
+  [[nodiscard]] bool isGhost() const noexcept { return is_ghost_; }
 
   /**
    * @brief Equality comparison operator

@@ -114,12 +114,15 @@ void LennardJones::calculateF(Container &particles) {
 
         const std::size_t base = static_cast<std::size_t>(tid) * n;
 
-        fx[base + i] += dfx;
-        fy[base + i] += dfy;
-        fz[base + i] += dfz;
-        fx[base + j] -= dfx;
-        fy[base + j] -= dfy;
-        fz[base + j] -= dfz;
+        const bool p1_owned = !p1.isGhost();
+        const bool p2_owned = !p2.isGhost();
+
+        if (p1_owned) {
+          fx[base + i] += dfx; fy[base + i] += dfy; fz[base + i] += dfz;
+        }
+        if (p2_owned) {
+          fx[base + j] -= dfx; fy[base + j] -= dfy; fz[base + j] -= dfz;
+        }
       };
 
       lc->forEachPairParallelStatic(visitor);

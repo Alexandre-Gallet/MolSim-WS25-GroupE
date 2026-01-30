@@ -410,6 +410,8 @@ void LinkedCellContainer::createGhostsForFace(Face face) {
     ghost_pool.emplace_back(*particle);
     auto *ghost = &ghost_pool.back();
 
+    ghost->is_ghost_ = true;
+
     auto ghost_pos = ghost->getX();
     auto ghost_vel = ghost->getV();
 
@@ -504,6 +506,8 @@ void LinkedCellContainer::createAllPeriodicGhosts() {
 
       ghost_pool.emplace_back(*particle);
       auto *ghost = &ghost_pool.back();
+
+      ghost->is_ghost_ = true;
 
       auto gpos = ghost->getX();
       gpos[0] += sx;
