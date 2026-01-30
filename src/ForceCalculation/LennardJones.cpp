@@ -5,6 +5,7 @@
 #include "../Container/LinkedCellContainer.h"
 #include "../Container/ParticleContainer.h"
 #include "../utils/ArrayUtils.h"
+#include "utils/OpenMPCompat.h"
 
 namespace {
 std::pair<double, double> mixParameters(const std::pair<double, double> &a, const std::pair<double, double> &b) {
@@ -91,68 +92,100 @@ void LennardJones::calculateF(Container &particles) {
 
   // Define the visitor once (so we don't rebuild lambdas inside the hot path)
   auto visitor = [this, &lookupPair](Particle &p1, Particle &p2) {
+    // Skip interactions involving wall particles
+    if (p1.getType() == 1 || p2.getType() == 1) return;
+
     const auto mixed = lookupPair(p1.getType(), p2.getType());
     calc(p1, p2, mixed.epsilon24, mixed.sigma6);
   };
 
-  // Call templated forEachPair on the *concrete* container to avoid std::function overhead
-  if (auto *lc = dynamic_cast<LinkedCellContainer *>(&particles)) {
-    lc->forEachPair(visitor);  // should bind to the templated overload (no std::function)
-  } else if (auto *pc = dynamic_cast<ParticleContainer *>(&particles)) {
-    pc->forEachPair(visitor);  // same idea
-  } else {
-    // Fallback: keep correctness if a different container type is used
-    particles.forEachPair(visitor);  // will wrap into std::function (old behavior)
+
+    // -----------------------------
+  // Choose traversal strategy
+  // -----------------------------
+  if (parallel_method_ == ParallelMethod::PairStatic && OpenMPCompat::enabled()) {
+    // Strategy A: thread-local accumulation + static distribution of base cells.
+    if (auto *lc = dynamic_cast<LinkedCellContainer *>(&particles)) {
+      const std::size_t n = particles.size();
+      const int T = std::max(1, OpenMPCompat::maxThreads());
+
+      // Thread-local force buffers: [tid][particle_index] -> (fx,fy,fz)
+      std::vector<double> fx(static_cast<std::size_t>(T) * n, 0.0);
+      std::vector<double> fy(static_cast<std::size_t>(T) * n, 0.0);
+      std::vector<double> fz(static_cast<std::size_t>(T) * n, 0.0);
+
+      auto visitor = [this, &lookupPair, n, T, &fx, &fy, &fz](Particle &p1, Particle &p2, int tid) {
+        // Skip interactions involving wall particles
+        if (p1.getType() == 1 || p2.getType() == 1) return;
+
+        if (tid < 0 || tid >= T) tid = 0;
+
+        const std::size_t i = static_cast<std::size_t>(p1.getOwnedIndex());
+        const std::size_t j = static_cast<std::size_t>(p2.getOwnedIndex());
+        if (i >= n || j >= n) return;
+
+        const auto mixed = lookupPair(p1.getType(), p2.getType());
+
+        double dfx, dfy, dfz;
+        computeForceComponents(p1, p2, mixed.epsilon24, mixed.sigma6, dfx, dfy, dfz);
+
+        const std::size_t base = static_cast<std::size_t>(tid) * n;
+
+        fx[base + i] += dfx; fy[base + i] += dfy; fz[base + i] += dfz;
+        fx[base + j] -= dfx; fy[base + j] -= dfy; fz[base + j] -= dfz;
+      };
+
+
+
+      lc->forEachPairParallelStatic(visitor);
+
+      // Reduce thread-local buffers into particle forces
+      for (auto &p : particles) {
+        // Do not add any accumulated interaction forces to wall particles
+        if (p.getType() == 1) continue;
+
+        const std::size_t idx = static_cast<std::size_t>(p.getOwnedIndex());
+        if (idx >= n) continue;
+
+        double sx = 0.0, sy = 0.0, sz = 0.0;
+        for (int t = 0; t < T; ++t) {
+          const std::size_t base = static_cast<std::size_t>(t) * n;
+          sx += fx[base + idx];
+          sy += fy[base + idx];
+          sz += fz[base + idx];
+        }
+        p.addF(sx, sy, sz);
+      }
+
+
+      return;  // done
+    }
+
+    // Fallback (non-linked-cell container): keep correctness
+    // (No efficient neighbor traversal available here.)
+    particles.forEachPair([this, &lookupPair](Particle &p1, Particle &p2) {
+  if (p1.getType() == 1 || p2.getType() == 1) return;
+  const auto mixed = lookupPair(p1.getType(), p2.getType());
+  calc(p1, p2, mixed.epsilon24, mixed.sigma6);
+});
+    return;
   }
+
+  // Strategy B not implemented yet -> fall back to serial
+  if (parallel_method_ == ParallelMethod::CellDynamic) {
+    // later
+  }
+
+  // Default: existing serial traversal (your curre<nt code)
+  if (auto *lc = dynamic_cast<LinkedCellContainer *>(&particles)) {
+    lc->forEachPair(visitor);
+  } else if (auto *pc = dynamic_cast<ParticleContainer *>(&particles)) {
+    pc->forEachPair(visitor);
+  } else {
+    particles.forEachPair(visitor);
+  }
+
 }
-/* Old version of LennarJones::Calc changed for serial optimization
-void LennardJones::calc(Particle &p1, Particle &p2, double epsilon24, double sigma6) {
-  const auto diff = ArrayUtils::elementWisePairOp(p1.getX(), p2.getX(), std::minus<>());
-  const double distance = std::max(ArrayUtils::L2Norm(diff), 1e-12);
-  const double invR2 = 1.0 / (distance * distance);
-  const double sr = sigma / distance;
-  const double sr6 = std::pow(sr, 6);
-  const double scalar = 24.0 * epsilon * invR2 * sr6 * (2.0 * sr6 - 1.0);
-  std::array<double, 3> newF = ArrayUtils::elementWiseScalarOp(scalar, diff, std::multiplies<>());
-  // Set the new values making use of Newton's third law
-  p1.setF(ArrayUtils::elementWisePairOp(p1.getF(), newF, std::plus<>()));
-  p2.setF(ArrayUtils::elementWisePairOp(p2.getF(), newF, std::minus<>()));
-}
-*/
-
-/* Old version of LennardJones::Calc changed for serial optimization
-void LennardJones::calc(Particle &p1, Particle &p2, double epsilon24, double sigma6) {
-  // Cache particle state locally (reduce accessor calls)
-  const auto &x1 = p1.getX();
-  const auto &x2 = p2.getX();
-
-  auto f1 = p1.getF();
-  auto f2 = p2.getF();
-
-  const auto diff =
-      ArrayUtils::elementWisePairOp(x1, x2, std::minus<>());
-
-  const double distance =
-      std::max(ArrayUtils::L2Norm(diff), 1e-12);
-
-  const double invR = 1.0 / distance;
-  const double invR2 = invR * invR;
-
-  const double sr = sigma * invR;
-  const double sr2 = sr * sr;
-  const double sr6 = sr2 * sr2 * sr2;
-
-  const double scalar =
-      24.0 * epsilon * invR2 * sr6 * (2.0 * sr6 - 1.0);
-
-  const auto newF =
-      ArrayUtils::elementWiseScalarOp(scalar, diff, std::multiplies<>());
-
-  // Write forces back once
-  p1.setF(ArrayUtils::elementWisePairOp(f1, newF, std::plus<>()));
-  p2.setF(ArrayUtils::elementWisePairOp(f2, newF, std::minus<>()));
-}
-*/
 
 void LennardJones::calc(Particle &p1, Particle &p2, double epsilon24, double sigma6) {
   // Cache particle state

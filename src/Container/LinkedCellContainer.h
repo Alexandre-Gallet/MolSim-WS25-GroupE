@@ -22,6 +22,8 @@
 #include <string>
 #include <vector>
 
+
+#include "utils/OpenMPCompat.h"
 #include "Container.h"
 #include "Particle.h"
 #include "spdlog/spdlog.h"
@@ -118,6 +120,12 @@ class LinkedCellContainer : public Container {
   auto forEachPair(const std::function<void(Particle &, Particle &)> &visitor) -> void override {
     forEachPair<const std::function<void(Particle &, Particle &)> &>(visitor);
   }
+
+  /// Iterate over all unordered pairs in parallel (static scheduling over cells).
+  template <typename Func>
+  void forEachPairParallelStatic(Func visitor);
+
+
   /**
    * @brief Iterate over all boundary particles (inside domain, adjacent to halos).
    * @param visitor Function called with each boundary particle pointer.
@@ -269,6 +277,74 @@ inline void LinkedCellContainer::forEachPair(Func visitor) {
     }
   }
 }
+
+
+template <typename Func>
+inline void LinkedCellContainer::forEachPairParallelStatic(Func visitor) {
+  // Half-stencil covering all 13 forward neighbors to avoid duplicate pair visits.
+  static constexpr std::array<std::array<int, 3>, 13> neighbor_offsets{{{{1, 0, 0}},
+                                                                        {{1, 1, 0}},
+                                                                        {{1, -1, 0}},
+                                                                        {{0, 1, 0}},
+                                                                        {{1, 0, 1}},
+                                                                        {{1, 1, 1}},
+                                                                        {{1, -1, 1}},
+                                                                        {{0, 1, 1}},
+                                                                        {{1, 0, -1}},
+                                                                        {{1, 1, -1}},
+                                                                        {{1, -1, -1}},
+                                                                        {{0, 1, -1}},
+                                                                        {{0, 0, 1}}}};
+
+  const auto cells_x = padded_dims.at(0);
+  const auto cells_y = padded_dims.at(1);
+  const auto cells_z = padded_dims.at(2);
+  const auto cells_xy = cells_x * cells_y;
+
+  // Parallelize over base cells; each pair is uniquely owned by its base cell + forward-neighbor stencil.
+  // If OpenMP is not enabled, the pragma is ignored and this runs serially.
+#pragma omp parallel for schedule(static)
+  for (std::int64_t linear_i = 0; linear_i < static_cast<std::int64_t>(cells.size()); ++linear_i) {
+    const std::size_t linear = static_cast<std::size_t>(linear_i);
+    const int tid = OpenMPCompat::threadId();
+
+    auto &current_particles = cells[linear].particles;
+
+    // within-cell pairs
+    for (std::size_t i = 0; i < current_particles.size(); ++i) {
+      for (std::size_t j = i + 1; j < current_particles.size(); ++j) {
+        visitor(*current_particles[i], *current_particles[j], tid);
+      }
+    }
+
+    const int cx = static_cast<int>(linear % cells_x);
+    const int cy = static_cast<int>((linear / cells_x) % cells_y);
+    const int cz = static_cast<int>(linear / cells_xy);
+
+    // forward-neighbor pairs
+    for (const auto &offset : neighbor_offsets) {
+      const int nx = cx + offset[0];
+      const int ny = cy + offset[1];
+      const int nz = cz + offset[2];
+
+      if (nx < 0 || ny < 0 || nz < 0) continue;
+      if (nx >= static_cast<int>(cells_x) || ny >= static_cast<int>(cells_y) || nz >= static_cast<int>(cells_z))
+        continue;
+
+      const std::size_t neighbor_index = toLinearIndex(static_cast<std::size_t>(nx), static_cast<std::size_t>(ny),
+                                                       static_cast<std::size_t>(nz), padded_dims);
+      auto &neighbor_particles = cells[neighbor_index].particles;
+
+      for (auto *p : current_particles) {
+        for (auto *q : neighbor_particles) {
+          visitor(*p, *q, tid);
+        }
+      }
+    }
+  }
+}
+
+
 
 template <typename Func>
 inline void LinkedCellContainer::forEachBoundaryParticle(Func visitor) {
