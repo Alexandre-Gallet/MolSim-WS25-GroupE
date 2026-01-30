@@ -6,6 +6,9 @@ simulation:
   gravity: [0.0, -12.44, 0.0]
   output_format: NONE
 
+parallel:
+  method: pair_static
+
 output:
   write_frequency: 500
 

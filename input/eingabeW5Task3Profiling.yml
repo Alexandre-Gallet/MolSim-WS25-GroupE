@@ -1,10 +1,13 @@
 simulation:
   sim_type: molecule
   t_start: 0.0
-  t_end: 1.0
+  t_end: 100
   delta_t: 0.0005
   gravity: [0.0, -12.44, 0.0]
-  output_format: NONE
+  output_format: VTK
+
+parallel:
+  method: pair_static
 
 output:
   write_frequency: 500

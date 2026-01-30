@@ -6,6 +6,9 @@ simulation:
   output_format: VTK
   gravity: [0.0, 0.0, -0.001]
 
+parallel:
+  method: pair_static
+
 output:
   write_frequency: 200
 

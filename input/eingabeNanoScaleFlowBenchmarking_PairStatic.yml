@@ -5,7 +5,9 @@ simulation:
   delta_t: 0.0005
   gravity: [0.0, -0.8, 0.0]
   output_format: NONE
-  parallel: none
+
+parallel:
+  method: pair_static
 
 output:
   write_frequency: 500
