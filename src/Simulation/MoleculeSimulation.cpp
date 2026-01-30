@@ -73,6 +73,7 @@ void MoleculeSimulation::runSimulation() {
   lj.setSigma(cfg_.lj_sigma);
   lj.setTypeParameters(cfg_.lj_types);
   lj.setGravity(cfg_.gravity);
+  lj.setEnableOmpForces(cfg_.parallel_strategy == ParallelStrategy::Force);
 
   // Initial force evaluation
   lj.calculateF(particles_);
@@ -91,12 +92,20 @@ void MoleculeSimulation::runSimulation() {
 
   while (current_time < cfg_.t_end) {
     // integrate positions (x), then recompute forces, then velocities (v)
-    LennardJones::calculateX(particles_, cfg_.delta_t);
+    if (cfg_.parallel_strategy == ParallelStrategy::Integrate) {
+      ForceCalculation::calculateXParallel(particles_, cfg_.delta_t);
+    } else {
+      LennardJones::calculateX(particles_, cfg_.delta_t);
+    }
     if (cfg_.containerType == ContainerType::Cell) {
       static_cast<LinkedCellContainer *>(&particles_)->rebuild();
     }
     lj.calculateF(particles_);
-    LennardJones::calculateV(particles_, cfg_.delta_t);
+    if (cfg_.parallel_strategy == ParallelStrategy::Integrate) {
+      ForceCalculation::calculateVParallel(particles_, cfg_.delta_t);
+    } else {
+      LennardJones::calculateV(particles_, cfg_.delta_t);
+    }
 
     // Thermostat application
     if (thermostat) {

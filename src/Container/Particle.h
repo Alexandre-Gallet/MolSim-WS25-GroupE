@@ -157,6 +157,12 @@ class Particle {
   int getType() const { return type; }
 
   /**
+   * @brief Get the owned index (stable index inside LinkedCellContainer storage).
+   * @return Owned particle index
+   */
+  uint32_t getOwnedIndex() const { return owned_index_; }
+
+  /**
    * @brief Equality comparison operator
    * @param other Particle to compare with
    * @return true if particles are equal, false otherwise

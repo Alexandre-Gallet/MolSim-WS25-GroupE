@@ -7,6 +7,8 @@
 #include <yaml-cpp/yaml.h>
 
 #include <array>
+#include <algorithm>
+#include <cctype>
 #include <limits>
 #include <sstream>
 #include <stdexcept>
@@ -18,6 +20,22 @@
 
 SimulationType parseSimType(const std::string &s);
 OutputFormat parse_output(const std::string &s);
+ParallelStrategy parseParallelStrategy(const std::string &s);
+
+// Parse parallelization strategy ("none", "force", "integrate").
+ParallelStrategy parseParallelStrategy(const std::string &s) {
+  std::string value = s;
+  std::transform(value.begin(), value.end(), value.begin(),
+                 [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+
+  if (value == "none") return ParallelStrategy::None;
+  if (value == "force") return ParallelStrategy::Force;
+  if (value == "integrate") return ParallelStrategy::Integrate;
+
+  std::ostringstream oss;
+  oss << "YAML error: simulation.parallel_strategy must be one of: none, force, integrate";
+  throw std::runtime_error(oss.str());
+}
 
 YamlInputReader::YamlInputReader(const std::string &filename) : filename(filename) {}
 
@@ -117,6 +135,9 @@ void YamlInputReader::parseSimulationSection(const YAML::Node &n, SimulationConf
   }
   if (n["gravity"]) {
     cfg.gravity = parseVec3(n["gravity"], "gravity");
+  }
+  if (n["parallel_strategy"]) {
+    cfg.parallel_strategy = parseParallelStrategy(n["parallel_strategy"].as<std::string>());
   }
 
   if (cfg.t_start > cfg.t_end) {

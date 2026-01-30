@@ -26,13 +26,26 @@ cuboids:
     type: 1
 
   - origin: [ 3.2, 0.6, 0.6 ]
-    numPerDim: [20, 25, 10 ]
+    numPerDim: [20, 10, 10 ]
+    baseVelocity: [ 0.0, 0.0, 0.0 ]
+    h: 1.2
+    mass: 1.0
+    type: 2
+
+  - origin: [ 3.2, 20.0, 0.6 ]
+    numPerDim: [20, 8, 10 ]
     baseVelocity: [ 0.0, 0.0, 0.0 ]
     h: 1.2
     mass: 1.0
     type: 2
 
 discs:
+  - center: [15.2, 15.0, 6.0]
+    radiusCells: 3
+    hDisc: 1.1
+    mass: 1.0
+    baseVelocity: [0.0, 0.0, 0.0]
+    typeDisc: 1
 
 types:
   - id: 1

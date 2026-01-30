@@ -181,10 +181,11 @@ The configuration is organized into the following sections:
 |               | t_start            | Start time of the simulation.                                                                                       |
 |               | t_end              | End time of the simulation.                                                                                         |
 |               | delta_t            | Time step size.                                                                                                     |
-|               | output_format      | Output format: `XYZ`, `VTK`, `CHECKPOINT`, or `NONE`                                                                                                                        |
+|               | output_format      | Output format: `XYZ`, `VTK`, `CHECKPOINT`, or `NONE`                                                                |
 |               | gravity            | Gravity factor.                                                                                                     |
 |               | epsilon            | LJ epsilon parameter for the simulation.                                                                            |
 |               | sigma              | LJ sigma parameter for the simulation.                                                                              |
+|               | parallel_strategy  | Parallelization strategy: none, force, or integrate (requires OpenMP build).                                        |
 |               |                    |                                                                                                                     |
 | output        | write_frequency    | Writes output every n-th iteration.                                                                                 |
 |               |                    |                                                                                                                     |

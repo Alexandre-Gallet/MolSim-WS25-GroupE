@@ -118,6 +118,9 @@ class LinkedCellContainer : public Container {
   auto forEachPair(const std::function<void(Particle &, Particle &)> &visitor) -> void override {
     forEachPair<const std::function<void(Particle &, Particle &)> &>(visitor);
   }
+  /// Iterate over all unordered pairs for a single cell index (for parallel outer loops).
+  template <typename Func>
+  void forEachPairByCellIndex(std::size_t linear_index, Func visitor);
   /**
    * @brief Iterate over all boundary particles (inside domain, adjacent to halos).
    * @param visitor Function called with each boundary particle pointer.
@@ -130,6 +133,17 @@ class LinkedCellContainer : public Container {
    */
   template <typename Func>
   void forEachHaloParticle(Func visitor);
+
+  /// @brief Check whether the particle pointer is owned by this container (not a ghost).
+  [[nodiscard]] bool isOwned(const Particle *particle) const {
+    const std::size_t idx = particle->owned_index_;
+    return idx < owned_particles.size() && owned_particles[idx].get() == particle;
+  }
+  /// @brief Access an owned particle by index.
+  [[nodiscard]] Particle &ownedParticle(std::size_t idx) { return *owned_particles[idx]; }
+  [[nodiscard]] const Particle &ownedParticle(std::size_t idx) const { return *owned_particles[idx]; }
+  /// @brief Total number of cells (including halo/boundary padding).
+  [[nodiscard]] std::size_t cellCount() const noexcept { return cells.size(); }
 
  private:
   void initDimensions();
@@ -265,6 +279,63 @@ inline void LinkedCellContainer::forEachPair(Func visitor) {
         for (auto *q : neighbor_particles) {
           visitor(*p, *q);
         }
+      }
+    }
+  }
+}
+
+template <typename Func>
+inline void LinkedCellContainer::forEachPairByCellIndex(std::size_t linear_index, Func visitor) {
+  // Half-stencil covering all 13 forward neighbors to avoid duplicate pair visits.
+  static constexpr std::array<std::array<int, 3>, 13> neighbor_offsets{{{{1, 0, 0}},
+                                                                        {{1, 1, 0}},
+                                                                        {{1, -1, 0}},
+                                                                        {{0, 1, 0}},
+                                                                        {{1, 0, 1}},
+                                                                        {{1, 1, 1}},
+                                                                        {{1, -1, 1}},
+                                                                        {{0, 1, 1}},
+                                                                        {{1, 0, -1}},
+                                                                        {{1, 1, -1}},
+                                                                        {{1, -1, -1}},
+                                                                        {{0, 1, -1}},
+                                                                        {{0, 0, 1}}}};
+
+  if (linear_index >= cells.size()) return;
+
+  const auto cells_x = padded_dims.at(0);
+  const auto cells_y = padded_dims.at(1);
+  const auto cells_z = padded_dims.at(2);
+  const auto cells_xy = cells_x * cells_y;
+
+  auto &current_particles = cells[linear_index].particles;
+
+  for (std::size_t i = 0; i < current_particles.size(); ++i) {
+    for (std::size_t j = i + 1; j < current_particles.size(); ++j) {
+      visitor(*current_particles[i], *current_particles[j]);
+    }
+  }
+
+  const int cx = static_cast<int>(linear_index % cells_x);
+  const int cy = static_cast<int>((linear_index / cells_x) % cells_y);
+  const int cz = static_cast<int>(linear_index / cells_xy);
+
+  for (const auto &offset : neighbor_offsets) {
+    const int nx = cx + offset[0];
+    const int ny = cy + offset[1];
+    const int nz = cz + offset[2];
+
+    if (nx < 0 || ny < 0 || nz < 0) continue;
+    if (nx >= static_cast<int>(cells_x) || ny >= static_cast<int>(cells_y) || nz >= static_cast<int>(cells_z)) {
+      continue;
+    }
+
+    const std::size_t neighbor_index = toLinearIndex(static_cast<std::size_t>(nx), static_cast<std::size_t>(ny),
+                                                     static_cast<std::size_t>(nz), padded_dims);
+    auto &neighbor_particles = cells[neighbor_index].particles;
+    for (auto *p : current_particles) {
+      for (auto *q : neighbor_particles) {
+        visitor(*p, *q);
       }
     }
   }

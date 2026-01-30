@@ -86,6 +86,11 @@ class ParticleContainer : public Container {
   auto cbegin() const noexcept -> const_iterator override;
   auto cend() const noexcept -> const_iterator override;
 
+  /// @brief Access a particle by index (non-const).
+  [[nodiscard]] Particle &particleAt(std::size_t idx) { return particles_.at(idx); }
+  /// @brief Access a particle by index (const).
+  [[nodiscard]] const Particle &particleAt(std::size_t idx) const { return particles_.at(idx); }
+
   /**
    * @brief Adds a particle by copying an existing one.
    * @param particle The particle to be copied.

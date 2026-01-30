@@ -5,6 +5,7 @@ simulation:
   delta_t: 0.0005
   gravity: [0.0, -12.44, 0.0]
   output_format: VTK
+  parallel_strategy: None
 
 output:
   write_frequency: 1000

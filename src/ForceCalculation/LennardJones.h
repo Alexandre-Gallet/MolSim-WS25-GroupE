@@ -28,6 +28,7 @@ class LennardJones : public ForceCalculation {
   std::vector<LJPairParams> pair_params_dense_;
   std::vector<bool> pair_params_dense_set_;
   int pair_params_dense_stride_ = 0;
+  bool enable_omp_forces_ = true;
 
  public:
   LennardJones();
@@ -39,6 +40,7 @@ class LennardJones : public ForceCalculation {
   void setSigma(double sig) { this->sigma = sig; }
   void setGravity(const std::array<double, 3> &g) { gravity_ = g; }
   [[nodiscard]] const std::array<double, 3> &getGravity() const { return gravity_; }
+  void setEnableOmpForces(bool enable) { enable_omp_forces_ = enable; }
   void setTypeParameters(const std::vector<LJTypeParams> &params) {
     type_params_.clear();
     int max_type = -1;
@@ -103,4 +105,5 @@ class LennardJones : public ForceCalculation {
    * @param sigma
    */
   static void calc(Particle &p1, Particle &p2, double epsilon24, double sigma6);
+  static std::array<double, 3> calcPairForce(const Particle &p1, const Particle &p2, double epsilon24, double sigma6);
 };

@@ -1,6 +1,11 @@
 #include "LennardJones.h"
 
 #include <cmath>
+#include <vector>
+
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 #include "../Container/LinkedCellContainer.h"
 #include "../Container/ParticleContainer.h"
@@ -88,6 +93,64 @@ void LennardJones::calculateF(Container &particles) {
     const double epsilon24 = 24.0 * mixed.first;
     return LennardJones::LJPairParams{epsilon24, sigma6};
   };
+
+#ifdef _OPENMP
+  if (enable_omp_forces_) {
+    if (auto *lc = dynamic_cast<LinkedCellContainer *>(&particles)) {
+      const std::size_t owned_count = lc->size();
+      if (owned_count == 0) {
+        return;
+      }
+
+    const int num_threads = omp_get_max_threads();
+    std::vector<double> force_buffers(static_cast<std::size_t>(num_threads) * owned_count * 3, 0.0);
+
+    #pragma omp parallel
+    {
+      const int tid = omp_get_thread_num();
+      double *buf = force_buffers.data() + (static_cast<std::size_t>(tid) * owned_count * 3);
+
+      #pragma omp for schedule(static)
+      for (std::size_t linear = 0; linear < lc->cellCount(); ++linear) {
+        lc->forEachPairByCellIndex(linear, [&](Particle &p1, Particle &p2) {
+          const auto mixed = lookupPair(p1.getType(), p2.getType());
+          const auto f = calcPairForce(p1, p2, mixed.epsilon24, mixed.sigma6);
+
+          if (lc->isOwned(&p1)) {
+            const std::size_t idx = p1.getOwnedIndex();
+            const std::size_t base = idx * 3;
+            buf[base] += f[0];
+            buf[base + 1] += f[1];
+            buf[base + 2] += f[2];
+          }
+          if (lc->isOwned(&p2)) {
+            const std::size_t idx = p2.getOwnedIndex();
+            const std::size_t base = idx * 3;
+            buf[base] -= f[0];
+            buf[base + 1] -= f[1];
+            buf[base + 2] -= f[2];
+          }
+        });
+      }
+    }
+
+    #pragma omp parallel for schedule(static)
+    for (std::size_t i = 0; i < owned_count; ++i) {
+      double fx = 0.0;
+      double fy = 0.0;
+      double fz = 0.0;
+      for (int t = 0; t < num_threads; ++t) {
+        const double *buf = force_buffers.data() + (static_cast<std::size_t>(t) * owned_count * 3) + (i * 3);
+        fx += buf[0];
+        fy += buf[1];
+        fz += buf[2];
+      }
+      lc->ownedParticle(i).addF(fx, fy, fz);
+    }
+      return;
+    }
+  }
+#endif
 
   // Define the visitor once (so we don't rebuild lambdas inside the hot path)
   auto visitor = [this, &lookupPair](Particle &p1, Particle &p2) {
@@ -180,4 +243,23 @@ void LennardJones::calc(Particle &p1, Particle &p2, double epsilon24, double sig
   const double fz = scalar * dz;
   p1.addF(fx, fy, fz);
   p2.addF(-fx, -fy, -fz);
+}
+
+std::array<double, 3> LennardJones::calcPairForce(const Particle &p1, const Particle &p2, double epsilon24,
+                                                  double sigma6) {
+  const auto &x1 = p1.getX();
+  const auto &x2 = p2.getX();
+
+  const double dx = x1[0] - x2[0];
+  const double dy = x1[1] - x2[1];
+  const double dz = x1[2] - x2[2];
+
+  const double r2 = std::max(dx * dx + dy * dy + dz * dz, 1e-12);
+  const double invR2 = 1.0 / r2;
+
+  const double invR6 = invR2 * invR2 * invR2;
+  const double sr6 = sigma6 * invR6;
+  const double scalar = epsilon24 * invR2 * sr6 * (2.0 * sr6 - 1.0);
+
+  return {scalar * dx, scalar * dy, scalar * dz};
 }

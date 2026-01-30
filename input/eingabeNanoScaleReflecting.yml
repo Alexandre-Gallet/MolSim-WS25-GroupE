@@ -46,7 +46,7 @@ linkedCell:
   - containerType: [Cell]
     domainSize: [30.0, 30.0, 12.0]
     rCutoff: 2.75
-    boundaryConditions: [Outflow, Outflow, Periodic, Periodic, Periodic, Periodic]
+    boundaryConditions: [Outflow, Outflow, Reflecting, Reflecting, Reflecting, Reflecting]
 
 ns_thermostat:
   t_init: 40

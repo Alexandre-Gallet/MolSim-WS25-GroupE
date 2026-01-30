@@ -48,7 +48,7 @@ linkedCell:
     rCutoff: 2.75
     boundaryConditions: [Outflow, Outflow, Periodic, Periodic, Periodic, Periodic]
 
-ns_thermostat:
+thermostat:
   t_init: 40
   n_thermostat: 10
   dimensions: 3

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <array>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -70,6 +71,9 @@ struct MembraneConfig {
   std::vector<std::array<int, 2>> pull_indices{{{17, 24}}, {{17, 25}}, {{18, 24}}, {{18, 25}}};
 };
 
+/// Parallelization strategy selection
+enum class ParallelStrategy : uint8_t { None, Force, Integrate };
+
 /**
  * @brief Bundles all simulation configuration options.
  */
@@ -121,4 +125,8 @@ struct SimulationConfig {
 
   // --- Membrane (Assignment 4)
   MembraneConfig membrane;
+
+  // --- Parallelization strategy
+  /// Selects the parallelization strategy ("none", "force", "integrate").
+  ParallelStrategy parallel_strategy = ParallelStrategy::Force;
 };

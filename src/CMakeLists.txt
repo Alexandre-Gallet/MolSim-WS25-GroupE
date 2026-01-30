@@ -19,6 +19,13 @@ list(REMOVE_ITEM MOLSIM_SRC
 # Crucially the core simulation logic is defined only once and is authoritative
 add_library(molsim_core ${MOLSIM_SRC})
 
+# OpenMP (optional)
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+    message(STATUS "OpenMP found: enabling OpenMP support")
+    target_link_libraries(molsim_core PUBLIC OpenMP::OpenMP_CXX)
+endif()
+
 # needed so that the compiler can understand include paths in src and knows where to locate file
 target_include_directories(molsim_core
         PUBLIC

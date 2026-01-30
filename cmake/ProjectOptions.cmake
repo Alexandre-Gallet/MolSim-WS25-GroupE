@@ -16,4 +16,3 @@ if(NOT CMAKE_BUILD_TYPE)
             FORCE)
 endif()
 
-

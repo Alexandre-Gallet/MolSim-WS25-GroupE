@@ -25,6 +25,11 @@ class MoleculeSimulation : public Simulation {
 
   /**
    * @brief Run the molecular dynamics simulation.
+   *
+   * The behavior depends on SimulationConfig::parallel_strategy:
+   * - Force: parallelize Lennard-Jones force calculation.
+   * - Integrate: parallelize position/velocity integration steps.
+   * - None: fully serial.
    */
   void runSimulation() override;
 
