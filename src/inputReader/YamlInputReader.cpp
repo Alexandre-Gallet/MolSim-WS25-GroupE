@@ -6,6 +6,8 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include <algorithm>
+#include <cctype>
 #include <array>
 #include <limits>
 #include <sstream>
@@ -149,7 +151,7 @@ void YamlInputReader::parseParallelSection(const YAML::Node &n, SimulationConfig
   if (s == "none") cfg.parallel.method = ParallelMethod::None;
   else if (s == "pair_static" || s == "pairstatic") cfg.parallel.method = ParallelMethod::PairStatic;
   else if (s == "cell_dynamic" || s == "celldynamic") cfg.parallel.method = ParallelMethod::CellDynamic;
-  else throw std::runtime_error("YAML error: parallel.method must be one of: none | pair_static | cell_dynamic");
+  else throw std::runtime_error("YAML error: parallel.method must be one of: none | pair_static | cell_dynamic (got '" + s + "')");
 }
 
 // Parsing of output Section
