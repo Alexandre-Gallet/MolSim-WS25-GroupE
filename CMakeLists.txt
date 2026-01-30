@@ -40,14 +40,6 @@ add_executable(MolSim ${MY_SRC}
 target_include_directories(MolSim PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # -------------------
-# OpenMP (optional)
-# -------------------
-find_package(OpenMP)
-if(OpenMP_CXX_FOUND)
-    target_link_libraries(MolSim PRIVATE OpenMP::OpenMP_CXX)
-endif()
-
-# -------------------
 # Compiler warnings
 # -------------------
 target_compile_options(MolSim
@@ -131,7 +123,7 @@ include(CTest)   # Enables BUILD_TESTING option
 
 if(BUILD_TESTING)
 
-    include(gtest)
+   include(gtest)
 
     # -----------------------------
     # Collect test source files
@@ -155,12 +147,8 @@ if(BUILD_TESTING)
 
     target_link_libraries(MolSimTests PRIVATE GTest::gtest_main)
 
-    # Link yaml-cpp to testing executable
-    target_link_libraries(MolSimTests PRIVATE yaml-cpp)
-
-    if(OpenMP_CXX_FOUND)
-        target_link_libraries(MolSimTests PRIVATE OpenMP::OpenMP_CXX)
-    endif()
+   # Link yaml-cpp to testing executable
+   target_link_libraries(MolSimTests PRIVATE yaml-cpp)
 
     # GoogleTest automatic discovery of every test that begins with TEST, TEST_F, TEST_P
     include(GoogleTest)
@@ -168,3 +156,4 @@ if(BUILD_TESTING)
 
 
 endif()
+

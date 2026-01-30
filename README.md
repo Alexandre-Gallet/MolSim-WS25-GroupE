@@ -6,9 +6,9 @@ at **Technische Universität München**, Winter Semester **2025/2026**.
 
 ## Table of Contents
 - [Building the Project](#building-the-project)
-- [Running the Simulation](#running-the-simulation)
+- [Running the Simulation](#running-the-simulation) 
 - [Benchmarking and Profiling](#benchmarking-and-profiling)
-- [YAML Configuration Format](#yaml-configuration-format)
+- [YAML Configuration Format](#yaml-configuration-format) 
 - [Checkpointing](#checkpointing)
 - [Running Tests](#running-tests)
 - [Doxygen Documentation](#doxygen-documentation)
@@ -43,13 +43,13 @@ sudo dnf install vtk-devel cmake gcc-c++ make
 
 You can optionally specify:
 
-- `-DCMAKE_BUILD_TYPE`
-  - Default: `Release` (`-O3`, `-DNDEBUG`)
+- `-DCMAKE_BUILD_TYPE`  
+  - Default: `Release` (`-O3`, `-DNDEBUG`)  
   - Other valid values: `Debug`, `RelWithDebInfo`, `MinSizeRel`
 
-- `-DLOG_LEVEL`
-  - Default: `INFO`
-  - Other options: `TRACE`, `DEBUG`, `WARN`, `ERROR`, `CRITICAL`, `OFF`
+- `-DLOG_LEVEL`  
+  - Default: `INFO`  
+  - Other options: `TRACE`, `DEBUG`, `WARN`, `ERROR`, `CRITICAL`, `OFF`  
   - Defines which logging statements are compiled into the binary.
 
 ```bash
@@ -81,9 +81,9 @@ will appear in the working directory.
 If logging is enabled (default), a `simulation.log` file is also generated
 in the working directory.
 
-## Benchmarking and Profiling
+## Benchmarking and Profiling 
 
-### Benchmarking
+### Benchmarking 
 
 For performance benchmarking a specific set of flags has to be passed during configuration.
 
@@ -96,9 +96,9 @@ cmake -S . -B build-benchmark \
 cmake --build build-benchmark -- -j"$(nproc)"
 ```
 
-Running the simulation produces a measurement of elapsed time and MUPS/s (Molecule Updates per Second).
-The above configuration turns of all IO, Logging and VTK Output. For Benchmarking on CoolMUC there are a series of
-SLURM batch scripts located at ´runs/task4´.
+Running the simulation produces a measurement of elapsed time and MUPS/s (Molecule Updates per Second). 
+The above configuration turns of all IO, Logging and VTK Output. For Benchmarking on CoolMUC there are a series of 
+SLURM batch scripts located at ´runs/task4´. 
 
 
 ### Profiling
@@ -114,7 +114,7 @@ cmake -S . -B build-benchmark \
 
 cmake --build build-gprof -- -j"$(nproc)"
 ```
-The above cofiguration turns of all IO, Logging and VTK Output.
+The above cofiguration turns of all IO, Logging and VTK Output. 
 The instrumented binary generates a gmon.out file after execution.
 The profiling report is generated with:
 
@@ -138,7 +138,6 @@ MolSim is configured entirely through a YAML file. The structure is divided into
 |               | gravity            | Gravity factor.                                                                                                     |
 |               | epsilon            | LJ epsilon parameter for the simulation.                                                                            |
 |               | sigma              | LJ sigma parameter for the simulation.                                                                              |
-|               | parallel_strategy  | Parallelization strategy: none, force, integrate.                                                                   |
 |               |                    |                                                                                                                     |
 | output        | write_frequency    | Writes output every n-th iteration.                                                                                 |
 |               |                    |                                                                                                                     |
@@ -179,7 +178,7 @@ MolSim is configured entirely through a YAML file. The structure is divided into
 |               | delta_t            | Maximum temperature change per thermostat application.                                                              |
 |               | brownian_motion    | If true, initializes velocities using Maxwell-Boltzmann distribution.                                               |
 
-Examples of a working yaml configuration files can be found at `input/eingabe.yml` and `input/eingabedisc.yml`
+Examples of a working yaml configuration files can be found at `input/eingabe.yml` and `input/eingabedisc.yml` 
 
 ##  Checkpointing
 Checkpointing is used in Worksheet 4 to split the falling drop simulation into an equilibration phase and a subsequent production run that restarts from a saved simulation state.
@@ -196,7 +195,7 @@ Checkpointing is used in Worksheet 4 to split the falling drop simulation into a
 
 ## Running Tests
 
-After having built the project, run the tests from the top-level directory via:
+After having built the project, run the tests from the top-level directory via: 
 
 ```bash
 ctest --test-dir build --output-on-failure -j"$(nproc)"
