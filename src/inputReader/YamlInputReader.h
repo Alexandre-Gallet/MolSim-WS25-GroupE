@@ -76,4 +76,7 @@ class YamlInputReader {
 
   /// Helper to parse a 3-element vector of ints from a YAML sequence.
   std::array<int, 3> parseVec3Int(const YAML::Node &n, const std::string &fieldName) const;
+
+  /// Parse the optional "parallel" section of the YAML file into the config.
+  void parseParallelSection(const YAML::Node &node, SimulationConfig &cfg) const;
 };

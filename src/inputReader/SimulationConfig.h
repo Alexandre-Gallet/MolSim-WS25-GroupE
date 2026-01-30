@@ -70,6 +70,16 @@ struct MembraneConfig {
   std::vector<std::array<int, 2>> pull_indices{{{17, 24}}, {{17, 25}}, {{18, 24}}, {{18, 25}}};
 };
 
+// enum for parallelization
+enum class ParallelMethod { None, PairStatic, CellDynamic };
+
+/**
+ * @brief Bundles parallelization configuration options.
+ */
+struct ParallelConfig {
+  ParallelMethod method = ParallelMethod::None;
+};
+
 /**
  * @brief Bundles all simulation configuration options.
  */
@@ -79,6 +89,9 @@ struct SimulationConfig {
   double t_start = 0.0;
   double t_end = 1000.0;
   double delta_t = 0.014;
+
+  // Parallelization
+  ParallelConfig parallel;
 
   // remove all compile flag hacking
   OutputFormat output_format = OutputFormat::XYZ;

@@ -22,6 +22,9 @@ class LennardJones : public ForceCalculation {
   double epsilon{};
   double sigma{};
   std::array<double, 3> gravity_{0.0, 0.0, 0.0};
+
+  ParallelMethod parallel_method_ = ParallelMethod::None;
+
   std::unordered_map<int, std::pair<double, double>> type_params_;
   std::vector<std::pair<double, double>> type_params_dense_;
   std::vector<bool> type_params_dense_set_;
@@ -33,8 +36,10 @@ class LennardJones : public ForceCalculation {
   LennardJones();
   ~LennardJones() override;
   // getters for parameters and potential
+
   [[nodiscard]] double getEpsilon() const { return epsilon; }
   [[nodiscard]] double getSigma() const { return sigma; }
+  void setParallelMethod(ParallelMethod method) { parallel_method_ = method; }
   void setEpsilon(double eps) { this->epsilon = eps; }
   void setSigma(double sig) { this->sigma = sig; }
   void setGravity(const std::array<double, 3> &g) { gravity_ = g; }
@@ -103,4 +108,26 @@ class LennardJones : public ForceCalculation {
    * @param sigma
    */
   static void calc(Particle &p1, Particle &p2, double epsilon24, double sigma6);
+
+  static inline void computeForceComponents(const Particle &p1, const Particle &p2, double epsilon24, double sigma6,
+                                            double &fx, double &fy, double &fz) {
+    const auto &x1 = p1.getX();
+    const auto &x2 = p2.getX();
+
+    const double dx = x1[0] - x2[0];
+    const double dy = x1[1] - x2[1];
+    const double dz = x1[2] - x2[2];
+
+    const double r2 = std::max(dx * dx + dy * dy + dz * dz, 1e-12);
+    const double invR2 = 1.0 / r2;
+
+    const double invR6 = invR2 * invR2 * invR2;
+    const double sr6 = sigma6 * invR6;
+
+    const double scalar = epsilon24 * invR2 * sr6 * (2.0 * sr6 - 1.0);
+
+    fx = scalar * dx;
+    fy = scalar * dy;
+    fz = scalar * dz;
+  }
 };

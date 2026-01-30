@@ -1,10 +1,10 @@
 simulation:
   sim_type: molecule
   t_start: 0.0
-  t_end: 500.0
+  t_end: 5.0 # set to 100th of a fraction of the actual simulation runtime for testing, local profiling
   delta_t: 0.0005
   gravity: [0.0, -0.8, 0.0]
-  output_format: VTK
+  output_format: NONE
 
 parallel:
   method: pair_static

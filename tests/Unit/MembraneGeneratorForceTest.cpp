@@ -70,7 +70,8 @@ TEST(MembraneGeneratorTest, CreatesGridAndNeighbors) {
 // Verifies gravity + pull stacking and that the previous force is preserved in old_f.
 TEST(MembraneForceTest, AppliesGravityAndPull) {
   ParticleContainer container;
-  auto &p = container.emplaceParticle(std::array<double, 3>{0.0, 0.0, 0.0}, std::array<double, 3>{0.0, 0.0, 0.0}, 2.0, 0);
+  auto &p =
+      container.emplaceParticle(std::array<double, 3>{0.0, 0.0, 0.0}, std::array<double, 3>{0.0, 0.0, 0.0}, 2.0, 0);
 
   MembraneForce force(/*epsilon*/ 0.0, /*sigma*/ 1.0, /*k*/ 0.0, /*r0*/ 1.0, /*pull_force*/ 5.0, /*pull_until*/ 10.0,
                       std::array<double, 3>{0.0, -9.81, 0.0});
@@ -91,8 +92,10 @@ TEST(MembraneForceTest, AppliesGravityAndPull) {
 TEST(MembraneForceTest, SpringForceIsSymmetric) {
   ParticleContainer container;
   container.reserve(2);
-  auto &p1 = container.emplaceParticle(std::array<double, 3>{0.0, 0.0, 0.0}, std::array<double, 3>{0.0, 0.0, 0.0}, 1.0, 0);
-  auto &p2 = container.emplaceParticle(std::array<double, 3>{2.0, 0.0, 0.0}, std::array<double, 3>{0.0, 0.0, 0.0}, 1.0, 0);
+  auto &p1 =
+      container.emplaceParticle(std::array<double, 3>{0.0, 0.0, 0.0}, std::array<double, 3>{0.0, 0.0, 0.0}, 1.0, 0);
+  auto &p2 =
+      container.emplaceParticle(std::array<double, 3>{2.0, 0.0, 0.0}, std::array<double, 3>{0.0, 0.0, 0.0}, 1.0, 0);
 
   p1.clearNeighbors();
   p2.clearNeighbors();
@@ -118,8 +121,10 @@ TEST(MembraneForceTest, SpringForceIsSymmetric) {
 TEST(MembraneForceTest, RepulsiveWithinCutoff) {
   ParticleContainer container;
   container.reserve(2);
-  auto &p1 = container.emplaceParticle(std::array<double, 3>{0.0, 0.0, 0.0}, std::array<double, 3>{0.0, 0.0, 0.0}, 1.0, 0);
-  auto &p2 = container.emplaceParticle(std::array<double, 3>{1.0, 0.0, 0.0}, std::array<double, 3>{0.0, 0.0, 0.0}, 1.0, 0);
+  auto &p1 =
+      container.emplaceParticle(std::array<double, 3>{0.0, 0.0, 0.0}, std::array<double, 3>{0.0, 0.0, 0.0}, 1.0, 0);
+  auto &p2 =
+      container.emplaceParticle(std::array<double, 3>{1.0, 0.0, 0.0}, std::array<double, 3>{0.0, 0.0, 0.0}, 1.0, 0);
 
   MembraneForce force(/*epsilon*/ 1.0, /*sigma*/ 1.0, /*k*/ 0.0, /*r0*/ 1.0, /*pull_force*/ 0.0, /*pull_until*/ 0.0,
                       std::array<double, 3>{0.0, 0.0, 0.0});
@@ -127,7 +132,8 @@ TEST(MembraneForceTest, RepulsiveWithinCutoff) {
 
   auto f1 = p1.getF();
   auto f2 = p2.getF();
-  const std::array<double, 3> r12{p2.getX()[0] - p1.getX()[0], p2.getX()[1] - p1.getX()[1], p2.getX()[2] - p1.getX()[2]};
+  const std::array<double, 3> r12{p2.getX()[0] - p1.getX()[0], p2.getX()[1] - p1.getX()[1],
+                                  p2.getX()[2] - p1.getX()[2]};
   const double dot = f1[0] * r12[0] + f1[1] * r12[1] + f1[2] * r12[2];
 
   EXPECT_LT(dot, 0.0);  // pushing apart along the separation vector

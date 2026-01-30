@@ -150,7 +150,7 @@ directory being cluttered and collect results from multiple runs, an automation 
 is provided:
 
 ```bash
-./scripts/run_benchmarking.sh path/to/config.yml
+./scripts/run_benchmark.sh path/to/config.yml
 ```
 
 This script stores benchmarking results together with metadata (timestamp,
@@ -181,11 +181,13 @@ The configuration is organized into the following sections:
 |               | t_start            | Start time of the simulation.                                                                                       |
 |               | t_end              | End time of the simulation.                                                                                         |
 |               | delta_t            | Time step size.                                                                                                     |
-|               | output_format      | Output format: `XYZ`, `VTK`, `CHECKPOINT`, or `NONE`                                                                                                                        |
+|               | output_format      | Output format: `XYZ`, `VTK`, `CHECKPOINT`, or `NONE`                                                                |
 |               | gravity            | Gravity factor.                                                                                                     |
 |               | epsilon            | LJ epsilon parameter for the simulation.                                                                            |
 |               | sigma              | LJ sigma parameter for the simulation.                                                                              |
 |               |                    |                                                                                                                     |
+ | parllel       | method             | Mode of parallelization: `None`, `pair_static`, `cell_dynamic`                                                      |
+ |               |                    |                                                                                                                       |
 | output        | write_frequency    | Writes output every n-th iteration.                                                                                 |
 |               |                    |                                                                                                                     |
 | cuboids       | origin             | Position of the cuboid’s lower-left-front corner.                                                                   |
@@ -238,7 +240,7 @@ The configuration is organized into the following sections:
 |               | pull_until         | Time until the pull_force is effective.                                                                             |
 |               | pull_indices       | Indices of the particles being pulled by the pull_force                                                             |
 
-Examples of a working YAML configuration files can be found at `input/`
+Examples of a working YAML configuration files can be found at `input/`. On your local system you may have to set thread count with export OMP_NUM_THREADS=`NUM_OF_THREADS`.
 
 ##  Checkpointing
 Checkpointing is used to split the falling drop simulation into an equilibration phase and a subsequent production run that restarts from a saved simulation state.

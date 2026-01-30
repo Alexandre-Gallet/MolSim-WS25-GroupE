@@ -6,7 +6,9 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include <algorithm>
 #include <array>
+#include <cctype>
 #include <limits>
 #include <sstream>
 #include <stdexcept>
@@ -38,6 +40,11 @@ SimulationConfig YamlInputReader::parse() const {
     throw std::runtime_error("YAML error: missing 'simulation' section");
   }
   parseSimulationSection(root["simulation"], cfg);
+
+  // parallel section (optional)
+  if (root["parallel"]) {
+    parseParallelSection(root["parallel"], cfg);
+  }
 
   // --- output section ---
   if (!root["output"]) {
@@ -125,6 +132,31 @@ void YamlInputReader::parseSimulationSection(const YAML::Node &n, SimulationConf
   if (cfg.delta_t <= 0.0) {
     throw std::runtime_error("YAML error: simulation.delta_t must be > 0");
   }
+}
+
+// parsing of the parallel input in yaml with some checks and error messages
+
+void YamlInputReader::parseParallelSection(const YAML::Node &n, SimulationConfig &cfg) const {
+  cfg.parallel.method = ParallelMethod::None;  // default
+
+  if (!n || n.IsNull()) return;
+  if (!n.IsMap()) throw std::runtime_error("YAML error: 'parallel' must be a mapping");
+
+  if (!n["method"]) return;
+  if (!n["method"].IsScalar()) throw std::runtime_error("YAML error: parallel.method must be a string");
+
+  std::string s = n["method"].as<std::string>();
+  std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return char(std::tolower(c)); });
+
+  if (s == "none")
+    cfg.parallel.method = ParallelMethod::None;
+  else if (s == "pair_static" || s == "pairstatic")
+    cfg.parallel.method = ParallelMethod::PairStatic;
+  else if (s == "cell_dynamic" || s == "celldynamic")
+    cfg.parallel.method = ParallelMethod::CellDynamic;
+  else
+    throw std::runtime_error("YAML error: parallel.method must be one of: none | pair_static | cell_dynamic (got '" +
+                             s + "')");
 }
 
 // Parsing of output Section

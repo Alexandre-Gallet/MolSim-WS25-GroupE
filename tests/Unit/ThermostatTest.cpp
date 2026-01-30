@@ -44,7 +44,6 @@ TEST_F(ThermostatTest, TestCoolingTemperature) {
   EXPECT_NEAR(iter->getV()[0], 2.0 * expected_beta, 1e-4);
 }
 
-
 TEST_F(ThermostatTest, TestHeatingTemperature) {
   ParticleContainer container;
   container.addParticle(Particle({0, 0, 0}, {1.0, 0.0, 0.0}, 1.0, 0));

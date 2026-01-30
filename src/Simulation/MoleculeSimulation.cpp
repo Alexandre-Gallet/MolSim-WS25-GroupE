@@ -73,6 +73,7 @@ void MoleculeSimulation::runSimulation() {
   lj.setSigma(cfg_.lj_sigma);
   lj.setTypeParameters(cfg_.lj_types);
   lj.setGravity(cfg_.gravity);
+  lj.setParallelMethod(cfg_.parallel.method);
 
   // Initial force evaluation
   lj.calculateF(particles_);
