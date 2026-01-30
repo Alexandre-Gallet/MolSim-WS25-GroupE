@@ -240,7 +240,12 @@ The configuration is organized into the following sections:
 |               | pull_until         | Time until the pull_force is effective.                                                                             |
 |               | pull_indices       | Indices of the particles being pulled by the pull_force                                                             |
 
-Examples of a working YAML configuration files can be found at `input/`. On your local system you may have to set thread count with export OMP_NUM_THREADS=`NUM_OF_THREADS`.
+Examples of a working YAML configuration files can be found at `input/`. <br /> 
+**Warning:** On your local system you may have to set thread count manually with 
+```bash
+export OMP_NUM_THREADS=NUM_OF_THREADS
+```
+where 'NUM_OF_THREADS' represents how many threads are made available. 
 
 ##  Checkpointing
 Checkpointing is used to split the falling drop simulation into an equilibration phase and a subsequent production run that restarts from a saved simulation state.
