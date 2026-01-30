@@ -60,6 +60,9 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
+  SPDLOG_INFO("Parallel method = {}", static_cast<int>(cfg.parallel.method));
+
+
   auto container = ContainerFactory::createContainer(cfg);
   auto &particles = *container;
 
