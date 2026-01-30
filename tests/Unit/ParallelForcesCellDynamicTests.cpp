@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
 #include <array>
-#include <vector>
 #include <cmath>
+#include <vector>
 
 #include "Container/LinkedCellContainer.h"
 #include "ForceCalculation/LennardJones.h"
@@ -47,9 +47,8 @@ TEST(ParallelForcesTest, CellDynamicMatchesSerialForcesLinkedCell) {
   }
 
   LinkedCellContainer lc(/*r_cutoff=*/3.0, /*domain_size=*/{10.0, 10.0, 10.0});
-  lc.setBoundaryConditions({BoundaryCondition::None, BoundaryCondition::None,
-                            BoundaryCondition::None, BoundaryCondition::None,
-                            BoundaryCondition::None, BoundaryCondition::None});
+  lc.setBoundaryConditions({BoundaryCondition::None, BoundaryCondition::None, BoundaryCondition::None,
+                            BoundaryCondition::None, BoundaryCondition::None, BoundaryCondition::None});
 
   lc.emplaceParticle({2.0, 2.0, 2.0}, {0.0, 0.0, 0.0}, 1.0, 0);
   lc.emplaceParticle({3.0, 2.2, 2.1}, {0.0, 0.0, 0.0}, 1.0, 2);

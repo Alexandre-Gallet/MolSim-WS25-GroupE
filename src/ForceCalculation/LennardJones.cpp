@@ -118,10 +118,14 @@ void LennardJones::calculateF(Container &particles) {
         const bool p2_owned = !p2.isGhost();
 
         if (p1_owned) {
-          fx[base + i] += dfx; fy[base + i] += dfy; fz[base + i] += dfz;
+          fx[base + i] += dfx;
+          fy[base + i] += dfy;
+          fz[base + i] += dfz;
         }
         if (p2_owned) {
-          fx[base + j] -= dfx; fy[base + j] -= dfy; fz[base + j] -= dfz;
+          fx[base + j] -= dfx;
+          fy[base + j] -= dfy;
+          fz[base + j] -= dfz;
         }
       };
 
@@ -183,8 +187,12 @@ void LennardJones::calculateF(Container &particles) {
         computeForceComponents(p1, p2, mixed.epsilon24, mixed.sigma6, dfx, dfy, dfz);
 
         const std::size_t base = static_cast<std::size_t>(tid) * n;
-        fx[base + i] += dfx; fy[base + i] += dfy; fz[base + i] += dfz;
-        fx[base + j] -= dfx; fy[base + j] -= dfy; fz[base + j] -= dfz;
+        fx[base + i] += dfx;
+        fy[base + i] += dfy;
+        fz[base + i] += dfz;
+        fx[base + j] -= dfx;
+        fy[base + j] -= dfy;
+        fz[base + j] -= dfz;
       };
 
       lc->forEachPairCellDynamic(visitorDyn);

@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
-#include <array>
-#include <vector>
-#include <cmath>
 #include <algorithm>
+#include <array>
+#include <cmath>
+#include <vector>
 
 #include "Container/LinkedCellContainer.h"
 #include "ForceCalculation/LennardJones.h"
@@ -34,8 +34,7 @@ std::vector<std::array<double, 3>> snapshotForces(Container &c) {
   return out;
 }
 
-void expectForceArraysNear(const std::vector<std::array<double,3>> &a,
-                           const std::vector<std::array<double,3>> &b,
+void expectForceArraysNear(const std::vector<std::array<double, 3>> &a, const std::vector<std::array<double, 3>> &b,
                            double absTol, double relTol) {
   ASSERT_EQ(a.size(), b.size());
   for (std::size_t i = 0; i < a.size(); ++i) {
@@ -62,7 +61,7 @@ void requireAtLeastTwoThreadsOrSkip() {
   }
 }
 
-} // namespace
+}  // namespace
 
 // ------------------------------------------------------------
 // TEST 1: PairStatic vs Serial, periodic across boundary
@@ -75,24 +74,24 @@ TEST(ParallelForcesTest, PairStaticMatchesSerial_WithPeriodicGhostsAcrossBoundar
 
   // Periodic in X and Y, none in Z (but Z periodic would also work)
   lc.setBoundaryConditions({
-    BoundaryCondition::Periodic, BoundaryCondition::Periodic, // X min/max
-    BoundaryCondition::Periodic, BoundaryCondition::Periodic, // Y min/max
-    BoundaryCondition::None,     BoundaryCondition::None      // Z min/max
+      BoundaryCondition::Periodic, BoundaryCondition::Periodic,  // X min/max
+      BoundaryCondition::Periodic, BoundaryCondition::Periodic,  // Y min/max
+      BoundaryCondition::None, BoundaryCondition::None           // Z min/max
   });
 
   // Two particles close across X boundary:
   // pA at x=0.2, pB at x=9.9 => wrapped distance 0.3 (within cutoff)
-  lc.emplaceParticle({0.2, 5.0, 5.0}, {0.0,0.0,0.0}, 1.0, /*type=*/0);
-  lc.emplaceParticle({9.9, 5.0, 5.0}, {0.0,0.0,0.0}, 1.0, /*type=*/2);
+  lc.emplaceParticle({0.2, 5.0, 5.0}, {0.0, 0.0, 0.0}, 1.0, /*type=*/0);
+  lc.emplaceParticle({9.9, 5.0, 5.0}, {0.0, 0.0, 0.0}, 1.0, /*type=*/2);
 
   // A couple extra interior particles so it isn't too degenerate
-  lc.emplaceParticle({5.0, 5.0, 5.0}, {0.0,0.0,0.0}, 1.0, /*type=*/0);
-  lc.emplaceParticle({6.2, 5.3, 5.1}, {0.0,0.0,0.0}, 1.0, /*type=*/2);
+  lc.emplaceParticle({5.0, 5.0, 5.0}, {0.0, 0.0, 0.0}, 1.0, /*type=*/0);
+  lc.emplaceParticle({6.2, 5.3, 5.1}, {0.0, 0.0, 0.0}, 1.0, /*type=*/2);
 
   lc.rebuild();
 
   LennardJones lj;
-  lj.setGravity({0.0,0.0,0.0});
+  lj.setGravity({0.0, 0.0, 0.0});
   lj.setTypeParameters({LJTypeParams{0, 1.0, 1.2}, LJTypeParams{2, 1.0, 1.1}});
 
   resetForces(lc);
@@ -116,16 +115,13 @@ TEST(ParallelForcesTest, CellDynamicMatchesSerial_NoBoundaries) {
   requireAtLeastTwoThreadsOrSkip();
 
   LinkedCellContainer lc(/*r_cutoff=*/3.0, /*domain_size=*/{10.0, 10.0, 10.0});
-  lc.setBoundaryConditions({
-    BoundaryCondition::None, BoundaryCondition::None,
-    BoundaryCondition::None, BoundaryCondition::None,
-    BoundaryCondition::None, BoundaryCondition::None
-  });
+  lc.setBoundaryConditions({BoundaryCondition::None, BoundaryCondition::None, BoundaryCondition::None,
+                            BoundaryCondition::None, BoundaryCondition::None, BoundaryCondition::None});
 
-  lc.emplaceParticle({2.0, 2.0, 2.0}, {0,0,0}, 1.0, 0);
-  lc.emplaceParticle({3.0, 2.2, 2.1}, {0,0,0}, 1.0, 2);
-  lc.emplaceParticle({7.0, 7.0, 7.0}, {0,0,0}, 2.0, 0);
-  lc.emplaceParticle({6.5, 7.2, 6.8}, {0,0,0}, 2.0, 2);
+  lc.emplaceParticle({2.0, 2.0, 2.0}, {0, 0, 0}, 1.0, 0);
+  lc.emplaceParticle({3.0, 2.2, 2.1}, {0, 0, 0}, 1.0, 2);
+  lc.emplaceParticle({7.0, 7.0, 7.0}, {0, 0, 0}, 2.0, 0);
+  lc.emplaceParticle({6.5, 7.2, 6.8}, {0, 0, 0}, 2.0, 2);
 
   // Optional wall particle if you want:
   // lc.emplaceParticle({5.0,5.0,5.0}, {0,0,0}, 999999.0, 1);
@@ -133,7 +129,7 @@ TEST(ParallelForcesTest, CellDynamicMatchesSerial_NoBoundaries) {
   lc.rebuild();
 
   LennardJones lj;
-  lj.setGravity({0.0,0.0,0.0});
+  lj.setGravity({0.0, 0.0, 0.0});
   lj.setTypeParameters({LJTypeParams{0, 1.0, 1.2}, LJTypeParams{2, 1.0, 1.1}});
 
   resetForces(lc);
@@ -157,20 +153,20 @@ TEST(ParallelForcesTest, CellDynamicMatchesSerial_WithPeriodicGhostsAcrossBounda
 
   LinkedCellContainer lc(/*r_cutoff=*/3.0, /*domain_size=*/{10.0, 10.0, 10.0});
   lc.setBoundaryConditions({
-    BoundaryCondition::Periodic, BoundaryCondition::Periodic, // X
-    BoundaryCondition::Periodic, BoundaryCondition::Periodic, // Y
-    BoundaryCondition::None,     BoundaryCondition::None      // Z
+      BoundaryCondition::Periodic, BoundaryCondition::Periodic,  // X
+      BoundaryCondition::Periodic, BoundaryCondition::Periodic,  // Y
+      BoundaryCondition::None, BoundaryCondition::None           // Z
   });
 
-  lc.emplaceParticle({0.2, 5.0, 5.0}, {0.0,0.0,0.0}, 1.0, 0);
-  lc.emplaceParticle({9.9, 5.0, 5.0}, {0.0,0.0,0.0}, 1.0, 2);
-  lc.emplaceParticle({5.0, 5.0, 5.0}, {0.0,0.0,0.0}, 1.0, 0);
-  lc.emplaceParticle({6.2, 5.3, 5.1}, {0.0,0.0,0.0}, 1.0, 2);
+  lc.emplaceParticle({0.2, 5.0, 5.0}, {0.0, 0.0, 0.0}, 1.0, 0);
+  lc.emplaceParticle({9.9, 5.0, 5.0}, {0.0, 0.0, 0.0}, 1.0, 2);
+  lc.emplaceParticle({5.0, 5.0, 5.0}, {0.0, 0.0, 0.0}, 1.0, 0);
+  lc.emplaceParticle({6.2, 5.3, 5.1}, {0.0, 0.0, 0.0}, 1.0, 2);
 
   lc.rebuild();
 
   LennardJones lj;
-  lj.setGravity({0.0,0.0,0.0});
+  lj.setGravity({0.0, 0.0, 0.0});
   lj.setTypeParameters({LJTypeParams{0, 1.0, 1.2}, LJTypeParams{2, 1.0, 1.1}});
 
   resetForces(lc);
